@@ -20,14 +20,27 @@
         .active1:hover, .active3:hover  {
             color: #8CD998;
         }
-        
     </style>
 </head>
 
 <body data-bs-theme="dark">
     
-
-    <h1>DOCUMENTS</h1>
+    <div class="container-fluid p-3">
+        <div class="row">
+            <div class="col-3">
+                <div class="filterCard p-3">
+                    
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="contentCard p-4">
+                    <div class="row">
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </body>
