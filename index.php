@@ -31,7 +31,7 @@
                     </li>
                     <li class="nav-item">
                         <div class="d-flex flex-row align-items-center">
-                            <a class="nav-link active3" href="signIn.html">Sign In/Sign Up</a>
+                            <a class="nav-link active3" href="signIn.php">Sign In/Sign Up</a>
                             <div class="bg-secondary" style="width: 75px; height: 75px; border-radius: 50%;">
                                 <img src="assets/images/defaultProfile.png"
                                     style="object-fit: cover; width: 100%; height: 100%;" alt="Profile">
