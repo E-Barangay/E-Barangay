@@ -12,7 +12,7 @@
 <body data-bs-theme="dark">
     <nav class="navbar navbar-expand-lg bg-body-tertiary p-0">
         <div class="container-fluid shadow">
-            <a class="navbar-brand d-flex align-items-center gap-3" href="navbar.html">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
                 <img src="assets/images/logoSanAntonio.png" alt="San Antonio Logo" width="100" height="125">
                 <img src="assets/images/logoSantoTomas.png" alt="Santo Tomas Logo" width="100" height="100">
                 <span class="fw-bold">Barangay San Antonio</span>
@@ -24,10 +24,10 @@
             <div class="collapse navbar-collapse " id="navbarNav">
                 <ul class="navbar-nav ms-auto d-flex align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active1" href="documents.html">Documents</a>
+                        <a class="nav-link active1" href="documents.php">Documents</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active2" href="reports.html">Reports</a>
+                        <a class="nav-link active2" href="reports.php">Reports</a>
                     </li>
                     <li class="nav-item">
                         <div class="d-flex flex-row align-items-center">

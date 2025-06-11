@@ -1,0 +1,100 @@
+* {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.active2 {
+    color: #0C8888;
+    font-weight: bold;
+}
+
+.active1,
+.active3,
+.active4 {
+    font-weight: bold;
+    color: white;
+}
+
+.filterCard {
+    position: sticky;
+    top: 0;
+}
+
+.searchIcon {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+}
+
+input.form-control:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.filterButton {
+    background-color: transparent;
+    color: #19AFA5;
+    border: 1px solid #19AFA5;
+}
+
+.filterButton:hover {
+    background-color: #19AFA5;
+    color: black;
+    border: none;
+}
+
+.contentCard {
+    height: 100%;
+}
+
+.contentButton {
+    width: 100%;
+    background-color: #19AFA5;
+    border: none;
+    color: white
+}
+
+.contentButton:hover {
+    background-color: #11A1A1;
+}
+
+.documentCard {
+    width: 100%;
+    height: 250px;
+    border: none;
+}
+
+.filterButtonPop {
+    position: fixed;
+    width: 3.5rem;
+    height: 3.5rem;
+    bottom: 2rem;
+    right: 2rem;
+    border-radius: 50%;
+    border: none;
+    background-color: #0C8888;
+    color: white;
+    text-align: center;
+    z-index: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.filterButtonPop:hover {
+    background-color: #11A1A1;
+}
+
+#scrollable {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#scrollable::-webkit-scrollbar {
+    display: none;
+}
