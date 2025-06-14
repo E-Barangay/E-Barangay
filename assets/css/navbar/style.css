@@ -24,3 +24,15 @@
     color: #19AFA5;
     font-size: 1.2rem; 
 }
+
+.dropdown-icon {
+    color: #19AFA5;
+}
+
+.dropdown-item {
+    color: white;
+}
+
+.dropdown-item:hover {
+    color: #19AFA5;
+}
