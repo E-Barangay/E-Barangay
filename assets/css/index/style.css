@@ -11,3 +11,20 @@ html {
 .active1 {
     color: #19AFA5;
 }
+
+.viewButton{
+    background-color: transparent;
+    color: white;
+    border: 1px solid #19AFA5;
+    border-radius: 12px;
+}
+
+.viewButton:hover {
+    background-color: #19AFA5;
+    color: black;
+    border: 1px solid #19AFA5;
+}
+
+.custom-title{
+    color: #19AFA5;
+}
