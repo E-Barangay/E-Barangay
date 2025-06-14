@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg">
-    <div class="container border-bottom p-1">
+    <div class="container navbarStyling p-1">
 
         <a class="navbar-brand d-flex align-items-center gap-2" href="index.php">
             <img class="sanAntonioLogo" src="assets/images/logoSanAntonio.png" alt="San Antonio Logo">
@@ -14,19 +14,17 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto d-flex align-items-center">
-                <li class="nav-item">
+                <li class="nav-item mx-1">
                     <a class="nav-link active1" href="index.php">Home</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item mx-1">
                     <a class="nav-link active2" href="documents.php">Documents</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item mx-1">
                     <a class="nav-link active3" href="reports.php">Reports</a>
                 </li>
-                <li class="nav-item">
-                    <div class="d-flex flex-row align-items-center">
-                        <a class="nav-link active4" href="signIn.php">Sign In / Sign Up</i></a>
-                    </div>
+                <li class="nav-item mx-1">
+                    <a class="nav-link active4" href="signIn.php">Sign In / Sign Up</i></a>
                 </li>
             </ul>
         </div>

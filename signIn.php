@@ -11,7 +11,6 @@
 </head>
 
 <body data-bs-theme="dark">
-    <?php include("sharedAssets/navbar.php") ?>
     <div class="container p-3 p-md-5">
         <div class="card p-3" style="min-height: 75vh">
             <div class="row">
