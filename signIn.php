@@ -7,41 +7,69 @@
     <title>Sign In</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/navbar/style.css">
+    <link rel="stylesheet" href="assets/css/signin/style.css">
+
+    <style>
+
+    </style>
 </head>
 
-<body data-bs-theme="dark">
-    <div class="container p-3 p-md-5">
-        <div class="card p-3" style="min-height: 75vh">
-            <div class="row">
-                <div class="col-md-3 col-0"></div>
-                <div class="col-md-6 col-12 d-flex flex-column">
-                    <div class="text-center mt-5 mb-5">
-                        <h2>SIGN IN</h2>
+<body data-bs-theme="light">
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Side Image -->
+            <div class="col-md-7 d-none d-md-block p-0">
+                <img src="assets/images/bg.png" class="left-img position-relative" alt="Barangay Background">
+                <!-- <div class="fs-6 fw-bolder position-absolute top-0 left-0 ms-3 mt-3 text-white" style = "color: #19AFA5">
+                    <a href = "index.php">Return Home</a></div> -->
+            </div>
+
+            <!-- Right Side Sign In -->
+            <div class="col-md-5 col-12 d-flex align-items-center justify-content-center" style = "height: 100vh">
+                <!-- <div class="card rounded-5 w-100 shadow sign-in-card p-5"> -->
+                    <div class="w-100">
+
+                    <div class="text-center mb-2">
+                        <div class="d-flex flex-row justify-content-center align-items-center gap-3">
+                            <img src="assets/images/logoSanAntonio.png" class="img-fluid" style="max-width: 60px;"
+                                alt="Logo">
+                            <img src="assets/images/logoSantoTomas.png" class="img-fluid" style="max-width: 60px;"
+                                alt="Logo">
+                        </div>
+
+                        <h2 class="mb-0">Brgy. San Antonio</h2>
+                        <div class="fs-6">Sto. Tomas, Batangas</div>
+
+                        <p class="fs-6 fst-italic text-center">
+                            Serving the vibrant community of Barangay San Antonio, Santo Tomas, Batangas — where
+                            tradition meets progress.
+                        </p>
+
                     </div>
-                    <div class="mb-5 mt-3">
-                        <label class="form-label text-start">Email/Phone Number</label>
-                        <input type="email" class="form-control w-100 h-25">
 
-                        <label class="form-label mt-3">Password</label>
-                        <input type="password" class="form-control w-100 h-25" aria-describedby="passwordHelpBlock">
-                        <div class="text-end mt-2">Forgot Password</div>
+                    <div class="mb-4 mt-3 d-flex flex-column align-items-center">
+                        <label class="form-label w-75">Email/Phone Number</label>
+                        <input type="email" placeholder="Email" class="form-control w-75">
+
+                        <label class="form-label mt-3 w-75">Password</label>
+                        <input type="password" placeholder="Password" class="form-control w-75"
+                            aria-describedby="passwordHelpBlock">
+
+                        <div class="text-end mt-2 w-75">
+                            <a href="#">Forgot Password?</a>
+                        </div>
                     </div>
 
-                    <div class="d-flex flex-row justify-content-center mb-md-5 m-0">
-                        <button type="button" class="rounded-5 btn btn-primary fs-5" style="width: 200px">Log
-                            in</button>
+                    <div class="d-flex justify-content-center mb-4">
+                        <button type="button" class="btn btn-custom rounded-5 fs-5 px-5">Log in</button>
                     </div>
 
-
-
-                    <div class="fs-6 mt-md-5 mt-2 mb-3 text-center">
+                    <div class="fs-6 text-center">
                         Need an Account? <a href="signup.php">Sign Up</a>
                     </div>
 
-
                 </div>
-                <div class="col-md-3 col-0"></div>
             </div>
         </div>
     </div>

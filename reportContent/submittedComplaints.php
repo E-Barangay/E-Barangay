@@ -1,4 +1,4 @@
-<div class="card content">
+<div class="content">
   <div class="p-5">
     <table class="mt-2 table table-striped text-center">
       <thead>

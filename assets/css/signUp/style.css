@@ -1,9 +1,39 @@
-* {
+/* * {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-}
+} */
 
 html {
     scroll-behavior: smooth;
+}
+
+body {
+    background-color: #F1FAF9;
+    overflow-x: hidden;
+    margin: 0;
+}
+
+.left-img {
+    height: 100vh;
+    object-fit: cover;
+    width: 100%;
+}
+
+.sign-in-card {
+    min-height: 75vh;
+}
+
+.form-control:focus {
+    border-color: #19AFA5;
+    box-shadow: 0 0 0 0.2rem rgba(25, 175, 165, 0.25);
+}
+
+.btn-custom {
+    background-color: #19AFA5;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #178f87;
 }
