@@ -1,0 +1,73 @@
+      body {
+          font-family: 'Poppins', sans-serif;
+          background-color: #b6c5c5;
+      }
+
+      .sidebar {
+          background-color: #E0E0E0;
+          min-height: 100vh;
+          border-right: 3px solid #CCCCCC;
+          position: sticky;
+          top: 0;
+          height: 100vh;
+          overflow-y: auto;
+      }
+
+      .nav-button {
+          background-color: #19AFA5;
+          color: #000;
+          border: none;
+          border-radius: 8px;
+          font-weight: 500;
+          font-size: 0.9rem;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-button:hover {
+          background-color: #11A1A1;
+          color: #000;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          text-decoration: none;
+      }
+
+      .nav-button.active {
+          background-color: #0A6E6E;
+          color: #fff;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .logout-button {
+          background-color: rgb(252, 108, 92);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-weight: 500;
+          font-size: 0.9rem;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .logout-button:hover {
+          background-color: rgb(131, 51, 42);
+          color: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          text-decoration: none;
+      }
+
+      .offcanvas-header {
+          background-color: #E0E0E0;
+          border-bottom: 3px solid #CCCCCC;
+      }
+
+      .offcanvas-body {
+          background-color: #E0E0E0;
+      }
+
+      .main-content {
+          min-height: 100vh;
+      }
