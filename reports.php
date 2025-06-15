@@ -39,11 +39,12 @@ if (isset($_GET['page'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/navbar/style.css">
     <link rel="stylesheet" href="assets/css/reports/style.css">
     <link rel="stylesheet" href="assets/css/footer/style.css">
-      
- 
+
+
 </head>
 
 <body data-bs-theme="dark">
@@ -53,25 +54,43 @@ if (isset($_GET['page'])) {
     <div class="container pt-3">
         <div class="row">
             <div class="col-12 col-lg-3 p-0">
-                <div class="filterCard card m-1 p-2 d-none d-sm-block">
-                    <div class="row mt-4">
+                <div class="filterCard card m-1 p-2 d-none d-md-block">
+                    <div class="row mt-2">
                         <div class="col d-flex flex-column align-items-center">
-                            <a href="?page=complaintSection" class="btn btn-custom btn-width mb-2">Complaint
-                                Section</a>
-                            <a href="?page=makeComplaint" class="btn btn-custom btn-width mb-2">Make A Complaint</a>
-                            <a href="?page=submittedComplaints" class="btn btn-custom btn-width mb-2">Submitted
-                                Complaints</a>
+                            <a href="?page=complaintSection" class="btn btn-custom btn-width mb-2">Home</a>
+                            <a href="?page=makeComplaint" class="btn btn-custom btn-width mb-2">File a Complaint</a>
+                            <a href="?page=submittedComplaints" class="btn btn-custom btn-width mb-2">Submitted</a>
                         </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2 px-5 d-sm-none d-flex justify-content-center">
+                    <div class="col-4 d-flex justify-content-center">
+                        <a href="?page=complaintSection" class="btn btn-custom p-2 w-100 text-center">
+                            <i class="bi bi-house-door-fill"></i>
+                        </a>
+                    </div>
+                    <div class="col-4 d-flex justify-content-center">
+                        <a href="?page=makeComplaint" class="btn btn-custom p-2 w-100 text-center">
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                        </a>
+                    </div>
+                    <div class="col-4 d-flex justify-content-center">
+                        <a href="?page=submittedComplaints" class="btn btn-custom p-2 w-100 text-center">
+                            <i class="bi bi-send-fill"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
+
             <div class="col-12 col-lg-9 ">
-                <div class="card cardBorder m-1 p-2">
+                <div class="card cardBorder m-1 p-0 p-md-2">
                     <?php include("reportContent/" . $page . ".php"); ?>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <?php include("sharedAssets/footer.php") ?>

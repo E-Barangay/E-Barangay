@@ -1,5 +1,5 @@
 <div class="content">
-    <div class="p-5">
+    <div class="p-md-5 p-4">
         <div class="d-flex flex-column align-items-center mb-5">
             <div class="card d-inline-block p-3 mt-5 text-center" style = "background-color: #0C8888">
                 <h2 class="fw-bolder m-0 text-light">REPORT COMMUNITY CONCERNS</h2>

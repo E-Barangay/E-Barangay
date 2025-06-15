@@ -133,7 +133,7 @@
                                                 <div class="col-12 my-3">
                                                     <label for="provinceInput" class="form-label">Province</label>
                                                     <input class="form-control w-100 h-75" list="dataListProvince"
-                                                        id="provinceInput" placeholder="Type to search...">
+                                                        id="provinceInput" placeholder="Province">
                                                     <datalist id="dataListProvince"></datalist>
                                                 </div>
                                             </div>
@@ -142,7 +142,7 @@
                                                 <div class="col-12 my-3">
                                                     <label for="cityInput" class="form-label">City</label>
                                                     <input class="form-control w-100 h-75" list="dataListCity"
-                                                        id="cityInput" placeholder="Type to search...">
+                                                        id="cityInput" placeholder="City">
                                                     <datalist id="dataListCity"></datalist>
                                                 </div>
                                             </div>
@@ -151,7 +151,7 @@
                                                 <div class="col-12 my-3">
                                                     <label for="barangayInput" class="form-label">Barangay</label>
                                                     <input class="form-control w-100 h-75" list="dataListBrgy"
-                                                        id="barangayInput" placeholder="Type to search...">
+                                                        id="barangayInput" placeholder="Barangay">
                                                     <datalist id="dataListBrgy"></datalist>
                                                 </div>
                                             </div>
