@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg">
-    <div class="container navbarStyling p-1">
+    <div class="container navbarStyling p-3">
 
         <a class="navbar-brand d-flex align-items-center gap-2" href="index.php">
             <img class="sanAntonioLogo" src="assets/images/logoSanAntonio.png" alt="San Antonio Logo">

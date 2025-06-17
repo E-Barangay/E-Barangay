@@ -44,7 +44,7 @@
             <div class="col">
                 <div class="card border-0">
                     <div id="carouselExample" class="carousel slide">
-                        <div class="carousel-inner" style="height: 600px;">
+                        <div class="carousel-inner rounded-4" style="height: 600px;">
                             <div class="carousel-item active">
                                 <img src="assets/images/announcements/image.png"
                                     class="d-block w-100 h-100 object-fit-cover" alt="...">

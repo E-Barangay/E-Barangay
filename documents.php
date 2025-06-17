@@ -30,6 +30,18 @@ if (isset($_GET['content'])) {
 
 include ("sharedAssets/connect.php");
 
+$searchTerm = '';
+
+$documentsQuery = "SELECT * FROM `documenttypes`";
+
+if (isset($_GET['search']) && !empty($_GET['search'])) {
+    $searchTerm = $_GET['search'];
+    $searchTerm = str_replace("'", "", $searchTerm);
+    $documentsQuery .= " AND documentName LIKE '%$searchTerm%'";
+}
+
+$documentsResult = executeQuery($documentsQuery);
+
 ?>
 
 <!doctype html>
@@ -55,60 +67,67 @@ include ("sharedAssets/connect.php");
     <?php include("sharedAssets/navbar.php") ?>
     
     <div class="container pt-3">
-        <div class="row">
-            <div class="col-12 col-lg-3 p-0">
+        <form method="GET">
+            <div class="row">
+                <div class="col-12 col-lg-3 p-0">
 
-                <!-- Pop Up when screen is in small size -->
+                    <!-- Pop Up when screen is in small size -->
 
-                    <!-- Search Bar -->
-                    <div class="searchBarPop position-relative d-block d-sm-none mb-4 mx-1">
-                        <input class="form-control rounded-pill ps-5" type="search" placeholder="Search Documents">
-                        <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
-                    </div>
+                        <!-- Search Bar -->
+                        <div class="searchBarPop position-relative d-block d-sm-none mb-4 mx-1">
+                            <input class="form-control rounded-pill ps-5" value="<?php echo $searchTerm ?>" name="search" type="search" placeholder="Search Documents">
+                            <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
+                        </div>
 
-                    <!-- Filter Button -->
-                    <div class="d-block d-sm-none">
-                        <button class="filterButtonPop"><i class="fa-solid fa-filter"></i></button>
-                    </div>
+                        <!-- Filter Button -->
+                        <div class="d-block d-sm-none dropdown">
+                            <button class="filterButtonPop dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>" href="?content=allDocuments">All Documents</a></li>
+                                <li><a class="dropdown-item <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>" href="?content=barangayHallDocuments">Barangay Hall</a></li>
+                                <li><a class="dropdown-item <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>" href="?content=mioDocuments">Migrant Information Office</a></li>
+                                <li><a class="dropdown-item <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>" href="?content=documentRequest">Document Request</a></li>
+                            </ul>
+                        </div>
 
-                <div class="filterCard card m-1 p-2 d-none d-sm-block">
-                    <div class="row">
-                        <div class="col m-2">
-                            <div class="position-relative">
-                                <input class="form-control rounded-pill ps-5" type="search" placeholder="Search Documents">
-                                <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
+                    <div class="filterCard card m-1 p-2 d-none d-sm-block">
+                        <div class="row">
+                            <div class="col m-2">
+                                <div class="position-relative">
+                                    <input class="form-control rounded-pill ps-5" value="<?php echo $searchTerm ?>" name="search" type="search" placeholder="Search Documents">
+                                    <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
+                                </div>
                             </div>
                         </div>
+                        <div class="row d-flex flex-column mt-4">
+
+                            <!-- Filter -->
+                            <div class="col d-flex flex-column justify-content-center">
+                                <a href="?content=allDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>">All Documents</a>
+                                <a href="?content=barangayHallDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>">Barangay Hall</a>
+                                <a href="?content=mioDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>">Migrant Information Office</a>
+                            </div>
+
+                            <!-- Document Request -->
+                            <div class="col d-flex justify-content-center">
+                                <a href="?content=documentRequest" class="btn btn-primary documentRequestButton m-2 mt-5 <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>">Document Request</a>
+                            </div>
+
+                        </div>
                     </div>
-                    <div class="row d-flex flex-column mt-4">
+                </div>
+                
+                <div class="col-12 col-lg-9 p-0">
+                    <div class="contentCard card m-1 p-2">
+                        <div class="row px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
 
-                        <!-- Filter -->
-                        <div class="col d-flex flex-column justify-content-center">
-                            <a href="?content=allDocuments" class="btn btn-primary filterButton m-2">All Documents</a>
-                            <a href="?content=barangayHallDocuments" class="btn btn-primary filterButton m-2">Barangay Hall</a>
-                            <a href="?content=mioDocuments" class="btn btn-primary filterButton m-2">Migrant Information Office</a>
-                            <a href="?content=barangayHealthDocuments" class="btn btn-primary filterButton m-2">Barangay Health</a>
+                            <?php include("documentContent/" . $content . ".php"); ?>
+                            
                         </div>
-
-                        <!-- Document Request -->
-                        <div class="col d-flex justify-content-center">
-                            <a href="?content=documentRequest" class="btn btn-primary documentRequestButton activeButton5 m-2 mt-5">Document Request</a>
-                        </div>
-
                     </div>
                 </div>
             </div>
-            
-            <div class="col-12 col-lg-9 p-0">
-                <div class="contentCard card m-1 p-2">
-                    <div class="row px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
-
-                        <?php include("documentContent/" . $content . ".php"); ?>
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 
     <?php include("sharedAssets/footer.php") ?>

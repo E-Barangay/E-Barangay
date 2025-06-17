@@ -33,35 +33,52 @@ input.form-control:focus {
 
 .filterButton {
     background-color: #19AFA5;
-    color: white;
+    color: black;
     border: 1px solid #19AFA5;
     border-radius: 12px;
 }
 
 .filterButton:hover {
     background-color: #19AFA5;
-    color: black;
+    color: white;
     border: 1px solid #19AFA5;
 }
 
 .documentRequestButton {
     width: 100%;
     background-color: #19AFA5;
-    color: white;
     border: 1px solid #19AFA5;
+    color: black;
     border-radius: 12px;
+}
+
+.filterButton.active {
+    background-color: #0A6E6E;
+    color: #FFFFFF;
+    border: 1px solid #0A6E6E;
+}
+
+.documentRequestButton.active {
+    background-color: #0A6E6E;
+    color: #FFFFFF;
+    border: 1px solid #0A6E6E;
 }
 
 .documentRequestButton:hover {
     background-color: #19AFA5;
-    color: black;
+    color: white;
     border: 1px solid #19AFA5;
 }
 
 .contentCard {
-    height: 100%;
+    height: 80vh;
     border-radius: 20px;
     border: 1px solid #19AFA5;
+}
+
+.form-select:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .documentCard {
@@ -78,14 +95,14 @@ input.form-control:focus {
     width: 100%;
     background-color: #19AFA5;
     border: 1px solid #19AFA5;
-    color: white;
+    color: black;
     border-radius: 12px;
 }
 
 .documentButton:hover {
     background-color: #19AFA5;
     border: 1px solid #19AFA5;
-    color: black;
+    color: white;
 }
 
 .filterButtonPop {
@@ -97,7 +114,6 @@ input.form-control:focus {
     border-radius: 50%;
     border: none;
     background-color: #19AFA5;
-    color: white;
     text-align: center;
     z-index: 1;
     cursor: pointer;
@@ -106,6 +122,11 @@ input.form-control:focus {
 
 .filterButtonPop:hover {
     background-color: #11A1A1;
+}
+
+.dropdown-item.active {
+    background-color: #19AFA5;
+    color: white;
 }
 
 #scrollable {

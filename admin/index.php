@@ -27,7 +27,7 @@ include("../sharedAssets/connect.php");
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>E-Barangay | <?php echo ucfirst($page); ?></title>
+  <title>E-Barangay | Home</title>
   <link rel="icon" href="../assets/images/logoSanAntonio.png">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css">
