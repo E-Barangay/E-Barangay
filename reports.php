@@ -47,7 +47,7 @@ if (isset($_GET['page'])) {
 
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light" style = "background-color: #F1FAF9">
 
     <?php include("sharedAssets/navbar.php") ?>
 

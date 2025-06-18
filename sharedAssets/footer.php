@@ -1,16 +1,16 @@
 <div class="container">
     <footer class="footer text-center pt-4 mt-4">
         <div class="row p-5" style="border-top: 1px solid #19AFA5; border-bottom: 1px solid #19AFA5;">
-            <div class="col-12 mb-5 mt-4">
-                <h3 style="color: white; font-weight: bold;">
+            <div class="col-12 mb-5 mt-4 text-adapt">
+                <h3 style="font-weight: bold;">
                     <span style="color:#19AFA5;">Makabagong</span> putol, <span style="color:#19AFA5;">Makikinabang</span> all!</h3>
                 </h3>
             </div>
             <div class="col-12 col-lg-5 text-center text-lg-start py-4 px-3" >
-                <h5 class="mb-3" style="color: white;">
+                <h5 class="mb-3 text-adapt">
                     Barangay<span style="color:#19AFA5;"> San Antonio</span>
                 </h5>
-                <p style="color: white;">
+                <p class = "text-adapt">
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Non tempore officia inventore minima ipsam
                     quis facilis. Aut vel quae excepturi ad, magni omnis cupiditate incidunt est eveniet vitae! Illum,
                     rerum!
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col text-center py-4" style="color: white;">
+            <div class="col text-center py-4 text-adapt">
                 © 2025 Barangay San Antonio. All Rights Reserved.
             </div>
         </div>

@@ -21,14 +21,14 @@
             <!-- Left Side Image -->
             <div class="col-md-7 d-none d-md-block p-0">
                 <img src="assets/images/bg.png" class="left-img position-relative" alt="Barangay Background">
-                <!-- <div class="fs-6 fw-bolder position-absolute top-0 left-0 ms-3 mt-3 text-white" style = "color: #19AFA5">
-                    <a href = "index.php">Return Home</a></div> -->
             </div>
 
             <!-- Right Side Sign In -->
-            <div class="col-md-5 col-12 d-flex align-items-center justify-content-center" style = "height: 100vh">
+            <div class="col-md-5 col-12 d-flex align-items-start justify-content-center"
+                style="height: 100vh; padding-top: 100px;">
+
                 <!-- <div class="card rounded-5 w-100 shadow sign-in-card p-5"> -->
-                    <div class="w-100">
+                <div class="w-100">
 
                     <div class="text-center mb-2">
                         <div class="d-flex flex-row justify-content-center align-items-center gap-3">

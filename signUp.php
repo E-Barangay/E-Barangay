@@ -20,16 +20,13 @@
             <!-- Left Side Image -->
             <div class="col-md-6 d-none d-md-block p-0">
                 <img src="assets/images/bg.png" class="left-img position-relative" alt="Barangay Background">
-                <!-- <div class="fs-6 fw-bolder position-absolute top-0 left-0 ms-3 mt-3 text-white" style = "color: #19AFA5">
-                    <a href = "index.php">Return Home</a></div> -->
             </div>
 
             <!-- Right Side Sign In -->
             <div class="col-md-6 col-12 d-flex align-items-center justify-content-center">
                 <div class="container">
-                    <!-- <div class="card rounded-5 w-100 shadow sign-in-card p-4"> -->
                         <div class="w-100">
-                        <div class="mb-4 mt-3">
+                        <div class="mb-4">
                             <div class="row">
                                 <div class="col-12">
                                     <div class="text-center mt-3 mb-2">

@@ -12,7 +12,7 @@ html {
     color: #19AFA5;
 }
 
-.viewButton{
+.viewButton {
     background-color: transparent;
     color: white;
     border: 1px solid #19AFA5;
@@ -25,11 +25,12 @@ html {
     border: 1px solid #19AFA5;
 }
 
-.custom-title{
+.custom-title {
     color: #19AFA5;
 }
 
-.carousel {
+
+/* .carousel {
     width: 100vw;
     height: 100dvh;
 }
@@ -38,4 +39,4 @@ html {
     width: 100vw;
     height: 100vh;
     object-fit: cover;
-}
+} */

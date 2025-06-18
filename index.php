@@ -47,7 +47,7 @@
                         <div class="carousel-inner rounded-4" style="height: 600px;">
                             <div class="carousel-item active">
                                 <img src="assets/images/announcements/image.png"
-                                    class="d-block w-100 h-100 object-fit-cover" alt="...">
+                                    class=" w-100 h-100 object-fit-cover" alt="...">
                             </div>
                             <div class="carousel-item">
                                 <img src="assets/images/announcements/image1.png"

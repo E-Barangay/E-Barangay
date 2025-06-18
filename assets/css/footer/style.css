@@ -1,6 +1,6 @@
 .footer-link {
     position: relative;
-    color: white;
+    color: var(--bs-body-color);
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -22,4 +22,8 @@
 
 .footer-link:hover::after {
     width: 100%;
+}
+
+.text-adapt {
+    color: var(--bs-body-color);
 }

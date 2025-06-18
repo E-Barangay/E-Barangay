@@ -3,7 +3,8 @@
 }
 
 .active1, .active2, .active3, .active4  {
-    color: white; 
+    color: var(--bs-body-color);
+    /* color: white;  */
 }
 
 .active1:hover, .active2:hover, .active3:hover, .active4:hover {
