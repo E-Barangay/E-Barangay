@@ -23,9 +23,10 @@
             </div>
 
             <!-- Right Side Sign In -->
-            <div class="col-md-6 col-12 d-flex align-items-center justify-content-center">
+            <div class="col-md-6 col-12 d-flex justify-content-center align-items-start"
+                style="height: 100vh; padding-top: 50px;">
                 <div class="container">
-                        <div class="w-100">
+                    <div class="w-100">
                         <div class="mb-4">
                             <div class="row">
                                 <div class="col-12">
@@ -37,7 +38,7 @@
                                                 style="max-width: 60px;" alt="Logo">
                                         </div>
 
-                                        <h2 class="mb-0">Brgy. San Antonio</h2>
+                                        <h2 class="mb-0">Barangay San Antonio</h2>
                                         <div class="fs-6">Sto. Tomas, Batangas</div>
 
                                         <p class="fs-6 fst-italic text-center">
@@ -145,11 +146,19 @@
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-md-6 col-12 my-3">
                                                     <label for="barangayInput" class="form-label">Barangay</label>
                                                     <input class="form-control w-100 h-75" list="dataListBrgy"
                                                         id="barangayInput" placeholder="Barangay">
                                                     <datalist id="dataListBrgy"></datalist>
+                                                </div>
+
+
+                                                <div class="col-md-6 col-12 my-3">
+                                                    <label for="cityInput" class="form-label">Street</label>
+                                                    <input class="form-control w-100 h-75" list="dataListCity"
+                                                        id="cityInput" placeholder="Street">
+                                                    <datalist id="dataListCity"></datalist>
                                                 </div>
                                             </div>
 
@@ -187,7 +196,7 @@
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="checkbox" value="" id="checkDefault">
                                         <label class="form-check-label" for="checkDefault">
-                                            I Accept The Terms & Condition
+                                            I Accept The <a href="">Terms & Condition</a>
                                         </label>
                                     </div>
 

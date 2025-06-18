@@ -25,12 +25,9 @@
 
             <!-- Right Side Sign In -->
             <div class="col-md-5 col-12 d-flex align-items-start justify-content-center"
-                style="height: 100vh; padding-top: 100px;">
-
-                <!-- <div class="card rounded-5 w-100 shadow sign-in-card p-5"> -->
+                style="height: 100vh; padding-top: 50px;">
                 <div class="w-100">
-
-                    <div class="text-center mb-2">
+                    <div class="text-center mb-5">
                         <div class="d-flex flex-row justify-content-center align-items-center gap-3">
                             <img src="assets/images/logoSanAntonio.png" class="img-fluid" style="max-width: 60px;"
                                 alt="Logo">
@@ -38,7 +35,7 @@
                                 alt="Logo">
                         </div>
 
-                        <h2 class="mb-0">Brgy. San Antonio</h2>
+                        <h2 class="mb-0">Barangay San Antonio</h2>
                         <div class="fs-6">Sto. Tomas, Batangas</div>
 
                         <p class="fs-6 fst-italic text-center">
