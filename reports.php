@@ -1,4 +1,7 @@
 <?php
+include("sharedAssets/connect.php");
+
+session_start();
 
 $page = "complaintSection";
 
@@ -6,7 +9,10 @@ if (isset($_GET['page'])) {
     $page = $_GET['page'];
     switch ($page) {
         case "makeComplaint":
-            $page = "makeComplaint";
+            if (!isset($_SESSION['userID'])) {
+                header("Location: signUp.php");
+                exit();
+            }
             break;
         case "complaintSection":
             $page = "complaintSection";
@@ -47,9 +53,15 @@ if (isset($_GET['page'])) {
 
 </head>
 
-<body data-bs-theme="light" style = "background-color: #F1FAF9">
+<body data-bs-theme="light" style="background-color: #F1FAF9">
 
-    <?php include("sharedAssets/navbar.php") ?>
+    <?php
+    if (isset($_SESSION['userID'])) {
+        include("sharedAssets/navbarLoggedIn.php");
+    } else {
+        include("sharedAssets/navbar.php");
+    }
+    ?>
 
     <div class="container pt-3">
         <div class="row">

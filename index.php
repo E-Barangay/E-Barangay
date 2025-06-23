@@ -1,3 +1,11 @@
+<?php
+
+include("sharedAssets/connect.php");
+session_start();
+
+?>
+
+
 <!doctype html>
 <html lang="en">
 
@@ -19,7 +27,13 @@
 </head>
 
 <body data-bs-theme="dark">
-    <?php include("sharedAssets/navbar.php") ?>
+    <?php
+    if (isset($_SESSION['userID'])) {
+        include("sharedAssets/navbarLoggedIn.php");
+    } else {
+        include("sharedAssets/navbar.php");
+    }
+    ?>
 
     <div class="container">
         <div class="col">
@@ -46,8 +60,8 @@
                     <div id="carouselExample" class="carousel slide">
                         <div class="carousel-inner rounded-4" style="height: 600px;">
                             <div class="carousel-item active">
-                                <img src="assets/images/announcements/image.png"
-                                    class=" w-100 h-100 object-fit-cover" alt="...">
+                                <img src="assets/images/announcements/image.png" class=" w-100 h-100 object-fit-cover"
+                                    alt="...">
                             </div>
                             <div class="carousel-item">
                                 <img src="assets/images/announcements/image1.png"

@@ -1,3 +1,54 @@
+<?php
+
+session_start();
+
+include('sharedAssets/connect.php');
+if (isset($_POST["submit"])) {
+    $firstName = $_POST['firstName'];
+    $middleName = $_POST['middleName'];
+    $lastName = $_POST['lastName'];
+    $birthDate = $_POST['birthDate'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $reEnterPassword = $_POST['reEnterPassword'];
+    $phoneNumber = $_POST['phoneNumber'];
+    $province = $_POST['province'];
+    $city = $_POST['city'];
+    $barangay = $_POST['barangay'];
+    $street = $_POST['street'];
+    $gender = $_POST['gender'];
+    $username = $email; // Or change to a username input
+    $role = "user";
+
+    if ($password === $reEnterPassword) {
+
+        // Step 1: Insert into userInfo
+        $insertInfo = "INSERT INTO userInfo (firstName, middleName, lastName, gender, birthDate, profilePicture) 
+            VALUES ('$firstName', '$middleName', '$lastName', '$gender', '$birthDate', NULL)";
+
+        $infoResult = executeQuery($insertInfo);
+
+        if ($infoResult) {
+            $userInfoID = mysqli_insert_id($conn); // get userInfoID
+
+            // Step 2: Insert into users table with link to userInfoID
+            $insertUser = "INSERT INTO users (userInfoID, username, email, password, phoneNumber, role) 
+                                    VALUES ('$userInfoID', '$username', '$email', '$password', '$phoneNumber', '$role')";
+
+            $userResult = executeQuery($insertUser);
+
+            if ($userResult) {
+                $_SESSION['userID'] = $userInfoID;
+                header("location:index.php");
+            }
+        }
+    } else {
+        echo "<script>alert('Passwords do not match');</script>";
+    }
+}
+?>
+
+
 <!doctype html>
 <html lang="en">
 
@@ -23,14 +74,13 @@
             </div>
 
             <!-- Right Side Sign In -->
-            <div class="col-md-6 col-12 d-flex justify-content-center align-items-start"
-                style="height: 100vh; padding-top: 50px;">
+            <div class="col-md-6 col-12 d-flex justify-content-center align-items-start">
                 <div class="container">
-                    <div class="w-100">
-                        <div class="mb-4">
+                    <div class="w-100 sign-in-card">
+                        <div class="">
                             <div class="row">
-                                <div class="col-12">
-                                    <div class="text-center mt-3 mb-2">
+                                <div class="col-12 ">
+                                    <div class="text-center mt-3 mb-2 ">
                                         <div class="d-flex flex-row justify-content-center align-items-center gap-3">
                                             <img src="assets/images/logoSanAntonio.png" class="img-fluid"
                                                 style="max-width: 60px;" alt="Logo">
@@ -56,34 +106,38 @@
                                 <div class="d-flex flex-md-row flex-column">
                                     <div class="col-md-4 col-12 p-md-2 p-1">
                                         <div class="mb-md-2 mt-md-2 mt-0 mb-0">
-
-                                            <div class="row">
-                                                <div class="col-12 my-3">
-                                                    <label class="form-label text-start">First Name</label>
-                                                    <input type="text" class="form-control w-100 h-75">
+                                            <form action="" method="POST">
+                                                <div class="row">
+                                                    <div class="col-12 my-1">
+                                                        <label class="form-label text-start">First Name</label>
+                                                        <input type="text" name="firstName"
+                                                            class="form-control w-100 h-50" required>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row">
-                                                <div class="col-12 my-3">
-                                                    <label class="form-label text-start">Middle Name</label>
-                                                    <input type="text" class="form-control w-100 h-75">
+                                                <div class="row">
+                                                    <div class="col-12 my-1">
+                                                        <label class="form-label text-start">Middle Name</label>
+                                                        <input type="text" name="middleName"
+                                                            class="form-control w-100 h-50" required>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row">
-                                                <div class="col-12 my-3">
-                                                    <label class="form-label text-start">Last Name</label>
-                                                    <input type="text" class="form-control w-100 h-75">
+                                                <div class="row">
+                                                    <div class="col-12 my-1">
+                                                        <label class="form-label text-start">Last Name</label>
+                                                        <input type="text" name="lastName"
+                                                            class="form-control w-100 h-50" required>
+                                                    </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row">
-                                                <div class="col-12 my-3">
-                                                    <label class="form-label text-start">Birth Date</label>
-                                                    <input type="date" class="form-control w-100 h-75">
+                                                <div class="row">
+                                                    <div class="col-12 my-1">
+                                                        <label class="form-label text-start">Birth Date</label>
+                                                        <input type="date" name="birthDate"
+                                                            class="form-control w-100 h-50" required>
+                                                    </div>
                                                 </div>
-                                            </div>
 
 
 
@@ -94,30 +148,34 @@
                                         <div class="mb-md-2 mt-md-2 mt-0 mb-0">
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <label class="form-label text-start">Email</label>
-                                                    <input type="email" class="form-control w-100 h-75">
+                                                    <input type="email" name="email" class="form-control w-100 h-50"
+                                                        required>
                                                 </div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <label class="form-label text-start">Password</label>
-                                                    <input type="password" class="form-control w-100 h-75">
+                                                    <input type="password" name="password"
+                                                        class="form-control w-100 h-50" required>
                                                 </div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <label class="form-label text-start">Re-enter Password</label>
-                                                    <input type="password" class="form-control w-100 h-75">
+                                                    <input type="password" name="reEnterPassword"
+                                                        class="form-control w-100 h-50" required>
                                                 </div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <label class="form-label text-start">Phone Number</label>
-                                                    <input type="number" class="form-control w-100 h-75">
+                                                    <input type="number" name="phoneNumber"
+                                                        class="form-control w-100 h-50">
                                                 </div>
                                             </div>
                                         </div>
@@ -128,52 +186,54 @@
                                         <div class="mb-md-2 mt-md-2 mt-0 mb-0">
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <label for="provinceInput" class="form-label">Province</label>
-                                                    <input class="form-control w-100 h-75" list="dataListProvince"
-                                                        id="provinceInput" placeholder="Province">
+                                                    <input class="form-control w-100 h-50" list="dataListProvince"
+                                                        id="provinceInput" name="province" placeholder="Province"
+                                                        required>
                                                     <datalist id="dataListProvince"></datalist>
                                                 </div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <label for="cityInput" class="form-label">City</label>
-                                                    <input class="form-control w-100 h-75" list="dataListCity"
-                                                        id="cityInput" placeholder="City">
+                                                    <input class="form-control w-100 h-50" list="dataListCity"
+                                                        id="cityInput" name="city" placeholder="City" required>
                                                     <datalist id="dataListCity"></datalist>
                                                 </div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-md-6 col-12 my-3">
+                                                <div class="col-md-6 col-12 my-1">
                                                     <label for="barangayInput" class="form-label">Barangay</label>
-                                                    <input class="form-control w-100 h-75" list="dataListBrgy"
-                                                        id="barangayInput" placeholder="Barangay">
+                                                    <input class="form-control w-100 h-50" list="dataListBrgy"
+                                                        id="barangayInput" name="barangay" placeholder="Barangay"
+                                                        required>
                                                     <datalist id="dataListBrgy"></datalist>
                                                 </div>
 
 
-                                                <div class="col-md-6 col-12 my-3">
+                                                <div class="col-md-6 col-12 my-1">
                                                     <label for="cityInput" class="form-label">Street</label>
-                                                    <input class="form-control w-100 h-75" list="dataListCity"
-                                                        id="cityInput" placeholder="Street">
+                                                    <input class="form-control w-100 h-50" list="dataListCity"
+                                                        id="cityInput" name="street" placeholder="Street">
                                                     <datalist id="dataListCity"></datalist>
                                                 </div>
                                             </div>
 
                                             <div class="row">
-                                                <div class="col-12 my-3">
+                                                <div class="col-12 my-1">
                                                     <p>Gender</p>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="radioDefault"
+                                                        <input class="form-check-input" type="radio" name="gender"
                                                             id="radioDefault1" checked>
                                                         <label class="form-check-label" for="radioDefault1">
                                                             Male
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="radioDefault"
+                                                        <input class="form-check-input" type="radio" name="gender"
                                                             id="radioDefault2">
                                                         <label class="form-check-label" for="radioDefault2">
                                                             Female
@@ -194,15 +254,17 @@
                                 <div class="d-flex flex-column align-items-center">
 
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" value="" id="checkDefault">
+                                        <input class="form-check-input" type="checkbox" value="" id="checkDefault"
+                                            required>
                                         <label class="form-check-label" for="checkDefault">
                                             I Accept The <a href="">Terms & Condition</a>
                                         </label>
                                     </div>
 
-                                    <button type="button" class="rounded-5 btn btn-custom fs-5"
+                                    <button type="submit" name="submit" class="rounded-5 btn btn-custom fs-5 mb-3"
                                         style="width: 200px; background-color: #19AFA5">Create Account</button>
                                 </div>
+                                </form>
                             </div>
                         </div>
                     </div>

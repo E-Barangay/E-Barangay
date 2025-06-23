@@ -1,3 +1,25 @@
+<?php
+
+if (isset($_POST['logOut'])) {
+    session_destroy();
+    header("location: index.php");
+}
+
+$firstName = "User"; // default fallback
+if (isset($_SESSION['userID'])) {
+    $userID = $_SESSION['userID'];
+
+    // Query to get the first name from your userInfo table
+    $query = "SELECT firstName FROM userinfo WHERE userInfoID = '$userID'";
+    $result = mysqli_query($conn, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $firstName = $row['firstName'];
+    }
+}
+?>
+
 <nav class="navbar navbar-expand-lg">
     <div class="container navbarStyling p-1">
 
@@ -24,13 +46,22 @@
                     <a class="nav-link active3" href="reports.php">Reports</a>
                 </li>
                 <li class="nav-item mx-1 dropdown">
-                    <a class="nav-link active4 text-center dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Hi, User! <i class="fa-solid fa-user"></i>
+                    <a class="nav-link active4 text-center dropdown-toggle" href="#" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Hi, <?php echo $firstName ?> <i class="fa-solid fa-user"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user dropdown-icon"></i> Profile</a></li>
-                        <li><button class="dropdown-item"><i class="fa-solid fa-sun dropdown-icon"></i> Light Mode</button></li>
-                        <li><a class="dropdown-item" href="signIn.php"><i class="fa-solid fa-right-from-bracket dropdown-icon"></i> Log-out</a></li>
+                        <li><a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user dropdown-icon"></i>
+                                Profile</a></li>
+                        <li><button class="dropdown-item"><i class="fa-solid fa-sun dropdown-icon"></i> Light
+                                Mode</button></li>
+                        <form action="" method="POST">
+                            <li>
+                                <button class="dropdown-item" type="submit" name="logOut">
+                                    <i class="fa-solid fa-right-from-bracket dropdown-icon"></i> Log-out
+                                </button>
+                            </li>
+                        </form>
                     </ul>
                 </li>
             </ul>

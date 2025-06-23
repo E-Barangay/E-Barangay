@@ -2,28 +2,34 @@
     border-bottom: 1px solid #19AFA5;
 }
 
-.active1, .active2, .active3, .active4  {
+.active1,
+.active2,
+.active3,
+.active4 {
     color: var(--bs-body-color);
     /* color: white;  */
 }
 
-.active1:hover, .active2:hover, .active3:hover, .active4:hover {
+.active1:hover,
+.active2:hover,
+.active3:hover,
+.active4:hover {
     color: #19AFA5;
 }
 
 .sanAntonioLogo {
-    width: 45px; 
+    width: 45px;
     height: 45px;
 }
 
 .santoTomasLogo {
-    width: 45px; 
+    width: 45px;
     height: 45px;
 }
 
 .barangayName {
     color: #19AFA5;
-    font-size: 1.2rem; 
+    font-size: 1.2rem;
 }
 
 .dropdown-icon {
@@ -31,7 +37,7 @@
 }
 
 .dropdown-item {
-    color: white;
+    color: var(--bs-body-color);
 }
 
 .dropdown-item:hover {

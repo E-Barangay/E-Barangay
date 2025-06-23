@@ -1,3 +1,22 @@
+<?php
+
+$reports = [];
+
+if (isset($_SESSION['userID'])) {
+  $userID = $_SESSION['userID'];
+
+  $sql = "SELECT * FROM reports WHERE userID = '$userID'";
+  $result = mysqli_query($conn, $sql);
+
+  if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+      $reports[] = $row;
+    }
+  }
+}
+?>
+
+
 <div class="content">
   <div class="p-md-5 p-4">
     <div class="d-flex justify-content-center mb-3">
@@ -15,18 +34,20 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>1</td>
-          <td>2025-04-30 02:45 PM</td>
-          <td>“Trash everywhere”</td>
-          <td>Sent</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>2025-05-30 01:45 AM</td>
-          <td>“Batang Quiapo”</td>
-          <td>Sent</td>
-        </tr>
+        <?php if (!empty($reports)): ?>
+          <?php foreach ($reports as $index => $report): ?>
+            <tr>
+              <td><?= $index + 1 ?></td>
+              <td><?= date("Y-m-d h:i A", strtotime($report['requestDate'])) ?></td>
+              <td><?= htmlspecialchars($report['reportTitle']) ?></td>
+              <td><?= ucfirst($report['requestStatus']) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <tr>
+            <td colspan="4">No reports submitted yet.</td>
+          </tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>
