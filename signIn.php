@@ -19,7 +19,12 @@ if (isset($_POST['submit'])) {
         $_SESSION['userID'] = $user['userID'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
-        header("Location: index.php");
+        
+        if ($user['role'] === 'admin') {
+            header("Location: admin/index.php"); 
+        } else {
+            header("Location: index.php");      
+        }
     } else {
         $_SESSION['login_error'] = true; // Set error flag
         header("Location: signin.php");   // Redirect to same page

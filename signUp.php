@@ -99,9 +99,6 @@ if (isset($_POST["submit"])) {
 }
 ?>
 
-
-
-
 <!doctype html>
 <html lang="en">
 

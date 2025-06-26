@@ -1,4 +1,13 @@
 <?php
+
+session_start();
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+  header("Location: ../index.php");
+  exit();
+}
+
+
 $page = "dashboard";
 if (isset($_GET['page'])) {
   switch ($_GET['page']) {
@@ -93,7 +102,7 @@ include("../sharedAssets/connect.php");
           </nav>
 
           <div class="mt-auto pt-3">
-            <a href="logout.php"
+            <a href="assets/logOut.php"
               class="logout-button py-3 px-4 d-flex align-items-center justify-content-start text-decoration-none w-100"
               onclick="return confirm('Are you sure you want to logout?')">
               <i class="fas fa-sign-out-alt me-3" style="width: 20px;"></i>
@@ -159,7 +168,7 @@ include("../sharedAssets/connect.php");
       </nav>
 
       <div class="mt-auto pt-3">
-        <a href="logout.php"
+        <a href="assets/logOut.php"
           class="logout-button py-3 px-4 d-flex align-items-center justify-content-start text-decoration-none w-100"
           onclick="return confirm('Are you sure you want to logout?')">
           <i class="fas fa-sign-out-alt me-3" style="width: 20px;"></i>

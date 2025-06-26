@@ -1,3 +1,9 @@
+<?php
+include("sharedAssets/connect.php");
+session_start();
+
+?>
+
 <!doctype html>
 <html lang="en">
 
@@ -19,7 +25,13 @@
 </head>
 
 <body data-bs-theme="dark">
-    <?php include("sharedAssets/navbar.php") ?>
+    <?php
+    if (isset($_SESSION['userID'])) {
+        include("sharedAssets/navbarLoggedIn.php");
+    } else {
+        include("sharedAssets/navbar.php");
+    }
+    ?>
 
     <div class="container">
         <div class="row">
