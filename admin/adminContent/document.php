@@ -1,11 +1,4 @@
 <?php
-<<<<<<< Updated upstream
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-  header("Location: ../index.php");
-  exit();
-}
-
-=======
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
 $search = trim($_GET['search'] ?? '');
@@ -62,7 +55,6 @@ if ($params) {
 }
 $stmt->execute();
 $result = $stmt->get_result();
->>>>>>> Stashed changes
 ?>
 
 <!DOCTYPE html>

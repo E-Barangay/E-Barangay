@@ -1,11 +1,4 @@
 <?php
-<<<<<<< Updated upstream
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-  header("Location: ../index.php");
-  exit();
-}
-
-=======
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
 $search = $_GET['search'] ?? '';
@@ -20,7 +13,6 @@ if (!empty($search)) {
     $fetchStmt->execute();
     $announcements = $fetchStmt->fetchAll(PDO::FETCH_ASSOC);
 }
->>>>>>> Stashed changes
 ?>
 <!DOCTYPE html>
 <html lang="en">

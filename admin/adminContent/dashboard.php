@@ -1,13 +1,4 @@
 <?php
-<<<<<<< Updated upstream
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-  header("Location: ../index.php");
-  exit();
-}
-
-?>
-
-=======
 
 $totalResult = executeQuery("SELECT COUNT(*) AS total FROM users WHERE role = 'user'");
 $totalUsers = mysqli_fetch_assoc($totalResult)['total'];
@@ -50,7 +41,6 @@ if (empty($loginLabels)) {
 ?>
 
 
->>>>>>> Stashed changes
 <!doctype html>
 <html lang="en">
 

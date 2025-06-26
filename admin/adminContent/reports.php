@@ -1,20 +1,4 @@
 <?php
-<<<<<<< Updated upstream
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-  header("Location: ../index.php");
-  exit();
-}
-
-$sql = "SELECT 
-            reports.*,
-            users.phoneNumber,
-            CONCAT(userInfo.lastName, ', ', userInfo.firstName) AS fullName
-        FROM reports
-        INNER JOIN users ON reports.userID = users.userID
-        INNER JOIN userInfo ON users.userInfoID = userInfo.userInfoID";
-$result = executeQuery($sql);
-
-=======
 // adminContent/concerns.php
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
@@ -90,7 +74,6 @@ function getBorderClass($status) {
     default => 'border-warning',
   };
 }
->>>>>>> Stashed changes
 ?>
 
 <!DOCTYPE html>
