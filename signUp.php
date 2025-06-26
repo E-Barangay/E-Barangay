@@ -120,7 +120,7 @@ if (isset($_POST["submit"])) {
         <div class="row">
             <!-- Left Side Image -->
             <div class="col-md-6 d-none d-md-block p-0">
-                <img src="assets/images/bg.png" class="left-img position-relative" alt="Barangay Background">
+                <img src="assets/images/bgHall.jpeg" class="left-img position-relative" alt="Barangay Background">
             </div>
 
             <!-- Right Side Sign In -->

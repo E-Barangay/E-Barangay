@@ -9,12 +9,12 @@ if (isset($_GET['page'])) {
     $page = $_GET['page'];
     switch ($page) {
         case "makeComplaint":
-            if (!isset($_SESSION['userID'])) {
-                header("Location: signUp.php");
-            }
+            $page = "makeComplaint";
             break;
         case "complaintSection":
-            $page = "complaintSection";
+            if (!isset($_SESSION['userID'])) {
+                header("Location: signIn.php");
+            }
             break;
         case "submittedComplaints":
             $page = "submittedComplaints";
@@ -52,7 +52,7 @@ if (isset($_GET['page'])) {
 
 </head>
 
-<body data-bs-theme="light">
+<body data-bs-theme="dark">
 
     <?php
 
@@ -70,9 +70,9 @@ if (isset($_GET['page'])) {
                 <div class="filterCard card m-1 p-2 d-none d-md-block">
                     <div class="row mt-2">
                         <div class="col d-flex flex-column align-items-center">
-                            <a href="?page=complaintSection" class="btn btn-custom btn-width mb-2">Home</a>
-                            <a href="?page=makeComplaint" class="btn btn-custom btn-width mb-2">File a Complaint</a>
-                            <a href="?page=submittedComplaints" class="btn btn-custom btn-width mb-2">Submitted</a>
+                            <a href="?page=complaintSection" class="btn btn-primary filterButton m-2 <?php echo ($page == 'complaintSection') ? 'active' : ''; ?>">Home</a>
+                            <a href="?page=makeComplaint" class="btn btn-primary filterButton m-2 <?php echo ($page == 'makeComplaint') ? 'active' : ''; ?>">File a Complaint</a>
+                            <a href="?page=submittedComplaints" class="btn btn-primary filterButton m-2 <?php echo ($page == 'submittedComplaints') ? 'active' : ''; ?>">Submitted Reports</a>
                         </div>
                     </div>
                 </div>

@@ -24,7 +24,7 @@ $documentRequestResult = executeQuery($documentRequestQuery);
 
                 <tr>
                     <th scope="row" class="align-middle"><?php echo $counter++; ?></th>
-                    <td class="align-middle"><?php echo $documentRequestRow['requestDate'] ?></td>
+                    <td class="align-middle"><?php echo date("F j, Y h:i a", strtotime($documentRequestRow['requestDate'])); ?></td>
                     <td class="align-middle"><?php echo $documentRequestRow['documentName'] ?></td>
                     <td class="align-middle"><?php echo $documentRequestRow['purpose'] ?></td>
                     <td class="align-middle"><?php echo $documentRequestRow['documentStatus'] ?></td>

@@ -4,15 +4,15 @@ include("sharedAssets/connect.php");
 
 session_start();
 
-$userID = $_SESSION['userID'];
-
 $content = "allDocuments";
 
 if (isset($_GET['content'])) {
     $content = $_GET['content'];
     switch ($content) {
         case "allDocuments":
-            $content = "allDocuments";
+            if (!isset($_SESSION['userID'])) {
+                header("Location: signIn.php");
+            }
             break;
         case "barangayHallDocuments":
             $content = "barangayHallDocuments";
@@ -34,34 +34,17 @@ if (isset($_GET['content'])) {
     header("Location: ?content=allDocuments");
 }
 
-if(isset($_POST['submit'])){
-  $purpose = $_POST['purpose'];
-
-  $formQuery = "INSERT INTO documents (userID, purpose) VALUES (4,'$purpose')";
-  executeQuery($formQuery); 
-}
-
-$searchTerm = '';
-
-// $documentsQuery = "SELECT * FROM `documenttypes`";
-
-// if (isset($_GET['search']) && !empty($_GET['search'])) {
-//     $searchTerm = $_GET['search'];
-//     $searchTerm = str_replace("'", "", $searchTerm);
-//     $documentsQuery .= " AND documentName LIKE '%$searchTerm%'";
-// }
-
-// $documentsResult = executeQuery($documentsQuery);
-
 $userQuery = "SELECT * FROM users LEFT JOIN userInfo ON users.userID = userInfo.userID";
 $userResult = executeQuery($userQuery);
 
-while($userRow = mysqli_fetch_assoc($userResult)) {
-    $firstName = $userRow['firstName'];
-    $middleName = $userRow['middleName'];
-    $lastName = $userRow['lastName'];
-    $gender = $userRow['gender'];
-}
+$allDocumentsQuery = "SELECT * FROM documentTypes ORDER BY documentName ASC";
+$allDocumentsResult = executeQuery($allDocumentsQuery);
+
+$barangayHallDocumentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 1";
+$barangayHallDocumentsResult = executeQuery($barangayHallDocumentsQuery);
+
+$mioDocumentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 2";
+$mioDocumentsResult = executeQuery($mioDocumentsQuery);
 
 ?>
 
@@ -85,7 +68,7 @@ while($userRow = mysqli_fetch_assoc($userResult)) {
     <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
-<body data-bs-theme="light">
+<body data-bs-theme="dark">
     
     <?php
 
@@ -118,7 +101,7 @@ while($userRow = mysqli_fetch_assoc($userResult)) {
                             <li><a class="dropdown-item <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>" href="?content=allDocuments">All Documents</a></li>
                             <li><a class="dropdown-item <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>" href="?content=barangayHallDocuments">Barangay Hall</a></li>
                             <li><a class="dropdown-item <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>" href="?content=mioDocuments">Migrant Information Office</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>" href="?content=documentRequest">Document Request</a></li>
+                            <li><a class="dropdown-item <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>" href="?content=documentRequest">Submitted Request</a></li>
                         </ul>
                     </div>
 
@@ -126,8 +109,7 @@ while($userRow = mysqli_fetch_assoc($userResult)) {
                         <div class="row">
                             <div class="col m-2">
                                 <div class="position-relative">
-                                    <input class="form-control rounded-pill ps-5" value="<?php echo $searchTerm ?>"
-                                        name="search" type="search" placeholder="Search Documents">
+                                    <input class="form-control rounded-pill ps-5" name="search" type="search" placeholder="Search Documents">
                                     <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
                                 </div>
                             </div>
@@ -136,22 +118,14 @@ while($userRow = mysqli_fetch_assoc($userResult)) {
 
                             <!-- Filter -->
                             <div class="col d-flex flex-column justify-content-center">
-                                <a href="?content=allDocuments"
-                                    class="btn btn-primary filterButton m-2 <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>">All
-                                    Documents</a>
-                                <a href="?content=barangayHallDocuments"
-                                    class="btn btn-primary filterButton m-2 <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>">Barangay
-                                    Hall</a>
-                                <a href="?content=mioDocuments"
-                                    class="btn btn-primary filterButton m-2 <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>">Migrant
-                                    Information Office</a>
+                                <a href="?content=allDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>">All Documents</a>
+                                <a href="?content=barangayHallDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>">Barangay Hall</a>
+                                <a href="?content=mioDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>">Migrant Information Office</a>
                             </div>
 
                             <!-- Document Request -->
                             <div class="col d-flex justify-content-center">
-                                <a href="?content=documentRequest"
-                                    class="btn btn-primary documentRequestButton m-2 mt-5 <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>">Document
-                                    Request</a>
+                                <a href="?content=documentRequest" class="btn btn-primary submittedRequestButton m-2 mt-5 <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>">Submitted Request</a>
                             </div>
 
                         </div>
@@ -170,50 +144,6 @@ while($userRow = mysqli_fetch_assoc($userResult)) {
             </div>
         </form>
     </div>
-
-    <!-- Modal -->
-    <form method="POST">
-        <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header" style="background-color: #19AFA5;">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col">
-                                First Name: <?php echo $firstName ?>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col">
-                                Middle Name: <?php echo $middleName ?>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col">
-                                Last Name: <?php echo $lastName ?>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col">
-                                Gender: <?php echo $gender ?>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="purpose" class="form-label">Purpose</label>
-                            <input id="purpose" class="form-control" type="text" name="purpose" placeholder="Purpose">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" name="submit" class="btn btn-primary" style="background-color: #19AFA5; border: 1px solid #19AFA5;">Submit Request</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-
 
     <?php include("sharedAssets/footer.php") ?>
 

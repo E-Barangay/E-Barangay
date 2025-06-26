@@ -44,7 +44,7 @@ input.form-control:focus {
     border: 1px solid #19AFA5;
 }
 
-.documentRequestButton {
+.submittedRequestButton {
     width: 100%;
     background-color: #19AFA5;
     border: 1px solid #19AFA5;
@@ -57,13 +57,13 @@ input.form-control:focus {
     border: 1px solid #0A6E6E;
 }
 
-.documentRequestButton.active {
+.submittedRequestButton.active {
     background-color: #0A6E6E;
     color: #FFFFFF;
     border: 1px solid #0A6E6E;
 }
 
-.documentRequestButton:hover {
+.submittedRequestButton:hover {
     background-color: #19AFA5;
     color: white;
     border: 1px solid #19AFA5;
