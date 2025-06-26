@@ -39,7 +39,7 @@
             <div class="col-12 col-lg-3 text-center text-lg-start py-4">
                 <h5 class="mb-3" style="color:#19AFA5;">Contacts</h5>
                 <ul class="nav flex-column">
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-brands fa-facebook" style="font-size: 20px; vertical-align: middle;"></i> Barangay San Antonio</a></li>
+                    <li class="footer-item mb-3"><a href="https://www.facebook.com/profile.php?id=61553441500742" class="footer-link p-0"><i class="fa-brands fa-facebook" style="font-size: 20px; vertical-align: middle;"></i> Barangay San Antonio</a></li>
                     <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-envelope" style="font-size: 20px; vertical-align: middle;"></i> sanantonio@gmail.com</a></li>
                     <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-phone" style="font-size: 20px; vertical-align: middle;"></i> 0912 345 6789</a></li>
                 </ul>

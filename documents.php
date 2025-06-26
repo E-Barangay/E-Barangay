@@ -1,7 +1,10 @@
 <?php
+
 include("sharedAssets/connect.php");
 
 session_start();
+
+$userID = $_SESSION['userID'];
 
 $content = "allDocuments";
 
@@ -31,19 +34,34 @@ if (isset($_GET['content'])) {
     header("Location: ?content=allDocuments");
 }
 
+if(isset($_POST['submit'])){
+  $purpose = $_POST['purpose'];
 
+  $formQuery = "INSERT INTO documents (userID, purpose) VALUES (4,'$purpose')";
+  executeQuery($formQuery); 
+}
 
 $searchTerm = '';
 
-$documentsQuery = "SELECT * FROM `documenttypes`";
+// $documentsQuery = "SELECT * FROM `documenttypes`";
 
-if (isset($_GET['search']) && !empty($_GET['search'])) {
-    $searchTerm = $_GET['search'];
-    $searchTerm = str_replace("'", "", $searchTerm);
-    $documentsQuery .= " AND documentName LIKE '%$searchTerm%'";
+// if (isset($_GET['search']) && !empty($_GET['search'])) {
+//     $searchTerm = $_GET['search'];
+//     $searchTerm = str_replace("'", "", $searchTerm);
+//     $documentsQuery .= " AND documentName LIKE '%$searchTerm%'";
+// }
+
+// $documentsResult = executeQuery($documentsQuery);
+
+$userQuery = "SELECT * FROM users LEFT JOIN userInfo ON users.userID = userInfo.userID";
+$userResult = executeQuery($userQuery);
+
+while($userRow = mysqli_fetch_assoc($userResult)) {
+    $firstName = $userRow['firstName'];
+    $middleName = $userRow['middleName'];
+    $lastName = $userRow['lastName'];
+    $gender = $userRow['gender'];
 }
-
-$documentsResult = executeQuery($documentsQuery);
 
 ?>
 
@@ -67,13 +85,16 @@ $documentsResult = executeQuery($documentsQuery);
     <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
+    
     <?php
-    if (isset($_SESSION['userID'])) {
-        include("sharedAssets/navbarLoggedIn.php");
-    } else {
-        include("sharedAssets/navbar.php");
-    }
+
+        if (isset($_SESSION['userID'])) {
+            include("sharedAssets/navbarLoggedIn.php");
+        } else {
+            include("sharedAssets/navbar.php");
+        }
+
     ?>
 
     <div class="container pt-3">
@@ -85,8 +106,7 @@ $documentsResult = executeQuery($documentsQuery);
 
                     <!-- Search Bar -->
                     <div class="searchBarPop position-relative d-block d-sm-none mb-4 mx-1">
-                        <input class="form-control rounded-pill ps-5" value="<?php echo $searchTerm ?>" name="search"
-                            type="search" placeholder="Search Documents">
+                        <input class="form-control rounded-pill ps-5" name="search" type="search" placeholder="Search Documents">
                         <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
                     </div>
 
@@ -95,14 +115,10 @@ $documentsResult = executeQuery($documentsQuery);
                         <button class="filterButtonPop dropdown-toggle" data-bs-toggle="dropdown"
                             aria-expanded="false"><i class="fa-solid fa-filter"></i></button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>"
-                                    href="?content=allDocuments">All Documents</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>"
-                                    href="?content=barangayHallDocuments">Barangay Hall</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>"
-                                    href="?content=mioDocuments">Migrant Information Office</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>"
-                                    href="?content=documentRequest">Document Request</a></li>
+                            <li><a class="dropdown-item <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>" href="?content=allDocuments">All Documents</a></li>
+                            <li><a class="dropdown-item <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>" href="?content=barangayHallDocuments">Barangay Hall</a></li>
+                            <li><a class="dropdown-item <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>" href="?content=mioDocuments">Migrant Information Office</a></li>
+                            <li><a class="dropdown-item <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>" href="?content=documentRequest">Document Request</a></li>
                         </ul>
                     </div>
 
@@ -154,6 +170,50 @@ $documentsResult = executeQuery($documentsQuery);
             </div>
         </form>
     </div>
+
+    <!-- Modal -->
+    <form method="POST">
+        <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #19AFA5;">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                First Name: <?php echo $firstName ?>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                Middle Name: <?php echo $middleName ?>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                Last Name: <?php echo $lastName ?>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                Gender: <?php echo $gender ?>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="purpose" class="form-label">Purpose</label>
+                            <input id="purpose" class="form-control" type="text" name="purpose" placeholder="Purpose">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" name="submit" class="btn btn-primary" style="background-color: #19AFA5; border: 1px solid #19AFA5;">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
 
     <?php include("sharedAssets/footer.php") ?>
 

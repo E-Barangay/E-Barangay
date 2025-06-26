@@ -15,28 +15,34 @@ html {
 .viewButton {
     background-color: transparent;
     color: white;
-    border: 1px solid #19AFA5;
+    border: 1px solid white;
     border-radius: 12px;
+    width: 200px;
 }
 
 .viewButton:hover {
     background-color: #19AFA5;
     color: black;
-    border: 1px solid #19AFA5;
+    border: 1px solid white;
 }
 
 .custom-title {
     color: #19AFA5;
 }
 
-
-/* .carousel {
-    width: 100vw;
-    height: 100dvh;
+.carousel-inner {
+    border-radius: 1rem;
+    overflow: hidden;
 }
 
-.carousel-item img {
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-} */
+.carousel-caption {
+    bottom: 20px;
+}
+
+.carousel img {
+    transition: transform 0.5s ease;
+}
+
+.carousel img:hover {
+    transform: scale(1.01);
+}

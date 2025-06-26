@@ -11,7 +11,6 @@ if (isset($_GET['page'])) {
         case "makeComplaint":
             if (!isset($_SESSION['userID'])) {
                 header("Location: signUp.php");
-                exit();
             }
             break;
         case "complaintSection":
@@ -53,14 +52,16 @@ if (isset($_GET['page'])) {
 
 </head>
 
-<body data-bs-theme="light" style="background-color: #F1FAF9">
+<body data-bs-theme="light">
 
     <?php
-    if (isset($_SESSION['userID'])) {
-        include("sharedAssets/navbarLoggedIn.php");
-    } else {
-        include("sharedAssets/navbar.php");
-    }
+
+        if (isset($_SESSION['userID'])) {
+            include("sharedAssets/navbarLoggedIn.php");
+        } else {
+            include("sharedAssets/navbar.php");
+        }
+
     ?>
 
     <div class="container pt-3">

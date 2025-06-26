@@ -33,14 +33,14 @@ input.form-control:focus {
 
 .filterButton {
     background-color: #19AFA5;
-    color: black;
+    color: white;
     border: 1px solid #19AFA5;
     border-radius: 12px;
 }
 
 .filterButton:hover {
     background-color: #19AFA5;
-    color: white;
+    color: black;
     border: 1px solid #19AFA5;
 }
 
@@ -48,13 +48,12 @@ input.form-control:focus {
     width: 100%;
     background-color: #19AFA5;
     border: 1px solid #19AFA5;
-    color: black;
+    color: white;
     border-radius: 12px;
 }
 
 .filterButton.active {
     background-color: #0A6E6E;
-    color: #FFFFFF;
     border: 1px solid #0A6E6E;
 }
 
@@ -95,14 +94,14 @@ input.form-control:focus {
     width: 100%;
     background-color: #19AFA5;
     border: 1px solid #19AFA5;
-    color: black;
+    color: white;
     border-radius: 12px;
 }
 
 .documentButton:hover {
     background-color: #19AFA5;
     border: 1px solid #19AFA5;
-    color: white;
+    color: black;
 }
 
 .filterButtonPop {

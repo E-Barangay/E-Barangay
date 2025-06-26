@@ -21,7 +21,7 @@ if (isset($_SESSION['userID'])) {
 ?>
 
 <nav class="navbar navbar-expand-lg">
-    <div class="container navbarStyling p-1">
+    <div class="container navbarStyling p-3">
 
         <a class="navbar-brand d-flex align-items-center gap-2" href="index.php">
             <img class="sanAntonioLogo" src="assets/images/logoSanAntonio.png" alt="San Antonio Logo">
@@ -57,7 +57,7 @@ if (isset($_SESSION['userID'])) {
                                 Mode</button></li>
                         <form action="" method="POST">
                             <li>
-                                <button class="dropdown-item" type="submit" name="logOut">
+                                <button class="dropdown-item" type="submit" name="logout">
                                     <i class="fa-solid fa-right-from-bracket dropdown-icon"></i> Log-out
                                 </button>
                             </li>

@@ -24,7 +24,7 @@ session_start();
     <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
     <?php
     if (isset($_SESSION['userID'])) {
         include("sharedAssets/navbarLoggedIn.php");
@@ -32,6 +32,7 @@ session_start();
         include("sharedAssets/navbar.php");
     }
     ?>
+
 
     <div class="container">
         <div class="row">
