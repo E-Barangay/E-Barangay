@@ -1,8 +1,7 @@
 <?php
-
 session_start();
-
 include('sharedAssets/connect.php');
+
 if (isset($_POST["submit"])) {
     $firstName = $_POST['firstName'];
     $middleName = $_POST['middleName'];
@@ -12,34 +11,86 @@ if (isset($_POST["submit"])) {
     $password = $_POST['password'];
     $reEnterPassword = $_POST['reEnterPassword'];
     $phoneNumber = $_POST['phoneNumber'];
-    $province = $_POST['province'];
-    $city = $_POST['city'];
-    $barangay = $_POST['barangay'];
-    $street = $_POST['street'];
+    $provinceName = $_POST['province'];
+    $cityName = $_POST['city'];
+    $barangayName = $_POST['barangay'];
+    $streetName = $_POST['street'];
     $gender = $_POST['gender'];
-    $username = $email; // Or change to a username input
+    $username = $email; // you can change this to use a different field
     $role = "user";
 
     if ($password === $reEnterPassword) {
-
         // Step 1: Insert into userInfo
         $insertInfo = "INSERT INTO userInfo (firstName, middleName, lastName, gender, birthDate, profilePicture) 
-            VALUES ('$firstName', '$middleName', '$lastName', '$gender', '$birthDate', NULL)";
-
+                       VALUES ('$firstName', '$middleName', '$lastName', '$gender', '$birthDate', NULL)";
         $infoResult = executeQuery($insertInfo);
 
         if ($infoResult) {
-            $userInfoID = mysqli_insert_id($conn); // get userInfoID
+            $userInfoID = mysqli_insert_id($conn); // get the inserted ID
 
-            // Step 2: Insert into users table with link to userInfoID
+            // Step 2: Insert into users table
             $insertUser = "INSERT INTO users (userInfoID, username, email, password, phoneNumber, role) 
-                                    VALUES ('$userInfoID', '$username', '$email', '$password', '$phoneNumber', '$role')";
-
+                           VALUES ('$userInfoID', '$username', '$email', '$password', '$phoneNumber', '$role')";
             $userResult = executeQuery($insertUser);
 
             if ($userResult) {
+                // Step 3: Insert or retrieve province
+                $checkProvince = "SELECT provinceID FROM provinces WHERE provinceName = '$provinceName'";
+                $provinceResult = mysqli_query($conn, $checkProvince);
+
+                if ($provinceResult && mysqli_num_rows($provinceResult) > 0) {
+                    $provinceRow = mysqli_fetch_assoc($provinceResult);
+                    $provinceID = $provinceRow['provinceID'];
+                } else {
+                    mysqli_query($conn, "INSERT INTO provinces (provinceName) VALUES ('$provinceName')");
+                    $provinceID = mysqli_insert_id($conn);
+                }
+
+                // Step 4: Insert or retrieve city
+                $checkCity = "SELECT cityID FROM cities WHERE cityName = '$cityName' AND provinceID = '$provinceID'";
+                $cityResult = mysqli_query($conn, $checkCity);
+
+                if ($cityResult && mysqli_num_rows($cityResult) > 0) {
+                    $cityRow = mysqli_fetch_assoc($cityResult);
+                    $cityID = $cityRow['cityID'];
+                } else {
+                    mysqli_query($conn, "INSERT INTO cities (cityName, provinceID) VALUES ('$cityName', '$provinceID')");
+                    $cityID = mysqli_insert_id($conn);
+                }
+
+                // Step 5: Insert or retrieve barangay
+                $checkBrgy = "SELECT barangayID FROM barangays WHERE barangayName = '$barangayName' AND cityID = '$cityID'";
+                $barangayResult = mysqli_query($conn, $checkBrgy);
+
+                if ($barangayResult && mysqli_num_rows($barangayResult) > 0) {
+                    $barangayRow = mysqli_fetch_assoc($barangayResult);
+                    $barangayID = $barangayRow['barangayID'];
+                } else {
+                    mysqli_query($conn, "INSERT INTO barangays (barangayName, cityID) VALUES ('$barangayName', '$cityID')");
+                    $barangayID = mysqli_insert_id($conn);
+                }
+
+                // Step 6: Insert or retrieve street
+                $checkStreet = "SELECT streetID FROM streets WHERE streetName = '$streetName'";
+                $streetResult = mysqli_query($conn, $checkStreet);
+
+                if ($streetResult && mysqli_num_rows($streetResult) > 0) {
+                    $streetRow = mysqli_fetch_assoc($streetResult);
+                    $streetID = $streetRow['streetID'];
+                } else {
+                    mysqli_query($conn, "INSERT INTO streets (streetName) VALUES ('$streetName')");
+                    $streetID = mysqli_insert_id($conn);
+                }
+
+                // Step 7: Insert into addresses table
+                $insertAddress = "INSERT INTO addresses (userInfoID, cityID, provinceID, barangayID, streetID) 
+                                  VALUES ('$userInfoID', '$cityID', '$provinceID', '$barangayID', '$streetID')";
+                executeQuery($insertAddress);
+
+                // Done: Redirect user
                 $_SESSION['userID'] = $userInfoID;
-                header("location:index.php");
+                header("Location: index.php");
+                exit();
             }
         }
     } else {
@@ -47,6 +98,8 @@ if (isset($_POST["submit"])) {
     }
 }
 ?>
+
+
 
 
 <!doctype html>
@@ -226,16 +279,16 @@ if (isset($_POST["submit"])) {
                                                 <div class="col-12 my-1">
                                                     <p>Gender</p>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="gender"
+                                                        <input class="form-check-input" type="radio" value = "Male" name="gender"
                                                             id="radioDefault1" checked>
-                                                        <label class="form-check-label" for="radioDefault1">
+                                                        <label class="form-check-label"  for="radioDefault1">
                                                             Male
                                                         </label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="gender"
+                                                        <input class="form-check-input" type="radio" value = "Female" name="gender"
                                                             id="radioDefault2">
-                                                        <label class="form-check-label" for="radioDefault2">
+                                                        <label class="form-check-label"  for="radioDefault2">
                                                             Female
                                                         </label>
                                                     </div>

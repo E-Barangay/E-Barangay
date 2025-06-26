@@ -1,23 +1,40 @@
+<?php
+
+
+$sql = "SELECT 
+            reports.*,
+            users.phoneNumber,
+            CONCAT(userInfo.lastName, ', ', userInfo.firstName) AS fullName
+        FROM reports
+        INNER JOIN users ON reports.userID = users.userID
+        INNER JOIN userInfo ON users.userInfoID = userInfo.userInfoID";
+$result = executeQuery($sql);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Concerns Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: rgb(233, 233, 233);
-        color: dark;
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-    }
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: rgb(233, 233, 233);
+            color: dark;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container-fluid p-3 p-md-4">
         <div class="card shadow-lg border-0 rounded-3">
@@ -38,7 +55,8 @@
                                         <span class="input-group-text bg-white border-end-0">
                                             <i class="fas fa-search text-muted"></i>
                                         </span>
-                                        <input type="text" class="form-control border-start-0" placeholder="Search User" id="searchUser">
+                                        <input type="text" class="form-control border-start-0" placeholder="Search User"
+                                            id="searchUser">
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-6">
@@ -79,40 +97,34 @@
                                             </tr>
                                         </thead>
                                         <tbody id="reportTableBody">
-                                            <tr>
-                                                <td class="px-4 py-3"><strong>1</strong></td>
-                                                <td class="px-4 py-3">2025-01-01</td>
-                                                <td class="px-4 py-3">John Doe</td>
-                                                <td class="px-4 py-3">
-                                                    <span class="badge rounded-pill bg-info">Noise Complaint</span>
-                                                </td>
-                                                <td class="px-4 py-3">205-001-01</td>
-                                                <td class="px-4 py-3">
-                                                    <span class="badge rounded-pill bg-warning text-dark">Pending</span>
-                                                </td>
-                                                <td class="px-4 py-3">
-                                                    <button class="btn btn-sm btn-primary" onclick="viewReport(1)">
-                                                        <i class="fas fa-eye me-1"></i>View
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3"><strong>2</strong></td>
-                                                <td class="px-4 py-3">2025-01-02</td>
-                                                <td class="px-4 py-3">Jane Smith</td>
-                                                <td class="px-4 py-3">
-                                                    <span class="badge rounded-pill bg-danger">Sanitation</span>
-                                                </td>
-                                                <td class="px-4 py-3">205-002-02</td>
-                                                <td class="px-4 py-3">
-                                                    <span class="badge rounded-pill bg-success">In Progress</span>
-                                                </td>
-                                                <td class="px-4 py-3">
-                                                    <button class="btn btn-sm btn-primary" onclick="viewReport(2)">
-                                                        <i class="fas fa-eye me-1"></i>View
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <?php
+                                            if (mysqli_num_rows($result) > 0) {
+                                                while ($resultRow = mysqli_fetch_assoc($result)) {
+
+                                                    ?>
+                                                    <tr>
+                                                        <td class="px-4 py-3"><strong><?php echo $resultRow['reportID']?></strong></td>
+                                                        <td class="px-4 py-3"><?php echo $resultRow['requestDate']?></td>
+                                                        <td class="px-4 py-3"><?php echo $resultRow['fullName']; ?></td>
+                                                        <td class="px-4 py-3">
+                                                            <span class="badge rounded-pill bg-info"><?php echo $resultRow['reportTitle']?></span>
+                                                        </td>
+                                                        <td class="px-4 py-3"><?php echo $resultRow['phoneNumber']?></td>
+                                                        <td class="px-4 py-3">
+                                                            <span class="badge rounded-pill bg-warning text-dark">Pending</span>
+                                                        </td>
+                                                        <td class="px-4 py-3">
+                                                            <button class="btn btn-sm btn-primary" onclick="viewReport(1)">
+                                                                <i class="fas fa-eye me-1"></i>View
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                    <?php
+
+                                                }
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -131,11 +143,12 @@
                                                 <div class="col-6"><strong>Contact:</strong> 205-001-01</div>
                                                 <div class="col-12"><strong>Name:</strong> John Doe</div>
                                                 <div class="col-12">
-                                                    <strong>Concern:</strong> 
+                                                    <strong>Concern:</strong>
                                                     <span class="badge rounded-pill bg-info ms-1">Noise Complaint</span>
                                                 </div>
                                                 <div class="col-12 mt-2">
-                                                    <button class="btn btn-sm btn-primary w-100" onclick="viewReport(1)">
+                                                    <button class="btn btn-sm btn-primary w-100"
+                                                        onclick="viewReport(1)">
                                                         <i class="fas fa-eye me-1"></i>View Details
                                                     </button>
                                                 </div>
@@ -154,11 +167,12 @@
                                                 <div class="col-6"><strong>Contact:</strong> 205-002-02</div>
                                                 <div class="col-12"><strong>Name:</strong> Jane Smith</div>
                                                 <div class="col-12">
-                                                    <strong>Concern:</strong> 
+                                                    <strong>Concern:</strong>
                                                     <span class="badge rounded-pill bg-danger ms-1">Sanitation</span>
                                                 </div>
                                                 <div class="col-12 mt-2">
-                                                    <button class="btn btn-sm btn-primary w-100" onclick="viewReport(2)">
+                                                    <button class="btn btn-sm btn-primary w-100"
+                                                        onclick="viewReport(2)">
                                                         <i class="fas fa-eye me-1"></i>View Details
                                                     </button>
                                                 </div>
@@ -168,7 +182,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card-footer bg-light">
                             <nav class="d-flex justify-content-center">
                                 <ul class="pagination pagination-sm mb-0">
@@ -198,7 +212,8 @@
                         <i class="fas fa-file-alt me-2"></i>
                         Report Details - ID: <span id="modalReportId">1</span>
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="row">
@@ -226,19 +241,24 @@
                                     <div class="row mb-3">
                                         <div class="col-sm-4 mb-2 mb-sm-0 fw-semibold">Concern Type:</div>
                                         <div class="col-sm-8">
-                                            <span class="badge rounded-pill bg-info" id="modalConcernType">Noise Complaint</span>
+                                            <span class="badge rounded-pill bg-info" id="modalConcernType">Noise
+                                                Complaint</span>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-sm-4 mb-2 mb-sm-0 fw-semibold">Location:</div>
-                                        <div class="col-sm-8" id="modalLocation">Barangay San Miguel, Majayjay, Laguna</div>
+                                        <div class="col-sm-8" id="modalLocation">Barangay San Miguel, Majayjay, Laguna
+                                        </div>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-12">
                                             <div class="fw-semibold mb-2">Description:</div>
                                             <div class="p-3 bg-light rounded-3 border-start border-primary border-4">
                                                 <p class="mb-0" id="modalDescription">
-                                                    There is a persistent noise issue in our neighborhood coming from a construction site that operates during late night hours. This has been disturbing the peace and affecting the sleep of residents, especially children and elderly members of our community.
+                                                    There is a persistent noise issue in our neighborhood coming from a
+                                                    construction site that operates during late night hours. This has
+                                                    been disturbing the peace and affecting the sleep of residents,
+                                                    especially children and elderly members of our community.
                                                 </p>
                                             </div>
                                         </div>
@@ -246,7 +266,8 @@
                                     <div class="row mb-3">
                                         <div class="col-12">
                                             <div class="fw-semibold mb-2">Location Map:</div>
-                                            <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border" style="height: 250px;">
+                                            <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border"
+                                                style="height: 250px;">
                                                 <div class="text-center text-muted">
                                                     <i class="fas fa-map-marker-alt fs-4 mb-2"></i>
                                                     <p class="mb-1">Interactive Map will be embedded here</p>
@@ -260,7 +281,9 @@
                                             <div class="fw-semibold mb-2">Attached Images:</div>
                                             <div class="row g-3">
                                                 <div class="col-md-4 col-6">
-                                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border" style="height: 150px; cursor: pointer;" onclick="openImageModal('image1.jpg')">
+                                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border"
+                                                        style="height: 150px; cursor: pointer;"
+                                                        onclick="openImageModal('image1.jpg')">
                                                         <div class="text-center text-muted">
                                                             <i class="fas fa-image fs-4 mb-2"></i>
                                                             <p class="mb-0 small">Image 1</p>
@@ -268,7 +291,9 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4 col-6">
-                                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border" style="height: 150px; cursor: pointer;" onclick="openImageModal('image2.jpg')">
+                                                    <div class="bg-light rounded-3 d-flex align-items-center justify-content-center border"
+                                                        style="height: 150px; cursor: pointer;"
+                                                        onclick="openImageModal('image2.jpg')">
                                                         <div class="text-center text-muted">
                                                             <i class="fas fa-image fs-4 mb-2"></i>
                                                             <p class="mb-0 small">Image 2</p>
@@ -294,10 +319,11 @@
                                     <div class="mb-3">
                                         <label class="fw-semibold mb-2">Current Status:</label>
                                         <div>
-                                            <span class="badge rounded-pill bg-warning text-dark" id="modalCurrentStatus">Pending</span>
+                                            <span class="badge rounded-pill bg-warning text-dark"
+                                                id="modalCurrentStatus">Pending</span>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="statusSelect" class="fw-semibold mb-2">Update Status:</label>
                                         <select class="form-select" id="statusSelect">
@@ -311,7 +337,8 @@
 
                                     <div class="mb-3">
                                         <label for="statusNotes" class="fw-semibold mb-2">Status Notes:</label>
-                                        <textarea class="form-control" id="statusNotes" rows="4" placeholder="Add notes about status update..."></textarea>
+                                        <textarea class="form-control" id="statusNotes" rows="4"
+                                            placeholder="Add notes about status update..."></textarea>
                                     </div>
 
                                     <div class="mb-3">
@@ -329,7 +356,8 @@
                                             Status History
                                         </h6>
                                         <div class="timeline" style="max-height: 200px; overflow-y: auto;">
-                                            <div class="p-3 bg-light rounded-3 mb-2 border-start border-primary border-3">
+                                            <div
+                                                class="p-3 bg-light rounded-3 mb-2 border-start border-primary border-3">
                                                 <div class="small fw-semibold">Pending</div>
                                                 <div class="small text-muted">2025-01-01 10:30 AM</div>
                                                 <div class="small text-muted mt-1">Report submitted by John Doe</div>
@@ -390,10 +418,10 @@
             document.getElementById('modalLocation').textContent = report.location;
             document.getElementById('modalDescription').textContent = report.description;
             document.getElementById('modalCurrentStatus').textContent = report.status;
-            
+
             const statusBadge = document.getElementById('modalCurrentStatus');
             statusBadge.className = 'badge rounded-pill';
-            switch(report.status) {
+            switch (report.status) {
                 case 'Pending':
                     statusBadge.classList.add('bg-warning', 'text-dark');
                     break;
@@ -415,19 +443,19 @@
         function updateStatus() {
             const newStatus = document.getElementById('statusSelect').value;
             const notes = document.getElementById('statusNotes').value;
-            
+
 
             alert(`Status updated to: ${newStatus}\nNotes: ${notes}`);
-            
+
             document.getElementById('modalCurrentStatus').textContent = newStatus;
-            
+
             document.getElementById('statusNotes').value = '';
         }
 
         function exportToHTML() {
             const reportId = document.getElementById('modalReportId').textContent;
             const report = sampleReports[reportId];
-            
+
             if (!report) return;
 
             // Create HTML content for export
@@ -504,24 +532,25 @@
             alert(`Opening image: ${imageName}\nIn a real implementation, this would open a larger view of the image.`);
         }
 
-        document.getElementById('searchUser').addEventListener('input', function() {
+        document.getElementById('searchUser').addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             console.log('Searching for:', searchTerm);
         });
 
-        document.getElementById('statusFilter').addEventListener('change', function() {
+        document.getElementById('statusFilter').addEventListener('change', function () {
             const selectedStatus = this.value;
             console.log('Filtering by status:', selectedStatus);
         });
 
-        document.getElementById('datePicker').addEventListener('change', function() {
+        document.getElementById('datePicker').addEventListener('change', function () {
             const selectedDate = this.value;
             console.log('Filtering by date:', selectedDate);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('Community Concerns Management System loaded');
         });
     </script>
 </body>
+
 </html>

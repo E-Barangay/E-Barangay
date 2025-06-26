@@ -1,3 +1,28 @@
+<?php
+
+$sql = "SELECT 
+            users.userID,
+            users.username,
+            users.email,
+            users.phoneNumber,
+            users.role,
+            userInfo.firstName,
+            userInfo.middleName,
+            userInfo.lastName,
+            userInfo.birthDate,
+            userInfo.gender,
+            userInfo.profilePicture,
+            barangays.barangayName,
+            cities.cityName
+        FROM users
+        INNER JOIN userInfo ON users.userInfoID = userInfo.userInfoID
+        LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID
+        LEFT JOIN barangays ON addresses.barangayID = barangays.barangayID
+        LEFT JOIN cities ON addresses.cityID = cities.cityID
+        WHERE users.role = 'user'";
+$result = executeQuery($sql)
+    ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -88,60 +113,48 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="px-4 py-3 text-center fw-bold">Doe</td>
-                                                <td class="px-4 py-3 text-center fw-bold">John</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Air</td>
-                                                <td class="px-4 py-3 text-center fw-bold">2025-01-01</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Male</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Mamatid Cab.</td>
-                                                <td class="px-4 py-3 text-center">
-                                                    <button class="btn btn-warning btn-sm me-1">
-                                                        <i class="fas fa-edit me-1"></i>Edit
-                                                    </button>
-                                                    <button class="btn btn-success btn-sm">
-                                                        <i class="fas fa-eye me-1"></i>View
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-center fw-bold">Smith</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Jane</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Water</td>
-                                                <td class="px-4 py-3 text-center fw-bold">1995-05-15</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Female</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Poblacion</td>
-                                                <td class="px-4 py-3 text-center">
-                                                    <button class="btn btn-warning btn-sm me-1">
-                                                        <i class="fas fa-edit me-1"></i>Edit
-                                                    </button>
-                                                    <button class="btn btn-success btn-sm">
-                                                        <i class="fas fa-eye me-1"></i>View
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="px-4 py-3 text-center fw-bold">Garcia</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Maria</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Fire</td>
-                                                <td class="px-4 py-3 text-center fw-bold">1988-12-20</td>
-                                                <td class="px-4 py-3 text-center fw-bold">Female</td>
-                                                <td class="px-4 py-3 text-center fw-bold">San Isidro</td>
-                                                <td class="px-4 py-3 text-center">
-                                                    <button class="btn btn-warning btn-sm me-1">
-                                                        <i class="fas fa-edit me-1"></i>Edit
-                                                    </button>
-                                                    <button class="btn btn-success btn-sm">
-                                                        <i class="fas fa-eye me-1"></i>View
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
+                                            <?php
+                                            if (mysqli_num_rows($result) > 0) {
+                                                while ($resultRow = mysqli_fetch_assoc($result)) {
+                                                    ?>
+                                                    <tr>
+                                                        <td class="px-4 py-3 text-center fw-bold">
+                                                            <?php echo $resultRow['lastName']; ?>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center fw-bold">
+                                                            <?php echo $resultRow['firstName']; ?>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center fw-bold">
+                                                            <?php echo $resultRow['middleName']; ?>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center fw-bold">
+                                                            <?php echo $resultRow['birthDate']; ?>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center fw-bold">
+                                                            <?php echo $resultRow['gender']; ?>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center fw-bold">
+                                                            <?php echo $resultRow['barangayName'] . ', ' . $resultRow['cityName'] ?>
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <button class="btn btn-warning btn-sm me-1">
+                                                                <i class="fas fa-edit me-1"></i>Edit
+                                                            </button>
+                                                            <button class="btn btn-success btn-sm">
+                                                                <i class="fas fa-eye me-1"></i>View
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <?php
+                                                }
+                                            }
+                                            ?>
                                     </table>
                                 </div>
                             </div>
 
-                            <div class="d-lg-none">
+                            <!-- <div class="d-lg-none">
                                 <div style="max-height: 70vh; overflow-y: auto;" class="p-3">
                                     <div class="card mb-3 border-start border-primary border-4">
                                         <div class="card-body">
@@ -215,14 +228,17 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="card-footer bg-light">
                             <div class="row align-items-center">
                                 <div class="col-12 col-md-6">
                                     <div class="text-center text-md-start">
-                                        <small class="text-muted">Showing 3 of 3 residents</small>
+                                        <small class="text-muted">
+                                            Showing <?= mysqli_num_rows($result) ?>
+                                            resident<?= mysqli_num_rows($result) !== 1 ? 's' : '' ?>
+                                        </small>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
