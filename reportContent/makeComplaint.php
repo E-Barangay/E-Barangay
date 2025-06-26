@@ -35,7 +35,7 @@ if (isset($_POST['submit'])) {
             style="resize: none; height: 50vh;" required></textarea>
 
         <div class="d-flex justify-content-center justify-content-md-end mt-2">
-            <button type="button" class="btn filterButton me-3">Upload</button>
+            <!-- <button type="button" class="btn filterButton me-3">Upload</button> -->
             <button type="button" class="btn filterButton" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Submit
             </button>
