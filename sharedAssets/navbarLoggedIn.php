@@ -1,8 +1,9 @@
 <?php
 
-if (isset($_POST['logOut'])) {
+if (isset($_POST['logout'])) {
     session_destroy();
-    header("location: index.php");
+    header("Location: index.php");
+    exit(); // Important: stop script execution after redirect
 }
 
 $firstName = "User"; // default fallback
