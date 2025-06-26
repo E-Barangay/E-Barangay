@@ -23,6 +23,7 @@ html {
 .filterButton {
     background-color: #19AFA5;
     color: white;
+    width: 200px;
     border: 1px solid #19AFA5;
     border-radius: 12px;
 }

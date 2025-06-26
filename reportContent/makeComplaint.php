@@ -35,8 +35,8 @@ if (isset($_POST['submit'])) {
             style="resize: none; height: 50vh;" required></textarea>
 
         <div class="d-flex justify-content-center justify-content-md-end mt-2">
-            <button type="button" class="btn btn-custom me-3">Upload</button>
-            <button type="button" class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <button type="button" class="btn filterButton me-3">Upload</button>
+            <button type="button" class="btn filterButton" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Submit
             </button>
         </div>
@@ -50,7 +50,7 @@ if (isset($_POST['submit'])) {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-custom" name="submit">Confirm</button>
+                        <button type="submit" class="btn btn-success" name="submit">Confirm</button>
                     </div>
                 </div>
             </div>

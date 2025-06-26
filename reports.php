@@ -79,17 +79,17 @@ if (isset($_GET['page'])) {
 
                 <div class="row mb-2 px-5 d-sm-none d-flex justify-content-center">
                     <div class="col-4 d-flex justify-content-center">
-                        <a href="?page=complaintSection" class="btn btn-custom p-2 w-100 text-center">
+                        <a href="?page=complaintSection" class="btn filterButton p-2 w-100 text-center">
                             <i class="bi bi-house-door-fill"></i>
                         </a>
                     </div>
                     <div class="col-4 d-flex justify-content-center">
-                        <a href="?page=makeComplaint" class="btn btn-custom p-2 w-100 text-center">
+                        <a href="?page=makeComplaint" class="btn filterButton p-2 w-100 text-center">
                             <i class="bi bi-file-earmark-text-fill"></i>
                         </a>
                     </div>
                     <div class="col-4 d-flex justify-content-center">
-                        <a href="?page=submittedComplaints" class="btn btn-custom p-2 w-100 text-center">
+                        <a href="?page=submittedComplaints" class="btn filterButton p-2 w-100 text-center">
                             <i class="bi bi-send-fill"></i>
                         </a>
                     </div>
