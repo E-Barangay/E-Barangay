@@ -52,7 +52,7 @@ if (isset($_GET['page'])) {
 
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
 
     <?php
 

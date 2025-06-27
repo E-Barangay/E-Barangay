@@ -44,7 +44,7 @@ if(isset($_POST['submit'])){
   $submitQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate) VALUES ($documentTypeID, $userID, '$purpose', NOW())";
   executeQuery($submitQuery);
 
-  header("Location: index.php");
+  header("Location: ../documents.php?content=documentRequest");
   exit();
 }
 

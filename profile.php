@@ -92,7 +92,7 @@ if (isset($_POST['saveBtn'])) {
     <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
     <?php
     if (isset($_SESSION['userID'])) {
         include("sharedAssets/navbarLoggedIn.php");

@@ -68,7 +68,7 @@ $mioDocumentsResult = executeQuery($mioDocumentsQuery);
     <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
     
     <?php
 

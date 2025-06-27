@@ -112,7 +112,7 @@ if (!empty($search)) {
                           </td>
 <td class="px-4 py-3">
   <?php if (!empty($a['image'])): ?>
-    <img src="/e-baranggay/E-Barangay/<?php echo $a['image']; ?>" 
+    <img src="../<?php echo $a['image']; ?>" 
          width="50" height="50" 
          class="rounded" style="object-fit: cover;">
   <?php else: ?>
@@ -156,9 +156,13 @@ if (!empty($search)) {
                           <strong>Description:</strong>
                           <p class="mb-1"><?php echo ($a['description']); ?></p>
                         </div>
-                        <?php if ($a['image']): ?>
-                          <img src="<?php echo $a['image']; ?>" class="img-fluid rounded mb-2" style="max-height: 150px;" alt="Image">
-                        <?php endif; ?>
+   <?php if (!empty($a['image'])): ?>
+    <img src="../<?php echo $a['image']; ?>" 
+         width="50" height="50" 
+         class="rounded" style="object-fit: cover;">
+  <?php else: ?>
+    <span class="text-muted">No image</span>
+  <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                           <div>
 <a href="adminContent/editAnnouncement.php?id=<?php echo $a['announcementID']; ?>" class="btn btn-warning btn-sm me-1">

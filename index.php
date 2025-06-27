@@ -26,7 +26,7 @@ session_start();
     <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
     <?php
     if (isset($_SESSION['userID'])) {
         include("sharedAssets/navbarLoggedIn.php");
@@ -64,12 +64,9 @@ session_start();
                             $query = "SELECT image FROM announcements ORDER BY dateTime DESC";
                             $result = mysqli_query($conn, $query);
                             $isFirst = true;
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $image = htmlspecialchars($row['image']);
-                                $imagePath = "assets/images/announcements/" . $image;
-                                ?>
+                            while ($row = mysqli_fetch_assoc($result)) { ?>
                                 <div class="carousel-item <?= $isFirst ? 'active' : '' ?>">
-                                    <img src="<?= $imagePath ?>" class="d-block w-100 h-100 object-fit-cover"
+                                    <img src="assets/images/announcements/<?php echo $row['image'] ?>" class="d-block w-100 h-100 object-fit-cover"
                                         alt="Announcement Image">
                                 </div>
                                 <?php
@@ -104,18 +101,16 @@ session_start();
         </div>
         <div class="row">
             <?php
-            $query = "SELECT * FROM announcements WHERE isImportant = 'TRUE' ORDER BY dateTime DESC";
+            $query = "SELECT * FROM announcements WHERE isImportant = '1' ORDER BY dateTime DESC";
             $result = mysqli_query($conn, $query);
 
             while ($row = mysqli_fetch_assoc($result)) {
                 $title = htmlspecialchars($row['title']);
                 $description = htmlspecialchars($row['description']);
-                $image = htmlspecialchars($row['image']);
-                $imagePath = "assets/images/announcements/" . $image;
                 ?>
                 <div class="col-md-4">
                     <div class="card mt-3" style="width: 100%;">
-                        <img src="<?= $imagePath ?>" class="card-img-top" alt="Announcement Image">
+                        <img src="assets/images/announcements/<?php echo $row['image'] ?>" class="card-img-top" alt="Announcement Image">
                         <div class="card-body">
                             <h5 class="card-title custom-title"><?= $title ?></h5>
                             <p class="card-text"><?= $description ?></p>
