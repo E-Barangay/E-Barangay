@@ -215,18 +215,20 @@ if (empty($loginLabels)) {
       }]
     };
 
-    new Chart(document.getElementById('userSignupsChart').getContext('2d'), {
+    // Fixed: Assign chart instances to variables
+    const signupChart = new Chart(document.getElementById('userSignupsChart').getContext('2d'), {
       type: 'bar',
       data: signupData,
       options: chartOptions
     });
 
-    new Chart(document.getElementById('loginActivityChart').getContext('2d'), {
+    const loginChart = new Chart(document.getElementById('loginActivityChart').getContext('2d'), {
       type: 'bar',
       data: loginData,
       options: chartOptions
     });
 
+    // Now this will work correctly
     window.addEventListener('resize', function () {
       signupChart.resize();
       loginChart.resize();

@@ -40,9 +40,12 @@ if (!empty($search)) {
       color: #6c757d;
     }
     .important-badge.bg-warning {
-      background-color: #ffc107 !important;
+      background-color: #09bba3ff !important;
       color: #000 !important;
     }
+    .important-border {
+  border-color: #09bba3ff !important;
+}
   </style>
 </head>
 
@@ -69,14 +72,14 @@ if (!empty($search)) {
                         <i class="fas fa-search text-muted"></i>
                       </span>
                       <input type="text" class="form-control border-start-0" name="search"
-                             placeholder="Search Announcement" value="<?php echo ($search ?? ''); ?>">
+                             placeholder="Search Announcement" value="<?php echo htmlspecialchars($search ?? ''); ?>">
                     </div>
                   </form>
                 </div>
                 <div class="col-lg-6 col-md-6 d-flex justify-content-md-end">
-<a href="adminContent/addAnnouncement.php" class="btn btn-primary" style="background-color: rgb(49, 175, 171); border: none;">
-    <i class="fas fa-plus me-2"></i> Add Announcement
-</a>
+                  <a href="adminContent/addAnnouncement.php" class="btn btn-primary" style="background-color: rgb(49, 175, 171); border: none;">
+                    <i class="fas fa-plus me-2"></i> Add Announcement
+                  </a>
                 </div>
               </div>
             </div>
@@ -102,38 +105,41 @@ if (!empty($search)) {
                     <tbody>
                       <?php foreach ($announcements as $a): ?>
                         <tr>
-                          <td class="px-4 py-3"><?php echo $a['announcementID']; ?></td>
-                          <td class="px-4 py-3"><?php echo ($a['title']); ?></td>
+                          <td class="px-4 py-3"><?php echo htmlspecialchars($a['announcementID']); ?></td>
+                          <td class="px-4 py-3"><?php echo htmlspecialchars($a['title']); ?></td>
                           <td class="px-4 py-3"><?php echo date('Y-m-d', strtotime($a['dateTime'])); ?></td>
                           <td class="px-4 py-3">
                             <span class="d-inline-block text-truncate" style="max-width: 180px;">
-                              <?php echo ($a['description']); ?>
+                              <?php echo htmlspecialchars($a['description']); ?>
                             </span>
                           </td>
-<td class="px-4 py-3">
-  <?php if (!empty($a['image'])): ?>
-    <img src="../<?php echo $a['image']; ?>" 
-         width="50" height="50" 
-         class="rounded" style="object-fit: cover;">
-  <?php else: ?>
-    <span class="text-muted">No image</span>
-  <?php endif; ?>
-</td>
                           <td class="px-4 py-3">
-<a href="adminContent/editAnnouncement.php?id=<?php echo $a['announcementID']; ?>" class="btn btn-warning btn-sm me-1">
-    <i class="fas fa-edit me-1"></i> Edit
-</a>
-                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $a['announcementID']; ?>">
-                              <i class="fas fa-trash me-1"></i>Delete
-                            </button>
+                            <?php if (!empty($a['image'])): ?>
+                              <img src="../assets/images/announcements/<?php echo $a['image'] ?>" 
+                                   width="50" height="50" 
+                                   class="rounded" style="object-fit: cover;" 
+                                   alt="Announcement Image">
+                            <?php else: ?>
+                              <span class="text-muted">No image</span>
+                            <?php endif; ?>
                           </td>
-  <td class="px-4 py-3 text-center">
-  <?php if ($a['isImportant']): ?>
-    <span class="badge bg-primary">Important</span>
-  <?php else: ?>
-    <span class="text-muted">—</span>
-  <?php endif; ?>
+<td class="px-4 py-3">
+  <div class="d-flex flex-column gap-2">
+    <a href="adminContent/editAnnouncement.php?id=<?php echo htmlspecialchars($a['announcementID']); ?>" class="btn btn-warning btn-sm">
+      <i class="fas fa-edit me-1"></i> Edit
+    </a>
+    <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo htmlspecialchars($a['announcementID']); ?>">
+      <i class="fas fa-trash me-1"></i>Delete
+    </button>
+  </div>
 </td>
+                          <td class="px-4 py-3 text-center">
+                            <?php if ($a['isImportant']): ?>
+                              <span class="badge bg-primary">Important</span>
+                            <?php else: ?>
+                              <span class="text-muted">—</span>
+                            <?php endif; ?>
+                          </td>
                         </tr>
                       <?php endforeach; ?>
                     </tbody>
@@ -141,51 +147,58 @@ if (!empty($search)) {
                 </div>
               </div>
 
-              <!-- Mobile View -->
-              <div class="d-lg-none">
-                <div style="max-height: 70vh; overflow-y: auto;" class="p-3">
-                  <?php foreach ($announcements as $a): ?>
-                    <div class="card mb-3 border-start <?php echo $a['isImportant'] ? 'border-warning' : ''; ?> border-4">
-                      <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                          <h6 class="card-title mb-0 fw-bold">ID: <?php echo $a['announcementID']; ?></h6>
-                          <span class="badge bg-info"><?php echo ($a['title']); ?></span>
-                        </div>
-                        <div class="small mb-2"><strong>Date:</strong> <?php echo $a['dateTime']; ?></div>
-                        <div class="mb-2">
-                          <strong>Description:</strong>
-                          <p class="mb-1"><?php echo ($a['description']); ?></p>
-                        </div>
-   <?php if (!empty($a['image'])): ?>
-    <img src="../<?php echo $a['image']; ?>" 
-         width="50" height="50" 
-         class="rounded" style="object-fit: cover;">
-  <?php else: ?>
-    <span class="text-muted">No image</span>
-  <?php endif; ?>
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                          <div>
-<a href="adminContent/editAnnouncement.php?id=<?php echo $a['announcementID']; ?>" class="btn btn-warning btn-sm me-1">
-    <i class="fas fa-edit me-1"></i> Edit
-</a>
-                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $a['announcementID']; ?>">
-                              <i class="fas fa-trash me-1"></i>Delete
-                            </button>
-                          </div>
-    <div class="form-check">
-  <?php if ($a['isImportant']): ?>
-    <span class="badge bg-primary">Important</span>
-  <?php else: ?>
-    <span class="text-muted small">—</span>
-  <?php endif; ?>
+<!-- Mobile View -->
+<div class="d-lg-none">
+  <div style="max-height: 70vh; overflow-y: auto;" class="p-3">
+    <?php foreach ($announcements as $a): ?>
+<div class="card mb-3 border-start <?php echo $a['isImportant'] ? 'important-border' : ''; ?> border-4 shadow-sm">
+  <div class="card-body pt-3">
+
+    <h5 class="fw-bold mb-2"><?php echo htmlspecialchars($a['title']); ?></h5>
+
+    <div class="small text-muted mb-1">
+      <strong>Date:</strong> <?php echo htmlspecialchars($a['dateTime']); ?>
+    </div>
+
+    <?php if ($a['isImportant']): ?>
+      <div class="mb-2">
+        <span class="important-badge bg-warning">Important</span>
+      </div>
+    <?php endif; ?>
+
+
+          <!-- Description -->
+          <div class="mb-2">
+            <strong>Description:</strong>
+            <p class="mb-1 small"><?php echo htmlspecialchars($a['description']); ?></p>
+          </div>
+
+          <!-- Image -->
+          <div class="mb-2">
+            <?php if (!empty($a['image'])): ?>
+              <img src="../assets/images/announcements/<?php echo $a['image'] ?>" 
+                   class="rounded w-100" style="object-fit: cover; max-height: 200px;" 
+                   alt="Announcement Image">
+            <?php else: ?>
+              <span class="text-muted">No image</span>
+            <?php endif; ?>
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex flex-column gap-2 mt-3">
+            <a href="adminContent/editAnnouncement.php?id=<?php echo htmlspecialchars($a['announcementID']); ?>" class="btn btn-warning btn-sm w-100">
+              <i class="fas fa-edit me-1"></i> Edit
+            </a>
+            <button class="btn btn-danger btn-sm w-100 delete-btn" data-id="<?php echo htmlspecialchars($a['announcementID']); ?>">
+              <i class="fas fa-trash me-1"></i> Delete
+            </button>
+          </div>
+
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
 </div>
-                        </div>
-                      </div>
-                    </div>
-                  <?php endforeach; ?>
-                </div>
-              </div>
-            </div>
 
             <div class="card-footer bg-light">
               <nav class="d-flex justify-content-center">
@@ -203,11 +216,19 @@ if (!empty($search)) {
     </div>
   </div>
 
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.6/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.6/js/bootstrap.bundle.min.js"></script>
     
-<script>
-</script>
+  <script>
+    // Add delete functionality if needed
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        if (confirm('Are you sure you want to delete this announcement?')) {
+          // Add your delete logic here
+          console.log('Delete announcement with ID:', id);
+        }
+      });
+    });
+  </script>
 </body>
-
 </html>
