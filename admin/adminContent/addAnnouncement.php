@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $imageName = time() . '_' . basename($_FILES['image']['name']);
         $absolutePath = $uploadDir . $imageName;
-        $browserPath = 'assets/images/announcements/' . $imageName;
+        $browserPath = $imageName;
 
         if (move_uploaded_file($_FILES['image']['tmp_name'], $absolutePath)) {
             $imagePath = $browserPath;

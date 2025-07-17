@@ -155,7 +155,7 @@ if(isset($_POST['submit'])){
           </div>
           <div class="col-3">
             <img src="../assets/images/<?php echo $profilePicture ?>" class="bg-secondary" style="width: 200px; height: 200px;" alt="">
-            <div class="signature-label">Signature</div>
+            <!-- <div class="signature-label mt-auto">Signature</div> -->
           </div>
         </div>
       </div>
