@@ -2,7 +2,7 @@
 if (isset($_POST['submit'])) {
     $reportContent = $_POST['reportContent'];
     $title = $_POST['title'];
-    $requestStatus = 'sent';
+    $requestStatus = 'pending';
 
     if (!empty($reportContent) && !empty($title)) {
         $userID = $_SESSION['userID'];
