@@ -86,12 +86,12 @@ include("../sharedAssets/connect.php");
             <a href="?page=announcement"
               class="nav-button py-3 px-4 d-flex align-items-center justify-content-start text-decoration-none <?php echo ($page == 'announcement') ? 'active' : ''; ?>">
               <i class="fas fa-bullhorn me-3" style="width: 20px;"></i>
-              <span>ANNOUNCEMENT</span>
+              <span>ANNOUNCEMENTS</span>
             </a>
             <a href="?page=reports"
-              class="nav-button py-3 px-4 d-flex align-items-center justify-content-start text-decoration-none <?php echo ($page == 'reports') ? 'active' : ''; ?>">
-              <i class="fas fa-chart-bar me-3" style="width: 20px;"></i>
-              <span>REPORT DATA</span>
+              class="nav-button py-3 px-4 d-flex align-items-center justify-content-start text-decoration-none <?= ($page == 'reports') ? 'active' : ''; ?>">
+              <i class="fas fa-exclamation-circle me-3" style="width: 20px;"></i>
+              <span>COMPLAINT</span>
             </a>
             <a href="?page=document"
               class="nav-button py-3 px-4 d-flex align-items-center justify-content-start text-decoration-none <?php echo ($page == 'document') ? 'active' : ''; ?>">
