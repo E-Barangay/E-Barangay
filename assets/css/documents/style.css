@@ -52,6 +52,12 @@ input.form-control:focus {
     border-radius: 12px;
 }
 
+.submittedRequestButton:hover {
+    background-color: #19AFA5;
+    color: black;
+    border: 1px solid #19AFA5;
+}
+
 .filterButton.active {
     background-color: #0A6E6E;
     border: 1px solid #0A6E6E;
@@ -59,18 +65,11 @@ input.form-control:focus {
 
 .submittedRequestButton.active {
     background-color: #0A6E6E;
-    color: #FFFFFF;
     border: 1px solid #0A6E6E;
 }
 
-.submittedRequestButton:hover {
-    background-color: #19AFA5;
-    color: white;
-    border: 1px solid #19AFA5;
-}
-
 .contentCard {
-    height: 80vh;
+    height: 100vh;
     border-radius: 20px;
     border: 1px solid #19AFA5;
 }
