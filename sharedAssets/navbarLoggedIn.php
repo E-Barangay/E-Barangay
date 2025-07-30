@@ -49,7 +49,7 @@ if (isset($_SESSION['userID'])) {
                 <li class="nav-item mx-1 dropdown">
                     <a class="nav-link active4 text-center dropdown-toggle" href="#" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        Hi, <?php echo $firstName ?> <i class="fa-solid fa-user"></i>
+                        Hi, <?php echo $firstName ?> <i class="fa-solid fa-user" style="color: #19AFA5;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user dropdown-icon"></i>

@@ -119,15 +119,20 @@ $mioDocumentsResult = executeQuery($mioDocumentsQuery);
                 <form method="GET">
 
                     <div class="filterCard card m-1 p-2 d-none d-sm-block">
+
                         <div class="row">
                             <div class="col m-2">
                                 <div class="position-relative">
+
+                                    <!-- Search Bar -->
                                     <input type="hidden" name="content" value="<?php echo $content; ?>">
                                     <input class="form-control rounded-pill ps-5" name="search" type="search" placeholder="Search Documents" value="<?php echo $searchTerm ?>">
                                     <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
+                                    
                                 </div>
                             </div>
                         </div>
+
                         <div class="row d-flex flex-column mt-4">
 
                             <!-- Filter -->

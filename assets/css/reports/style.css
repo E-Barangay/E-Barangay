@@ -23,7 +23,6 @@ html {
 .filterButton {
     background-color: #19AFA5;
     color: white;
-    width: 200px;
     border: 1px solid #19AFA5;
     border-radius: 12px;
 }
@@ -39,22 +38,8 @@ html {
     border: 1px solid #0A6E6E;
 }
 
-.content {
-    min-height: 75vh;
-    max-height: 75vh;
-    overflow-y: auto;
-}
-
-.cardBorder {
-    height: 80vh;
+.contentCard {
+    height: 100vh;
     border-radius: 20px;
     border: 1px solid #19AFA5;
-}
-
-.sidebar {
-    min-height: 100%;
-}
-
-.outline {
-    outline: none;
 }

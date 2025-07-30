@@ -75,6 +75,7 @@ include("../sharedAssets/connect.php");
       display: block;
       margin: 0 auto;
       border-radius: 50%;
+      cursor: pointer;
     }
 
     .sidebar.collapsed .sidebar-logo img {

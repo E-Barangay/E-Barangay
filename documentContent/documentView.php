@@ -26,6 +26,7 @@ $lastName = $userRow['lastName'];
 $birthDate = $userRow['birthDate'];
 $gender = $userRow['gender'];
 $profilePicture = $userRow['profilePicture'];
+$residencyType = $userRow['residencyType'];
 $streetName = $userRow['streetName'];
 $barangayName = $userRow['barangayName'];
 $cityName = $userRow['cityName'];
@@ -87,7 +88,7 @@ if (isset($_POST['submit'])) {
     </style>
 </head>
 
-<body data-bs-theme="dark">
+<body data-bs-theme="light">
     
     <form method="POST">
         <div class="container py-4">
@@ -161,16 +162,25 @@ if (isset($_POST['submit'])) {
                                         <p><strong>Gender: </strong><?php echo $gender ?></p>
                                         <p><strong>Civil Status: </strong>Single</p>
                                         <p><strong>Length of Stay: </strong>20 years</p>
-                                        <p><strong>Type of Residency: </strong>Bonafide</p>
+                                        <p><strong>Type of Residency: </strong><?php echo $residencyType ?></p>
                                         <p><strong>Landlord: </strong></p>
                                         <p><strong>Company: </strong></p>
                                         <div class="d-flex">
                                             <p><strong>Purpose:</strong></p>
-                                            <select class="form-select form-select-sm ms-2 purposeSelect" aria-label="Purpose Select">
+                                            <select class="form-select form-select-sm ms-2 purposeSelect" name="purpose" aria-label="Purpose Select">
                                                 <option selected>Choose Purpose</option>
-                                                <option value="1">For Work</option>
-                                                <option value="2">Business</option>
-                                                <option value="3">Student</option>
+                                                <option value="Employment">Employment</option>
+                                                <option value="Job Requirement / Local Employment">Job Requirement / Local Employment</option>
+                                                <option value="Overseas Employment (OFW)">Overseas Employment (OFW)</option>
+                                                <option value="School Requirement / Enrollment">School Requirement / Enrollment</option>
+                                                <option value="Scholarship Application">Scholarship Application</option>
+                                                <option value="Medical Assistance">Medical Assistance</option>
+                                                <option value="Hospital Requirement">Hospital Requirement</option>
+                                                <option value="Legal Requirement / Court Use">Legal Requirement / Court Use</option>
+                                                <option value="NBI / Police Clearance">NBI / Police Clearance</option>
+                                                <option value="Passport Application / Renewal">Passport Application / Renewal</option>
+                                                <option value="Driver’s License">Driver’s License</option>
+                                                <option value="Loan Application">Loan Application</option>
                                             </select>
                                         </div>
                                         <p><strong>Remarks:</strong> No Derogatory Record</p>

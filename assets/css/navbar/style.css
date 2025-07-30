@@ -2,14 +2,6 @@
     border-bottom: 1px solid #19AFA5;
 }
 
-.active1,
-.active2,
-.active3,
-.active4 {
-    color: var(--bs-body-color);
-    /* color: white;  */
-}
-
 .active1:hover,
 .active2:hover,
 .active3:hover,
