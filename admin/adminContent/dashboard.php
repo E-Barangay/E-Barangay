@@ -15,8 +15,8 @@ $signupResult = executeQuery("SELECT MONTHNAME(dateCreated) AS month, COUNT(*) A
     ORDER BY MONTH(dateCreated)");
 $signupLabels = $signupData = [];
 while ($row = mysqli_fetch_assoc($signupResult)) {
-    $signupLabels[] = $row['month'];
-    $signupData[] = $row['count'];
+  $signupLabels[] = $row['month'];
+  $signupData[] = $row['count'];
 }
 
 $loginResult = executeQuery("SELECT MONTHNAME(lastLogin) AS month, COUNT(*) AS count 
@@ -26,20 +26,19 @@ $loginResult = executeQuery("SELECT MONTHNAME(lastLogin) AS month, COUNT(*) AS c
     ORDER BY MONTH(lastLogin)");
 $loginLabels = $loginData = [];
 while ($row = mysqli_fetch_assoc($loginResult)) {
-    $loginLabels[] = $row['month'];
-    $loginData[] = $row['count'];
+  $loginLabels[] = $row['month'];
+  $loginData[] = $row['count'];
 }
 
 if (empty($signupLabels)) {
-    $signupLabels = ["No data"];
-    $signupData = [0];
+  $signupLabels = ["No data"];
+  $signupData = [0];
 }
 if (empty($loginLabels)) {
-    $loginLabels = ["No data"];
-    $loginData = [0];
+  $loginLabels = ["No data"];
+  $loginData = [0];
 }
 ?>
-
 
 <!doctype html>
 <html lang="en">
@@ -73,63 +72,137 @@ if (empty($loginLabels)) {
             <h1 class="mb-0 display-5">Hello, <span style="color: #19AFA5;">Admin</span></h1>
           </div>
         </div>
-
         <!-- USER STATISTICS -->
         <div class="mb-4">
-          <h4 class="mb-4 fw-bold">USER STATISTICS</h4>
-          <hr class="border-top border-dark opacity-100" style="border-width: 2px !important;">
-          <div class="card text-dark rounded-4 border-0" style="background-color: rgb(49, 175, 171);">
-            <div class="card-body p-4 p-md-5">
-              <div class="row text-center">
-                <div class="col-12 col-lg-4 mb-4 mb-lg-0">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <!-- Card 1 -->
+            <div class="col">
+              <div class="card text-dark rounded-4 border-0 h-100" style="background-color: rgb(49, 175, 171);">
+                <div class="card-body p-md-5 text-center">
                   <p class="display-6 fw-bold mb-3"><?= $totalUsers ?></p>
-                  <h5 class="mb-0 fw-bold">TOTAL USERS</h5>
+                  <h5 class="mb-0 fw-bold">Total Population</h5>
                 </div>
-                <div class="col-12 col-lg-4 mb-4 mb-lg-0">
-                  <p class="display-6 fw-bold mb-3"><?= $activeUsers ?></p>
-                  <h5 class="mb-0 fw-bold">ACTIVE USERS</h5>
+              </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col">
+              <div class="card text-dark rounded-4 border-0 h-100" style="background-color: rgb(49, 175, 171);">
+                <div class="card-body p-md-5 text-center">
+                  <p class="display-6 fw-bold mb-3"><?= $totalUsers ?></p>
+                  <h5 class="mb-0 fw-bold">Total Users</h5>
                 </div>
-                <div class="col-12 col-lg-4 mb-4 mb-lg-0">
-                  <p class="display-6 fw-bold mb-3"><?= $inactiveUsers ?></p>
-                  <h5 class="mb-0 fw-bold">INACTIVE USERS</h5>
+              </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col">
+              <div class="card text-dark rounded-4 border-0 h-100" style="background-color: rgb(49, 175, 171);">
+                <div class="card-body p-md-5 text-center">
+                  <p class="display-6 fw-bold mb-3"><?= $totalUsers ?></p>
+                  <h5 class="mb-0 fw-bold">Total Document Requests</h5>
+                </div>
+              </div>
+            </div>
+            <!-- Card 4 -->
+            <div class="col">
+              <div class="card text-dark rounded-4 border-0 h-100" style="background-color: rgb(49, 175, 171);">
+                <div class="card-body p-md-5 text-center">
+                  <p class="display-6 fw-bold mb-3"><?= $totalUsers ?></p>
+                  <h5 class="mb-0 fw-bold">Total Complaints</h5>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- WEBSITE ENGAGEMENT -->
-        <div class="mb-4">
-          <h4 class="mb-4 fw-bold">WEBSITE ENGAGEMENT</h4>
-          <hr class="border-top border-dark opacity-100" style="border-width: 2px !important;">
-          <div class="row">
-            <div class="col-12 mb-5">
-              <h5 class="fw-bold mb-4">MONTHLY USER SIGNUPS</h5>
-              <div class="bg-light rounded-4 p-4 p-md-5">
-                <div class="position-relative" style="height: 400px;">
-                  <canvas id="userSignupsChart" class="w-100 h-100 border border-2 border-dark rounded-3"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-12 mb-5">
-              <h5 class="fw-bold mb-4">MONTHLY LOGIN ACTIVITY</h5>
-              <div class="bg-light rounded-4 p-4 p-md-5">
-                <div class="position-relative" style="height: 400px;">
-                  <canvas id="loginActivityChart" class="w-100 h-100 border border-2 border-dark rounded-3"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
+    <div class="row">
+      <!--70%-->
+      <div class="col-8">
+        <div class="card text-dark rounded-4 border-0 h-100" style="background-color: rgb(49, 175, 171);">
+          <div class="card-body p-md-5 text-center">
+            <h5 class="mb-0 fw-bold">Diagram Map</h5>
+          </div>
+        </div>
+      </div>
+      <!--30%-->
+      <div class="col-4">
+        <div class="card text-dark rounded-4 border-0 h-100" style="background-color: rgb(49, 175, 171);">
+          <div class="card-body p-md-5 text-center">
+            <h4 class="mb-2 fw-bold">Barangay Population Breakdown</h4>
+            <p class="mb-4 fw-bold">as of July 2025</p>
+
+            <div class="d-flex flex-column gap-2">
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Male:</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Female:</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Age (0-12):</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Age (18-59):</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Age (60+):</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Registered:</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <h5 class="mb-0 fw-bold">Unregistered:</h5>
+                <h5 class="mb-0 fw-bold"><?= $totalUsers ?></h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="max-width: 500px; margin: auto;">
+    <canvas id="myDoughnutChart"></canvas>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script>
+    const ctx = document.getElementById('myDoughnutChart');
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Bonafide', 'Transient', 'Migrant', 'Isa pa na type of Residency'],
+        datasets: [{
+          label: 'Population Distribution',
+          data: [300, 50, 100, 1234],
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)',
+            'rgb(22, 41, 90)'
+          ],
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  </script>
+  <!-- <script>
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -232,7 +305,7 @@ if (empty($loginLabels)) {
     window.addEventListener('resize', function () {
       signupChart.resize();
       loginChart.resize();
-    });
+    }); -->
   </script>
 </body>
 
