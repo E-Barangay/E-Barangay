@@ -1,30 +1,30 @@
 <?php
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
-$reportID = $_GET['reportID'] ?? $_POST['reportID'] ?? '';
+$complaintID = $_GET['complaintID'] ?? $_POST['complaintID'] ?? '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requestStatus'])) {
-  $newStatus = $_POST['requestStatus'];
-  $stmt = $conn->prepare("UPDATE reports SET requestStatus = ? WHERE reportID = ?");
-  $stmt->bind_param("si", $newStatus, $reportID);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaintStatus'])) {
+  $newStatus = $_POST['complaintStatus'];
+  $stmt = $conn->prepare("UPDATE complaints SET complaintStatus = ? WHERE complaintID = ?");
+  $stmt->bind_param("si", $newStatus, $complaintID);
   $stmt->execute();
   $stmt->close();
 
-  header("Location: ../index.php?page=reports");
+  header("Location: ../index.php?page=complaints");
   exit;
 }
 
-$stmt = $conn->prepare("SELECT r.reportID, r.requestDate, r.requestStatus, r.reportTitle,
+$stmt = $conn->prepare("SELECT r.complaintID, r.requestDate, r.complaintStatus, r.complaintTitle,
     CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS requesterName,
-    u.phoneNumber
-    FROM reports r
+    phoneNumber
+    FROM complaints r
     JOIN users u ON r.userID = u.userID
     JOIN userinfo ui ON u.userID = ui.userID
-    WHERE r.reportID = ?");
-$stmt->bind_param('i', $reportID);
+    WHERE r.complaintID = ?");
+$stmt->bind_param('i', $complaintID);
 $stmt->execute();
 $result = $stmt->get_result();
-$report = $result->fetch_assoc();
+$complaint = $result->fetch_assoc();
 $stmt->close();
 
 function getStatusBadgeClass($status)
@@ -45,7 +45,7 @@ function getStatusBadgeClass($status)
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Report Details</title>
+  <title>Complaint Details</title>
   <link rel="icon" href="../../assets/images/logoSanAntonio.png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
@@ -95,16 +95,16 @@ function getStatusBadgeClass($status)
   <div class="container px-3">
     <div class="report-card">
       <div class="report-info">
-        <h5 class="fw-bold mb-3"><i class="fas fa-file-alt text-primary me-2"></i>Report Details</h5>
+        <h5 class="fw-bold mb-3"><i class="fas fa-file-alt text-primary me-2"></i>Complaint Details</h5>
 
-        <p><strong>Report ID:</strong> <?= $report['reportID'] ?></p>
-        <p><strong>Date Submitted:</strong> <?= $report['requestDate'] ?></p>
-        <p><strong>Requester Name:</strong> <?= $report['requesterName'] ?></p>
-        <p><strong>Phone Number:</strong> <?= $report['phoneNumber'] ?></p>
-        <p><strong>Report Title:</strong> <?= $report['reportTitle'] ?></p>
+        <p><strong>Complaint ID:</strong> <?= $complaint['complaintID'] ?></p>
+        <p><strong>Date Submitted:</strong> <?= $complaint['requestDate'] ?></p>
+        <p><strong>Requester Name:</strong> <?= $complaint['requesterName'] ?></p>
+        <p><strong>Phone Number:</strong> <?= $complaint['phoneNumber'] ?></p>
+        <p><strong>Complaint Title:</strong> <?= $complaint['complaintTitle'] ?></p>
         <p><strong>Status:</strong>
-          <span class="badge <?= getStatusBadgeClass($report['requestStatus']) ?> status-badge">
-            <?= ucfirst($report['requestStatus']) ?>
+          <span class="badge <?= getStatusBadgeClass($complaint['complaintStatus']) ?> status-badge">
+            <?= ucfirst($complaint['complaintStatus']) ?>
           </span>
         </p>
 
@@ -118,26 +118,30 @@ function getStatusBadgeClass($status)
       <div class="sidebar-controls">
         <h6 class="fw-bold mb-3"><i class="fas fa-tools me-1 text-dark"></i>Admin Controls</h6>
         <form method="POST" action="">
-          <input type="hidden" name="reportID" value="<?= $report['reportID'] ?>">
+          <input type="hidden" name="complainttID" value="<?= $complaint['complaintID'] ?>">
 
           <div class="mb-3">
-            <label for="requestStatus" class="form-label">Change Status</label>
-            <select name="requestStatus" id="requestStatus" class="form-select" required>
+            <label for="complaintStatus" class="form-label">Change Status</label>
+            <select name="complaintStatus" id="complaintStatus" class="form-select" required>
               <option disabled>-- Select Status --</option>
-              <option value="Pending" <?= $report['requestStatus'] == 'Pending' ? 'selected' : '' ?>>Pending</option>
-              <option value="In Progress" <?= $report['requestStatus'] == 'In Progress' ? 'selected' : '' ?>>In Progress
+              <option value="Pending" <?= $complaint['complaintStatus'] == 'Pending' ? 'selected' : '' ?>>Pending</option>
+              <option value="In Progress" <?= $complaint['complaintStatus'] == 'In Progress' ? 'selected' : '' ?>>In
+                Progress
               </option>
-              <option value="Resolved" <?= $report['requestStatus'] == 'Resolved' ? 'selected' : '' ?>>Resolved</option>
-              <option value="Closed" <?= $report['requestStatus'] == 'Closed' ? 'selected' : '' ?>>Closed</option>
+              <option value="Resolved" <?= $complaint['complaintStatus'] == 'Resolved' ? 'selected' : '' ?>>Resolved
+              </option>
+              <option value="Closed" <?= $complaint['complaintStatus'] == 'Closed' ? 'selected' : '' ?>>Closed</option>
             </select>
           </div>
 
           <div class="d-flex justify-content-between">
-            <a href="../index.php?page=reports" class="btn btn-secondary">
+            <a href="../index.php?page=complaintsKP" class="btn btn-secondary">
               <i class="fas fa-arrow-left me-1"></i>Back
             </a>
             <button type="submit" class="btn btn-success">
-              <i class="fas fa-save me-1"></i>Update Status
+              <a href="../index.php?page=complaintsKP" class="btn btn-success">
+                <i class="fas fa-save me-1"></i>Update Status
+              </a>
             </button>
           </div>
         </form>

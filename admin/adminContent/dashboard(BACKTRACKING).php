@@ -1,64 +1,44 @@
 <?php
 
-// total users
 $totalResult = executeQuery("SELECT COUNT(*) AS total FROM users WHERE role = 'user'");
 $totalUsers = mysqli_fetch_assoc($totalResult)['total'];
 
-// check if lastLogin column exists
-$checkColumn = executeQuery("
-    SELECT COUNT(*) AS colExists
-    FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_NAME = 'users'
-    AND COLUMN_NAME = 'lastLogin'
-    AND TABLE_SCHEMA = 'eBarangay'
-");
-$col = mysqli_fetch_assoc($checkColumn);
-$hasLastLogin = $col['colExists'] > 0;
-
-// active users (last 30 days)
-if ($hasLastLogin) {
-  $activeResult = executeQuery("
-        SELECT COUNT(*) AS active 
-        FROM users 
-        WHERE role = 'user' AND lastLogin >= NOW() - INTERVAL 30 DAY
-    ");
-  $activeUsers = mysqli_fetch_assoc($activeResult)['active'];
-} else {
-  $activeUsers = 0; // fallback if no lastLogin
-}
+$activeResult = executeQuery("SELECT COUNT(*) AS active FROM users WHERE role = 'user' AND lastLogin >= NOW() - INTERVAL 30 DAY");
+$activeUsers = mysqli_fetch_assoc($activeResult)['active'];
 
 $inactiveUsers = $totalUsers - $activeUsers;
 
-// ----------------------------
-// removed dateCreated logic
-// ----------------------------
-$signupLabels = ["No data"];
-$signupData = [0];
-
-// logins by month (only if lastLogin exists)
-$loginLabels = $loginData = [];
-if ($hasLastLogin) {
-  $loginResult = executeQuery("
-        SELECT MONTHNAME(lastLogin) AS month, COUNT(*) AS count 
-        FROM users 
-        WHERE role = 'user' AND lastLogin IS NOT NULL 
-        GROUP BY MONTH(lastLogin), MONTHNAME(lastLogin) 
-        ORDER BY MONTH(lastLogin)
-    ");
-  while ($row = mysqli_fetch_assoc($loginResult)) {
-    $loginLabels[] = $row['month'];
-    $loginData[] = $row['count'];
-  }
+$signupResult = executeQuery("SELECT MONTHNAME(dateCreated) AS month, COUNT(*) AS count 
+    FROM users 
+    WHERE role = 'user' 
+    GROUP BY MONTH(dateCreated), MONTHNAME(dateCreated) 
+    ORDER BY MONTH(dateCreated)");
+$signupLabels = $signupData = [];
+while ($row = mysqli_fetch_assoc($signupResult)) {
+  $signupLabels[] = $row['month'];
+  $signupData[] = $row['count'];
 }
 
-// fallback if no login data
+$loginResult = executeQuery("SELECT MONTHNAME(lastLogin) AS month, COUNT(*) AS count 
+    FROM users 
+    WHERE role = 'user' AND lastLogin IS NOT NULL 
+    GROUP BY MONTH(lastLogin), MONTHNAME(lastLogin) 
+    ORDER BY MONTH(lastLogin)");
+$loginLabels = $loginData = [];
+while ($row = mysqli_fetch_assoc($loginResult)) {
+  $loginLabels[] = $row['month'];
+  $loginData[] = $row['count'];
+}
+
+if (empty($signupLabels)) {
+  $signupLabels = ["No data"];
+  $signupData = [0];
+}
 if (empty($loginLabels)) {
   $loginLabels = ["No data"];
   $loginData = [0];
 }
 ?>
-
-
 
 <!doctype html>
 <html lang="en">
@@ -222,7 +202,7 @@ if (empty($loginLabels)) {
       }
     });
   </script>
-  <script>
+  <!-- <script>
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -325,7 +305,7 @@ if (empty($loginLabels)) {
     window.addEventListener('resize', function () {
       signupChart.resize();
       loginChart.resize();
-    });
+    }); -->
   </script>
 </body>
 

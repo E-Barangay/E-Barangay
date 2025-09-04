@@ -6,7 +6,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 $page = $_GET['page'] ?? 'dashboard';
-$validPages = ['dashboard', 'resident', 'announcement', 'reportsKP', 'reportsVAWC', 'document'];
+$validPages = ['dashboard', 'resident', 'announcement', 'complaintsKP', 'complaintsVAWC', 'document',];
 if (!in_array($page, $validPages)) {
   header("Location: ?page=dashboard");
   exit();
@@ -256,13 +256,13 @@ include("../sharedAssets/connect.php");
           </a>
         </li>
         <li class="sidebar-item">
-          <a href="?page=reportsKP" class="sidebar-link <?php if ($page === 'reportsKP')
+          <a href="?page=complaintsKP" class="sidebar-link <?php if ($page === 'complaintsKP')
             echo 'active'; ?>">
             <i class="bi bi-exclamation-diamond"></i> <span>COMPLAINT (KP)</span>
           </a>
         </li>
         <li class="sidebar-item">
-          <a href="?page=reportsVAWC" class="sidebar-link <?php if ($page === 'reportsVAWC')
+          <a href="?page=complaintsVAWC" class="sidebar-link <?php if ($page === 'complaintsVAWC')
             echo 'active'; ?>">
             <i class="bi bi-exclamation-diamond"></i> <span>COMPLAINT (VAWC)</span>
           </a>
@@ -289,8 +289,8 @@ include("../sharedAssets/connect.php");
         'dashboard' => 'adminContent',
         'resident' => 'adminContent',
         'announcement' => 'adminContent',
-        'reportsKP' => 'adminContent',
-        'reportsVAWC' => 'adminContent',
+        'complaintsKP' => 'adminContent',
+        'complaintsVAWC' => 'adminContent',
         'document' => 'adminContent',
       ];
 

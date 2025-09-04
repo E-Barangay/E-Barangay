@@ -6,13 +6,13 @@ $status = $_GET['status'] ?? '';
 $date = $_GET['date'] ?? '';
 
 $sql = "SELECT 
-  r.reportID AS concernID,
+  r.complaintID AS concernID,
   r.requestDate,
   CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS reporterName,
-  r.reportTitle AS concernType,
-  u.phoneNumber,
-  r.requestStatus AS status
-FROM reports r
+  r.complaintTitle AS concernType,
+  phoneNumber,
+  r.complaintStatus AS status
+FROM complaints r
 JOIN users u ON r.userID = u.userID
 JOIN userinfo ui ON u.userID = ui.userID
 WHERE 1";
@@ -23,8 +23,8 @@ $types = '';
 if ($search !== '') {
   $sql .= " AND (
     CONCAT(ui.firstName, ' ', ui.lastName) LIKE ?
-    OR CAST(r.reportID AS CHAR) LIKE ?
-    OR r.reportTitle LIKE ?
+    OR CAST(r.complaintID AS CHAR) LIKE ?
+    OR r.complaintTitle LIKE ?
   )";
   $term = "%$search%";
   $params = array_merge($params, [$term, $term, $term]);
@@ -32,7 +32,7 @@ if ($search !== '') {
 }
 
 if ($status !== '' && $status !== 'All') {
-  $sql .= " AND r.requestStatus = ?";
+  $sql .= " AND r.complaintStatus = ?";
   $params[] = $status;
   $types .= 's';
 }
@@ -57,7 +57,7 @@ function getStatusBadgeClass($status)
   return match ($status) {
     'Closed' => 'bg-secondary text-white',
     'Resolved' => 'bg-success text-white',
-    'In Progress' => 'bg-primary text-white',
+    'inprogress' => 'bg-primary text-white',
     default => 'bg-warning text-dark',
   };
 }
@@ -67,7 +67,7 @@ function getBorderClass($status)
   return match ($status) {
     'Closed' => 'border-secondary',
     'Resolved' => 'border-success',
-    'In Progress' => 'border-primary',
+    'inprogress' => 'border-primary',
     default => 'border-warning',
   };
 }
@@ -122,13 +122,13 @@ function getBorderClass($status)
         <div class="p-4 rounded-top bg-custom">
           <div class="d-flex align-items-center">
             <i class="fas fa-users-cog me-3 fs-4"></i>
-            <h1 class="h4 mb-0 fw-semibold">Community Concerns Management</h1>
+            <h1 class="h4 mb-0 fw-semibold">Violence Against Children</h1>
           </div>
         </div>
 
-        <div class="p-3 p-md-4">
+        <div class="p-3 p-md-3">
           <form method="GET" action="index.php" class="mb-4">
-            <input type="hidden" name="page" value="reports">
+            <input type="hidden" name="page" value="complaintsVAWC">
             <div class="row g-3">
               <div class="col-md-4">
                 <div class="input-group">
@@ -140,16 +140,16 @@ function getBorderClass($status)
                 </div>
               </div>
 
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <select name="status" class="form-select">
                   <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
-                  <?php foreach (['Pending', 'In Progress', 'Resolved', 'Closed'] as $st): ?>
+                  <?php foreach (['Pending', 'Inprogress', 'Resolved', 'Closed'] as $st): ?>
                     <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>
 
-              <div class="col-md-3">
+              <div class="col-md-2">
                 <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="form-control">
               </div>
 
@@ -158,8 +158,15 @@ function getBorderClass($status)
                   <i class="fas fa-filter me-2"></i>Filter
                 </button>
               </div>
+
+              <div class="col-md-2">
+                <button type="button" class="btn btn-custom w-100">
+                  <i class="fas fa-plus me-2"></i>Add
+                </button>
+              </div>
             </div>
           </form>
+
 
           <div class="card shadow-sm">
             <div class="card-body p-0">
@@ -167,7 +174,7 @@ function getBorderClass($status)
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th>Report ID</th>
+                      <th>Complaint ID</th>
                       <th>Date Submitted</th>
                       <th>Reporter Name</th>
                       <th>Report Type</th>
@@ -189,7 +196,7 @@ function getBorderClass($status)
                               class="badge <?= getStatusBadgeClass($row['status']) ?>"><?= htmlspecialchars($row['status']) ?></span>
                           </td>
                           <td>
-                            <a href="adminContent/viewReport.php?reportID=<?= $row['concernID'] ?>"
+                            <a href="adminContent/viewReport.php?complaintID=<?= $row['concernID'] ?>"
                               class="btn btn-sm btn-primary" title="View Details">
                               <i class="fas fa-eye"></i>
                             </a>
@@ -213,16 +220,149 @@ function getBorderClass($status)
                     <div class="card mb-3 border-start border-4 <?= getBorderClass($row['status']) ?>">
                       <div class="card-body">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                          <h6 class="fw-bold mb-0">Report ID: <?= htmlspecialchars($row['concernID']) ?></h6>
+                          <h6 class="fw-bold mb-0">Complaint ID: <?= htmlspecialchars($row['concernID']) ?></h6>
                           <span
                             class="badge <?= getStatusBadgeClass($row['status']) ?>"><?= htmlspecialchars($row['status']) ?></span>
                         </div>
                         <div class="small">
                           <p class="mb-1"><strong>Date:</strong> <?= date('M d, Y', strtotime($row['requestDate'])) ?></p>
                           <p class="mb-1"><strong>Name:</strong> <?= htmlspecialchars($row['reporterName']) ?></p>
-                          <p class="mb-1"><strong>Report:</strong> <?= htmlspecialchars($row['concernType']) ?></p>
+                          <p class="mb-1"><strong>Complaint:</strong> <?= htmlspecialchars($row['concernType']) ?></p>
                           <p class="mb-2"><strong>Contact:</strong> <?= htmlspecialchars($row['phoneNumber']) ?></p>
-                          <a href="adminContent/viewReport.php?reportID=<?= $row['concernID'] ?>"
+                          <a href="adminContent/viewReport.php?complaintID=<?= $row['complaintID'] ?>"
+                            class="btn btn-sm btn-primary w-100">
+                            <i class="fas fa-eye me-2"></i>View Details
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  <?php endwhile; else: ?>
+                  <div class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fs-1 mb-3"></i>
+                    <p>No concerns found.</p>
+                  </div>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD SECTION FOR VIOLENCE AGAINST WOMEN -->
+    <div class="card shadow-lg border-0 rounded-3">
+      <div class="card-body p-0">
+        <div class="p-4 rounded-top bg-custom">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-users-cog me-3 fs-4"></i>
+            <h1 class="h4 mb-0 fw-semibold">Violence Against Women</h1>
+          </div>
+        </div>
+
+        <div class="p-3 p-md-3">
+          <form method="GET" action="index.php" class="mb-4">
+            <input type="hidden" name="page" value="complaintsVAWC">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                  </span>
+                  <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                    class="form-control border-start-0" placeholder="Search Reporter, ID, or Title">
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <select name="status" class="form-select">
+                  <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
+                  <?php foreach (['Pending', 'Inprogress', 'Resolved', 'Closed'] as $st): ?>
+                    <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+
+              <div class="col-md-2">
+                <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="form-control">
+              </div>
+
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-custom w-100">
+                  <i class="fas fa-filter me-2"></i>Filter
+                </button>
+              </div>
+
+              <div class="col-md-2">
+                <button type="button" class="btn btn-custom w-100">
+                  <i class="fas fa-plus me-2"></i>Add
+                </button>
+              </div>
+            </div>
+          </form>
+
+
+          <div class="card shadow-sm">
+            <div class="card-body p-0">
+              <div class="table-responsive d-none d-lg-block">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Complaint ID</th>
+                      <th>Date Submitted</th>
+                      <th>Reporter Name</th>
+                      <th>Report Type</th>
+                      <th>Contact</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php if ($result->num_rows > 0): ?>
+                      <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                          <td><strong><?= htmlspecialchars($row['concernID']) ?></strong></td>
+                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
+                          <td><?= htmlspecialchars($row['reporterName']) ?></td>
+                          <td><?= htmlspecialchars($row['concernType']) ?></td>
+                          <td><?= htmlspecialchars($row['phoneNumber']) ?></td>
+                          <td><span
+                              class="badge <?= getStatusBadgeClass($row['status']) ?>"><?= htmlspecialchars($row['status']) ?></span>
+                          </td>
+                          <td>
+                            <a href="adminContent/viewReport.php?complaintID=<?= $row['concernID'] ?>"
+                              class="btn btn-sm btn-primary" title="View Details">
+                              <i class="fas fa-eye"></i>
+                            </a>
+                          </td>
+                        </tr>
+                      <?php endwhile; ?>
+                    <?php else: ?>
+                      <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No concerns found.</td>
+                      </tr>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="d-lg-none p-3" style="max-height:70vh;overflow-y:auto;">
+                <?php
+                $result->data_seek(0);
+                if ($result->num_rows > 0):
+                  while ($row = $result->fetch_assoc()): ?>
+                    <div class="card mb-3 border-start border-4 <?= getBorderClass($row['status']) ?>">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                          <h6 class="fw-bold mb-0">Complaint ID: <?= htmlspecialchars($row['concernID']) ?></h6>
+                          <span
+                            class="badge <?= getStatusBadgeClass($row['status']) ?>"><?= htmlspecialchars($row['status']) ?></span>
+                        </div>
+                        <div class="small">
+                          <p class="mb-1"><strong>Date:</strong> <?= date('M d, Y', strtotime($row['requestDate'])) ?></p>
+                          <p class="mb-1"><strong>Name:</strong> <?= htmlspecialchars($row['reporterName']) ?></p>
+                          <p class="mb-1"><strong>Complaint:</strong> <?= htmlspecialchars($row['concernType']) ?></p>
+                          <p class="mb-2"><strong>Contact:</strong> <?= htmlspecialchars($row['phoneNumber']) ?></p>
+                          <a href="adminContent/viewReport.php?complaintID=<?= $row['complaintID'] ?>"
                             class="btn btn-sm btn-primary w-100">
                             <i class="fas fa-eye me-2"></i>View Details
                           </a>
