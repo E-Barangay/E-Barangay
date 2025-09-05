@@ -10,17 +10,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaintStatus'])) {
   $stmt->execute();
   $stmt->close();
 
-  header("Location: ../index.php?page=complaints");
+  header("Location: ../index.php?page=complaintsKP");
   exit;
 }
 
-$stmt = $conn->prepare("SELECT r.complaintID, r.requestDate, r.complaintStatus, r.complaintTitle,
-    CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS requesterName,
-    phoneNumber
+// ✅ Updated SELECT query to handle both registered users and manual complainants
+$stmt = $conn->prepare("
+    SELECT 
+      r.complaintID, 
+      r.requestDate, 
+      r.complaintStatus, 
+      r.complaintTitle,
+      COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), r.complainantName) AS complainantName,
+      r.complaintVictim,
+      r.victimAge,
+      r.complaintAccused,
+      r.victimRelationship,
+      r.complaintPhoneNumber
     FROM complaints r
-    JOIN users u ON r.userID = u.userID
-    JOIN userinfo ui ON u.userID = ui.userID
-    WHERE r.complaintID = ?");
+    LEFT JOIN users u ON r.userID = u.userID
+    LEFT JOIN userinfo ui ON u.userID = ui.userID
+    WHERE r.complaintID = ?
+");
 $stmt->bind_param('i', $complaintID);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -38,6 +49,7 @@ function getStatusBadgeClass($status)
   };
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -95,18 +107,24 @@ function getStatusBadgeClass($status)
   <div class="container px-3">
     <div class="report-card">
       <div class="report-info">
-        <h5 class="fw-bold mb-3"><i class="fas fa-file-alt text-primary me-2"></i>Complaint Details</h5>
-
-        <p><strong>Complaint ID:</strong> <?= $complaint['complaintID'] ?></p>
-        <p><strong>Date Submitted:</strong> <?= $complaint['requestDate'] ?></p>
-        <p><strong>Requester Name:</strong> <?= $complaint['requesterName'] ?></p>
-        <p><strong>Phone Number:</strong> <?= $complaint['phoneNumber'] ?></p>
-        <p><strong>Complaint Title:</strong> <?= $complaint['complaintTitle'] ?></p>
-        <p><strong>Status:</strong>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">
+            <i class="fas fa-file-alt text-primary me-2"></i>Complaint Details
+          </h5>
           <span class="badge <?= getStatusBadgeClass($complaint['complaintStatus']) ?> status-badge">
             <?= ucfirst($complaint['complaintStatus']) ?>
           </span>
-        </p>
+        </div>
+
+        <p><strong>Complaint ID:</strong> <?= $complaint['complaintID'] ?></p>
+        <p><strong>Complaint Title:</strong> <?= $complaint['complaintTitle'] ?></p>
+        <p><strong>Date Submitted:</strong> <?= $complaint['requestDate'] ?></p>
+        <p><strong>Complainant Name:</strong> <?= $complaint['complainantName'] ?></p>
+        <p><strong>Victim:</strong> <?= $complaint['complaintVictim'] ?></p>
+        <p><strong>Victim Age:</strong> <?= $complaint['victimAge'] ?></p>
+        <p><strong>Perpetrator:</strong> <?= $complaint['complaintAccused'] ?></p>
+        <p><strong>Relationship:</strong> <?= $complaint['victimRelationship'] ?></p>
+        <p><strong>Phone Number:</strong> <?= $complaint['complaintPhoneNumber'] ?></p>
 
         <div class="mt-4">
           <h6 class="fw-semibold mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>Location Map (Placeholder)
@@ -118,7 +136,8 @@ function getStatusBadgeClass($status)
       <div class="sidebar-controls">
         <h6 class="fw-bold mb-3"><i class="fas fa-tools me-1 text-dark"></i>Admin Controls</h6>
         <form method="POST" action="">
-          <input type="hidden" name="complainttID" value="<?= $complaint['complaintID'] ?>">
+          <!-- FIXED typo: complaintID not complainttID -->
+          <input type="hidden" name="complaintID" value="<?= $complaint['complaintID'] ?>">
 
           <div class="mb-3">
             <label for="complaintStatus" class="form-label">Change Status</label>
@@ -126,8 +145,7 @@ function getStatusBadgeClass($status)
               <option disabled>-- Select Status --</option>
               <option value="Pending" <?= $complaint['complaintStatus'] == 'Pending' ? 'selected' : '' ?>>Pending</option>
               <option value="In Progress" <?= $complaint['complaintStatus'] == 'In Progress' ? 'selected' : '' ?>>In
-                Progress
-              </option>
+                Progress</option>
               <option value="Resolved" <?= $complaint['complaintStatus'] == 'Resolved' ? 'selected' : '' ?>>Resolved
               </option>
               <option value="Closed" <?= $complaint['complaintStatus'] == 'Closed' ? 'selected' : '' ?>>Closed</option>
@@ -138,10 +156,9 @@ function getStatusBadgeClass($status)
             <a href="../index.php?page=complaintsKP" class="btn btn-secondary">
               <i class="fas fa-arrow-left me-1"></i>Back
             </a>
+            <!-- FIXED: pure submit button, no nested <a> -->
             <button type="submit" class="btn btn-success">
-              <a href="../index.php?page=complaintsKP" class="btn btn-success">
-                <i class="fas fa-save me-1"></i>Update Status
-              </a>
+              <i class="fas fa-save me-1"></i>Update Status
             </button>
           </div>
         </form>

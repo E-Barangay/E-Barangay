@@ -8,21 +8,22 @@ $date = $_GET['date'] ?? '';
 $sql = "SELECT 
   r.complaintID AS concernID,
   r.requestDate,
-  CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS reporterName,
+  COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), complainantName) AS reporterName,
   r.complaintTitle AS concernType,
-  phoneNumber,
+  r.complaintPhoneNumber AS phoneNumber,
   r.complaintStatus AS status
 FROM complaints r
-JOIN users u ON r.userID = u.userID
-JOIN userinfo ui ON u.userID = ui.userID
+LEFT JOIN users u ON r.userID = u.userID
+LEFT JOIN userinfo ui ON u.userID = ui.userID
 WHERE 1";
+
 
 $params = [];
 $types = '';
 
 if ($search !== '') {
   $sql .= " AND (
-    CONCAT(ui.firstName, ' ', ui.lastName) LIKE ?
+    COALESCE(CONCAT(ui.firstName, ' ', ui.lastName), r.complainantName) LIKE ?
     OR CAST(r.complaintID AS CHAR) LIKE ?
     OR r.complaintTitle LIKE ?
   )";
@@ -166,7 +167,7 @@ function getBorderClass($status)
 
             <!-- Add Button (outside the form) -->
             <div class="col-md-2">
-              <a href="adminContent/addComplaint.php" class="btn btn-custom w-100">
+              <a href="adminContent/addComplaintKP.php" class="btn btn-custom w-100">
                 <i class="fas fa-plus me-2"></i>Add
               </a>
             </div>
@@ -179,7 +180,7 @@ function getBorderClass($status)
                   <thead class="table-light">
                     <tr>
                       <th>Complaint ID</th>
-                      <th>Date Submitted</th>
+                      <th>Date Recorded</th>
                       <th>Reporter Name</th>
                       <th>Type</th>
                       <th>Contact</th>
@@ -200,9 +201,16 @@ function getBorderClass($status)
                               class="badge <?= getStatusBadgeClass($row['status']) ?>"><?= htmlspecialchars($row['status']) ?></span>
                           </td>
                           <td>
+                            <!-- View button -->
                             <a href="adminContent/viewReport.php?complaintID=<?= $row['concernID'] ?>"
                               class="btn btn-sm btn-primary" title="View Details">
                               <i class="fas fa-eye"></i>
+                            </a>
+
+                            <!-- Delete button -->
+                            <a href="index.php?page=complaintsKP" class="btn btn-sm btn-danger"
+                              onclick="return confirm('Are you sure you want to delete this complaint?');">
+                              <i class="fas fa-trash"></i>
                             </a>
                           </td>
                         </tr>
