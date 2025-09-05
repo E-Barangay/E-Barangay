@@ -27,25 +27,10 @@ if (!empty($search)) {
     body {
       font-family: 'Poppins', sans-serif;
       background-color: rgb(233, 233, 233);
-      color: dark;
       height: 100vh;
       margin: 0;
       padding: 0;
     }
-    .important-badge {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.375rem;
-      background-color: #f8f9fa;
-      color: #6c757d;
-    }
-    .important-badge.bg-warning {
-      background-color: #09bba3ff !important;
-      color: #000 !important;
-    }
-    .important-border {
-  border-color: #09bba3ff !important;
-}
   </style>
 </head>
 
@@ -99,7 +84,6 @@ if (!empty($search)) {
                         <th class="px-4 py-3 fw-semibold">Description</th>
                         <th class="px-4 py-3 fw-semibold">Image</th>
                         <th class="px-4 py-3 fw-semibold">Action</th>
-                        <th class="px-4 py-3 fw-semibold">Important</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -123,22 +107,15 @@ if (!empty($search)) {
                               <span class="text-muted">No image</span>
                             <?php endif; ?>
                           </td>
-<td class="px-4 py-3">
-  <div class="d-flex flex-column gap-2">
-    <a href="adminContent/editAnnouncement.php?id=<?php echo htmlspecialchars($a['announcementID']); ?>" class="btn btn-warning btn-sm">
-      <i class="fas fa-edit me-1"></i> Edit
-    </a>
-    <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo htmlspecialchars($a['announcementID']); ?>">
-      <i class="fas fa-trash me-1"></i>Delete
-    </button>
-  </div>
-</td>
-                          <td class="px-4 py-3 text-center">
-                            <?php if ($a['isImportant']): ?>
-                              <span class="badge bg-primary">Important</span>
-                            <?php else: ?>
-                              <span class="text-muted">—</span>
-                            <?php endif; ?>
+                          <td class="px-4 py-3">
+                            <div class="d-flex flex-column gap-2">
+                              <a href="adminContent/editAnnouncement.php?id=<?php echo htmlspecialchars($a['announcementID']); ?>" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit me-1"></i> Edit
+                              </a>
+                              <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo htmlspecialchars($a['announcementID']); ?>">
+                                <i class="fas fa-trash me-1"></i> Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       <?php endforeach; ?>
@@ -151,21 +128,14 @@ if (!empty($search)) {
 <div class="d-lg-none">
   <div style="max-height: 70vh; overflow-y: auto;" class="p-3">
     <?php foreach ($announcements as $a): ?>
-<div class="card mb-3 border-start <?php echo $a['isImportant'] ? 'important-border' : ''; ?> border-4 shadow-sm">
-  <div class="card-body pt-3">
+      <div class="card mb-3 border-start border-4 shadow-sm">
+        <div class="card-body pt-3">
 
-    <h5 class="fw-bold mb-2"><?php echo htmlspecialchars($a['title']); ?></h5>
+          <h5 class="fw-bold mb-2"><?php echo htmlspecialchars($a['title']); ?></h5>
 
-    <div class="small text-muted mb-1">
-      <strong>Date:</strong> <?php echo htmlspecialchars($a['dateTime']); ?>
-    </div>
-
-    <?php if ($a['isImportant']): ?>
-      <div class="mb-2">
-        <span class="important-badge bg-warning">Important</span>
-      </div>
-    <?php endif; ?>
-
+          <div class="small text-muted mb-1">
+            <strong>Date:</strong> <?php echo htmlspecialchars($a['dateTime']); ?>
+          </div>
 
           <!-- Description -->
           <div class="mb-2">
