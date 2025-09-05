@@ -29,7 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $date = $_POST['date'];
     $description = trim($_POST['description']);
-    $isImportant = isset($_POST['important']) ? 1 : 0;
 
     if (empty($title) || empty($date) || empty($description)) {
         $message = 'All fields are required.';
@@ -199,12 +198,6 @@ function getImagePath($imagePath)
                                 <input type="file" name="image" class="form-control"
                                     accept="image/jpeg,image/png,image/gif,image/webp">
                                 <div class="form-text">Leave empty to keep current image. Max size 5MB.</div>
-                            </div>
-
-                            <div class="form-check mb-4">
-                                <input type="checkbox" name="important" class="form-check-input" id="importantCheck"
-                                    <?= $announcement['isImportant'] ? 'checked' : '' ?>>
-                                <label for="importantCheck" class="form-check-label">Mark as Important</label>
                             </div>
 
                             <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mt-3">
