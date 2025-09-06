@@ -179,9 +179,8 @@ function getBorderClass($status)
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th>Complaint ID</th>
+                      <th>Reporter's Name</th>
                       <th>Date Recorded</th>
-                      <th>Reporter Name</th>
                       <th>Type</th>
                       <th>Contact</th>
                       <th>Status</th>
@@ -192,9 +191,8 @@ function getBorderClass($status)
                     <?php if ($result->num_rows > 0): ?>
                       <?php while ($row = $result->fetch_assoc()): ?>
                         <tr>
-                          <td><strong><?= htmlspecialchars($row['concernID']) ?></strong></td>
-                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
                           <td><?= htmlspecialchars($row['reporterName']) ?></td>
+                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
                           <td><?= htmlspecialchars($row['concernType']) ?></td>
                           <td><?= htmlspecialchars($row['phoneNumber']) ?></td>
                           <td><span

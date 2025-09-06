@@ -27,17 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $complaintAddress = null;
     $evidence = null;
 
-    // ✅ Handle file upload (Evidence)
-    if (isset($_FILES['evidence']) && $_FILES['evidence']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . "/../../uploads/evidence/";
+    // Handle file upload
+    $evidenceFile = null;
+    if (!empty($_FILES['evidence']['name'])) {
+        $uploadDir = __DIR__ . "/../../uploads/"; // make sure this folder exists and is writable
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true); // Create folder if not exists
+            mkdir($uploadDir, 0777, true);
         }
-        $fileName = time() . "_" . basename($_FILES['evidence']['name']);
-        $targetFile = $uploadDir . $fileName;
 
-        if (move_uploaded_file($_FILES['evidence']['tmp_name'], $targetFile)) {
-            $evidence = "uploads/evidence/" . $fileName; // Save relative path
+        $fileName = time() . "_" . basename($_FILES['evidence']['name']);
+        $targetPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($_FILES['evidence']['tmp_name'], $targetPath)) {
+            $evidenceFile = $fileName; // store only filename in DB
         }
     }
 
@@ -65,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $victimAge,
         $victimRelationship,
         $actionTaken,
-        $evidence
+        $evidenceFile
     );
 
     $stmt->execute();

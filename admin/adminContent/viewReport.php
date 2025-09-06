@@ -23,10 +23,13 @@ $stmt = $conn->prepare("
       r.complaintTitle,
       COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), r.complainantName) AS complainantName,
       r.complaintVictim,
+      r.complaintDescription,
+      r.actionTaken,
       r.victimAge,
       r.complaintAccused,
       r.victimRelationship,
-      r.complaintPhoneNumber
+      r.complaintPhoneNumber,
+      r.evidence
     FROM complaints r
     LEFT JOIN users u ON r.userID = u.userID
     LEFT JOIN userinfo ui ON u.userID = ui.userID
@@ -41,15 +44,23 @@ $stmt->close();
 function getStatusBadgeClass($status)
 {
   return match (strtolower($status)) {
-    'pending' => 'bg-warning text-dark',
-    'in progress' => 'bg-primary text-white',
-    'resolved' => 'bg-success text-white',
-    'closed' => 'bg-secondary text-white',
-    default => 'bg-light text-dark',
+    'criminal', 'civil' => 'bg-danger text-white',
+    'mediation', 'conciliation', 'arbitration' => 'bg-info text-white',
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white',
+    default => 'bg-secondary text-white',
+  };
+}
+
+function getBorderClass($status)
+{
+  return match (strtolower($status)) {
+    'criminal', 'civil' => 'border-danger',
+    'mediation', 'conciliation', 'arbitration' => 'border-info',
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success',
+    default => 'border-secondary',
   };
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -109,25 +120,93 @@ function getStatusBadgeClass($status)
       <div class="report-info">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="fw-bold mb-0">
-            <i class="fas fa-file-alt text-primary me-2"></i>Complaint Details
+            <i class="fas fa-file-alt text-primary me-2"></i> Complaint Details
           </h5>
           <span class="badge <?= getStatusBadgeClass($complaint['complaintStatus']) ?> status-badge">
-            <?= ucfirst($complaint['complaintStatus']) ?>
+            <?= ucfirst($complaint['complaintStatus'] ?? 'No data') ?>
           </span>
         </div>
 
-        <p><strong>Complaint ID:</strong> <?= $complaint['complaintID'] ?></p>
-        <p><strong>Complaint Title:</strong> <?= $complaint['complaintTitle'] ?></p>
-        <p><strong>Date Submitted:</strong> <?= $complaint['requestDate'] ?></p>
-        <p><strong>Complainant Name:</strong> <?= $complaint['complainantName'] ?></p>
-        <p><strong>Victim:</strong> <?= $complaint['complaintVictim'] ?></p>
-        <p><strong>Victim Age:</strong> <?= $complaint['victimAge'] ?></p>
-        <p><strong>Perpetrator:</strong> <?= $complaint['complaintAccused'] ?></p>
-        <p><strong>Relationship:</strong> <?= $complaint['victimRelationship'] ?></p>
-        <p><strong>Phone Number:</strong> <?= $complaint['complaintPhoneNumber'] ?></p>
+        <!-- Complaint Info -->
+        <div class="mb-3">
+          <p><strong>Title:</strong>
+            <?= !empty($complaint['complaintTitle']) ? $complaint['complaintTitle'] : '<span class="text-muted">No data</span>' ?>
+          </p>
+          <p><strong>Date Submitted:</strong>
+            <?= !empty($complaint['requestDate']) ? $complaint['requestDate'] : '<span class="text-muted">No data</span>' ?>
+          </p>
+          <p><strong>Complainant:</strong>
+            <?= !empty($complaint['complainantName']) ? $complaint['complainantName'] : '<span class="text-muted">No data</span>' ?>
+          </p>
+          <p><strong>Phone Number:</strong>
+            <?= !empty($complaint['complaintPhoneNumber']) ? $complaint['complaintPhoneNumber'] : '<span class="text-muted">No data</span>' ?>
+          </p>
+          <p><strong>Description:</strong>
+            <?= !empty($complaint['complaintDescription']) ? $complaint['complaintDescription'] : '<span class="text-muted">No data</span>' ?>
+          </p>
+          <p><strong>Action:</strong>
+            <?= !empty($complaint['actionTaken']) ? $complaint['actionTaken'] : '<span class="text-muted">No data</span>' ?>
+          </p>
+        </div>
 
+        <!-- Victim & Perpetrator Info -->
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Victim:</strong>
+              <?= !empty($complaint['complaintVictim']) ? $complaint['complaintVictim'] : '<span class="text-muted">No data</span>' ?>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Victim Age:</strong>
+              <?= !empty($complaint['victimAge']) ? $complaint['victimAge'] : '<span class="text-muted">No data</span>' ?>
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Perpetrator:</strong>
+              <?= !empty($complaint['complaintAccused']) ? $complaint['complaintAccused'] : '<span class="text-muted">No data</span>' ?>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Relationship:</strong>
+              <?= !empty($complaint['victimRelationship']) ? $complaint['victimRelationship'] : '<span class="text-muted">No data</span>' ?>
+            </p>
+          </div>
+        </div>
+
+        <!-- Contact & Evidence -->
+        <div class="mb-3">
+          <strong>Evidence:</strong>
+          <?php if (!empty($complaint['evidence'])): ?>
+            <button type="button" class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal"
+              data-bs-target="#evidenceModal">
+              <i class="fas fa-eye me-1"></i> View Evidence
+            </button>
+            <div class="modal fade" id="evidenceModal" tabindex="-1" aria-labelledby="evidenceModalLabel"
+              aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="evidenceModalLabel">Evidence Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                    <img src="../../uploads/<?= htmlspecialchars($complaint['evidence']) ?>" class="img-fluid rounded"
+                      alt="Evidence">
+                  </div>
+                </div>
+              </div>
+            </div>
+          <?php else: ?>
+            <span class="text-muted ms-2">No evidence</span>
+          <?php endif; ?>
+        </div>
+
+        <!-- Map -->
         <div class="mt-4">
-          <h6 class="fw-semibold mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i>Location Map (Placeholder)
+          <h6 class="fw-semibold mb-2">
+            <i class="fas fa-map-marker-alt text-danger me-1"></i> Location Map (Placeholder)
           </h6>
           <div id="map"></div>
         </div>
@@ -143,12 +222,11 @@ function getStatusBadgeClass($status)
             <label for="complaintStatus" class="form-label">Change Status</label>
             <select name="complaintStatus" id="complaintStatus" class="form-select" required>
               <option disabled>-- Select Status --</option>
-              <option value="Pending" <?= $complaint['complaintStatus'] == 'Pending' ? 'selected' : '' ?>>Pending</option>
-              <option value="In Progress" <?= $complaint['complaintStatus'] == 'In Progress' ? 'selected' : '' ?>>In
-                Progress</option>
-              <option value="Resolved" <?= $complaint['complaintStatus'] == 'Resolved' ? 'selected' : '' ?>>Resolved
-              </option>
-              <option value="Closed" <?= $complaint['complaintStatus'] == 'Closed' ? 'selected' : '' ?>>Closed</option>
+              <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
+                <option value="<?= $st ?>" <?= $complaint['complaintStatus'] == $st ? 'selected' : '' ?>>
+                  <?= $st ?>
+                </option>
+              <?php endforeach; ?>
             </select>
           </div>
 
@@ -173,6 +251,7 @@ function getStatusBadgeClass($status)
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
