@@ -26,7 +26,7 @@ if (isset($_POST['submit'])) {
             <div class="col-12 col-md-4">
                 <div class="d-flex justify-content-center mb-3">
                     <div class="card p-3 text-center" style="background-color: #0C8888; border: none;">
-                        <h2 class="fw-bold fs-5 text-light mb-0">Make A Report</h2>
+                        <h2 class="fw-bold fs-5 text-light mb-0">Make A Complaint</h2>
                     </div>
                 </div>
             </div>
@@ -36,26 +36,31 @@ if (isset($_POST['submit'])) {
         </div>
 
         <div class="row">
-            <div class="col-12 col-md-4">
+            <div class="col-4 col-md-4">
 
                 <div class="d-flex justify-content-center align-items-center mb-3">
-                    <div class="card p-3 text-center rounded-4" style="background-color: #0C8888;">
-                        <img src="assets/images/reports/call logo.png" alt="Report Icon"
-                            style="width: 20px; height: 20px;">
-                    </div>
-                    <div class="fs-6 ms-2" style="color: #0C8888;">0917 452 8364</div>
+                    <a href="tel:09174528364" class="d-flex align-items-center text-decoration-none">
+                        <div class="card p-3 text-center rounded-4" style="background-color: #0C8888;">
+                            <img src="assets/images/reports/call logo.png" alt="Call Logo"
+                                style="width: 20px; height: 20px;">
+                        </div>
+                        <div class="fs-6 ms-2 d-none d-md-block" style="color: #0C8888;">0917 452 8364</div>
+                    </a>
                 </div>
             </div>
-            <div class="col-12 col-md-4">
+            <div class="col-4 col-md-4">
             </div>
 
-            <div class="col-12 col-md-4">
+            <div class="col-4 col-md-4">
                 <div class="d-flex justify-content-center align-items-center mb-3">
-                    <div class="card p-3 text-center rounded-4" style="background-color: #0C8888;">
-                        <img src="assets/images/reports/facebook logo.png" alt="Report Icon"
-                            style="width: 20px; height: 20px;">
-                    </div>
-                    <div class="fs-6 ms-2" style="color: #0C8888;">San Antonio</div>
+                    <a href="https://www.facebook.com/sanantonioofficial" target="_blank"
+                        class="d-flex align-items-center text-decoration-none">
+                        <div class="card p-3 text-center rounded-4" style="background-color: #0C8888;">
+                            <img src="assets/images/reports/facebook logo.png" alt="Facebook Logo"
+                                style="width: 20px; height: 20px;">
+                        </div>
+                        <div class="fs-6 ms-2 d-none d-md-block" style="color: #0C8888;">San Antonio</div>
+                    </a>
                 </div>
             </div>
 
@@ -113,38 +118,7 @@ if (isset($_POST['submit'])) {
                     style="resize: none; height: 30vh; border-color: #19AFA5;" required></textarea>
             </div>
 
-            <style>
-                .thumb-card {
-                    position: relative;
-                    height: 100px;
-                    border-radius: 0.5rem;
-                    overflow: hidden;
-                    border: 2px solid #19AFA5;
-                }
 
-                .thumb-card img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-
-                .remove-btn {
-                    position: absolute;
-                    top: 4px;
-                    right: 4px;
-                    background: rgba(0, 0, 0, 0.5);
-                    border: none;
-                    color: white;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 16px;
-                    cursor: pointer;
-                }
-            </style>
 
             <div class="mb-3">
                 <label class="form-label fw-bold" style="color: #19AFA5 ">Upload Evidence</label>
@@ -161,9 +135,7 @@ if (isset($_POST['submit'])) {
             <div class="d-flex justify-content-center justify-content-md-end mt-2 gap-2">
                 <!-- <button type="button" class="btn filterButton me-3">Upload</button> -->
 
-                <button type="button" class="btn filterButton" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    Cancel
-                </button>
+                <a href="reports.php?page=complaintSection.php" class="btn filterButton">Cancel</a>
 
                 <button type="button" class="btn filterButton" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     Submit
@@ -185,6 +157,7 @@ if (isset($_POST['submit'])) {
                     </div>
                 </div>
             </div>
+
         </form>
     </div>
 </div>
