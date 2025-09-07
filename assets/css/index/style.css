@@ -12,37 +12,170 @@ html {
     color: #19AFA5;
 }
 
+.bannerCard {
+    position: relative;
+}
+
+.bannerImage {
+    width: 100vw; 
+    height: 75vh; 
+    object-fit: cover; 
+    object-position: center;
+}
+
+.bannerContent {
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    z-index: 2; 
+}
+
+.header {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: bold;
+    color: white; 
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+}
+
+.tagline {
+    font-size: clamp(14px, 2vw, 18px); 
+    color: white; 
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+}
+
 .viewButton {
     background-color: #19AFA5;
     color: white;
     border: 1px solid white;
     border-radius: 12px;
     width: 200px;
+    border: 1px solid #19AFA5;
 }
 
 .viewButton:hover {
-    background-color: #19AFA5;
+    background-color: #11A1A1;
     color: black;
-    border: 1px solid white;
+    border: 1px solid #19AFA5;
 }
 
-.custom-title {
-    color: #19AFA5;
+.announcements {
+    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: bold;
 }
 
-.carousel-inner {
-    border-radius: 1rem;
-    overflow: hidden;
+.whatIsNew {
+    font-size: clamp(18px, 2.5vw, 24px); 
+    font-weight: bold;
 }
 
-.carousel-caption {
-    bottom: 20px;
+.newCard {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
 }
 
-.carousel img {
-    transition: transform 0.5s ease;
+.logo {
+    width: 45px; 
+    height: 45px; 
+    object-fit: cover; 
+    border-radius: 50%;
 }
 
-.carousel img:hover {
-    transform: scale(1.01);
+.barangay {
+    font-size: 14px; font-weight: bold;
+}
+
+.date {
+    font-size: 12px;
+    color: gray;
+}
+
+.newAnnouncementImage {
+    width: 100%; 
+    height: 250px; 
+    object-fit: cover; 
+    object-position: center;
+}
+
+.title {
+    font-size: 16px; 
+    font-weight: bold;
+}
+
+.description {
+    font-size: 14px; 
+    text-indent: 2em;
+    text-align: justify;
+}
+
+.recents {
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: bold;
+}
+
+.recentCard {
+    width: 100%; 
+    height: 100%; 
+    border-radius: 16px;
+}
+
+.recentAnnouncementImage {
+    width: 100%; 
+    height: 200px;
+    object-fit: cover; 
+    object-position: center; 
+    border-radius: 16px 16px 0 0;
+}
+
+.viewDetailsButton {
+    width: 100%;
+    color: white;
+    background-color: #19AFA5; 
+    border: 1px solid #19AFA5; 
+    border-radius: 12px;
+}
+
+.viewDetailsButton:hover {
+    color: black;
+    background-color: #11A1A1; 
+    border: 1px solid #11A1A1; 
+    border-radius: 12px;
+}
+
+.modalRecentAnnouncementImage {
+    width: 100%; 
+    height: 100%;
+    object-fit: fit; 
+}
+
+.modalLogo {
+    width: 45px; 
+    height: 45px; 
+    object-fit: cover; 
+    border-radius: 50%;
+}
+
+.modalBarangay {
+    font-size: 14px; font-weight: bold;
+}
+
+.modalDate {
+    font-size: 12px;
+    color: gray;
+}
+
+.modalTitle {
+    font-size: 16px; 
+    font-weight: bold;
+}
+
+.modalDescription {
+    font-size: 14px; 
+    text-indent: 2em;
+    text-align: justify;
 }
