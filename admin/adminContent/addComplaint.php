@@ -18,12 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $complaintAccused = $_POST['complaintAccused'] ?? '';
     $victimRelationship = $_POST['victimRelationship'] ?? '';
     $actionTaken = $_POST['actionTaken'] ?? '';
+    $complaintAddress = $_POST['complaintAddress'] ?? ''; // ✅ make sure value comes from form
     $requestDate = date('Y-m-d H:i:s');
 
     // Default values for unused columns
     $complaintCategoryID = null;
     $complaintTypeID = null;
-    $complaintAddress = null;
     $evidence = null;
 
     // Handle file upload
@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      complainantName, victimAge, victimRelationship, actionTaken, evidence) 
     VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
+    // 🔥 Fixed bind_param format (complaintAddress included properly)
     $stmt->bind_param(
         "iisssssssssisss",
         $complaintCategoryID,
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $complaintStatus,
         $phoneNumber,
         $complaintAccused,
-        $complaintAddress,
+        $complaintAddress,     // ✅ FIXED: now bound as string
         $complaintVictim,
         $complainantName,
         $victimAge,

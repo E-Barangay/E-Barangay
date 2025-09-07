@@ -1,6 +1,20 @@
 <?php
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
+// Handle soft delete
+if (isset($_GET['delete'])) {
+  $complaintID = (int) $_GET['delete'];
+
+  $stmt = $conn->prepare("UPDATE complaints SET isDeleted = 'yes' WHERE complaintID = ?");
+  $stmt->bind_param("i", $complaintID);
+  $stmt->execute();
+  $stmt->close();
+
+  // Redirect so refresh doesn't repeat deletion
+  echo "<script>window.location.href = 'index.php?page=complaints';</script>";
+  exit;
+}
+
 $search = trim($_GET['search'] ?? '');
 $status = $_GET['status'] ?? '';
 $date = $_GET['date'] ?? '';
@@ -15,8 +29,7 @@ $sql = "SELECT
 FROM complaints r
 LEFT JOIN users u ON r.userID = u.userID
 LEFT JOIN userinfo ui ON u.userID = ui.userID
-WHERE 1";
-
+WHERE r.isDeleted = 'no'";
 
 $params = [];
 $types = '';
@@ -57,8 +70,8 @@ function getStatusBadgeClass($status)
 {
   return match (strtolower($status)) {
     'criminal', 'civil' => 'bg-danger text-white',
-    'mediation', 'conciliation', 'arbitration' => 'bg-info text-white', 
-    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white', 
+    'mediation', 'conciliation', 'arbitration' => 'bg-info text-white',
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white',
     default => 'bg-secondary text-white',
   };
 }
@@ -67,14 +80,12 @@ function getBorderClass($status)
 {
   return match (strtolower($status)) {
     'criminal', 'civil' => 'border-danger',
-    'mediation', 'conciliation', 'arbitration' => 'border-info', 
-    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success', 
+    'mediation', 'conciliation', 'arbitration' => 'border-info',
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success',
     default => 'border-secondary',
   };
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -207,8 +218,8 @@ function getBorderClass($status)
                               <i class="fas fa-eye"></i>
                             </a>
 
-                            <!-- Delete button -->
-                            <a href="index.php?page=complaints" class="btn btn-sm btn-danger"
+                            <a href="index.php?page=complaints&delete=<?= $row['concernID'] ?>"
+                              class="btn btn-sm btn-danger"
                               onclick="return confirm('Are you sure you want to delete this complaint?');">
                               <i class="fas fa-trash"></i>
                             </a>
@@ -241,7 +252,7 @@ function getBorderClass($status)
                           <p class="mb-1"><strong>Name:</strong> <?= htmlspecialchars($row['reporterName']) ?></p>
                           <p class="mb-1"><strong>Complaint:</strong> <?= htmlspecialchars($row['concernType']) ?></p>
                           <p class="mb-2"><strong>Contact:</strong> <?= htmlspecialchars($row['phoneNumber']) ?></p>
-                          <a href="adminContent/viewComplaint.php?complaintID=<?= $row['complaintID'] ?>"
+                          <a href="adminContent/viewComplaint.php?complaintID=<?= $row['concernID'] ?>"
                             class="btn btn-sm btn-primary w-100">
                             <i class="fas fa-eye me-2"></i>View Details
                           </a>
