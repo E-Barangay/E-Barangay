@@ -55,24 +55,26 @@ $result = $stmt->get_result();
 
 function getStatusBadgeClass($status)
 {
-  return match ($status) {
-    'Closed' => 'bg-secondary text-white',
-    'Resolved' => 'bg-success text-white',
-    'inprogress' => 'bg-primary text-white',
-    default => 'bg-warning text-dark',
+  return match (strtolower($status)) {
+    'criminal', 'civil' => 'bg-danger text-white',
+    'mediation', 'conciliation', 'arbitration' => 'bg-info text-white', 
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white', 
+    default => 'bg-secondary text-white',
   };
 }
 
 function getBorderClass($status)
 {
-  return match ($status) {
-    'Closed' => 'border-secondary',
-    'Resolved' => 'border-success',
-    'inprogress' => 'border-primary',
-    default => 'border-warning',
+  return match (strtolower($status)) {
+    'criminal', 'civil' => 'border-danger',
+    'mediation', 'conciliation', 'arbitration' => 'border-info', 
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success', 
+    default => 'border-secondary',
   };
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -147,7 +149,7 @@ function getBorderClass($status)
                 <div class="col-md-3">
                   <select name="status" class="form-select">
                     <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
-                    <?php foreach (['Pending', 'Inprogress', 'Resolved', 'Closed'] as $st): ?>
+                    <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
                       <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
                     <?php endforeach; ?>
                   </select>
@@ -179,9 +181,8 @@ function getBorderClass($status)
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th>Complaint ID</th>
+                      <th>Reporter's Name</th>
                       <th>Date Recorded</th>
-                      <th>Reporter Name</th>
                       <th>Type</th>
                       <th>Contact</th>
                       <th>Status</th>
@@ -192,9 +193,8 @@ function getBorderClass($status)
                     <?php if ($result->num_rows > 0): ?>
                       <?php while ($row = $result->fetch_assoc()): ?>
                         <tr>
-                          <td><strong><?= htmlspecialchars($row['concernID']) ?></strong></td>
-                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
                           <td><?= htmlspecialchars($row['reporterName']) ?></td>
+                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
                           <td><?= htmlspecialchars($row['concernType']) ?></td>
                           <td><?= htmlspecialchars($row['phoneNumber']) ?></td>
                           <td><span

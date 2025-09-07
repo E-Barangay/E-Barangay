@@ -9,8 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $complaintTitle = $_POST['otherComplaint'];
     }
 
-    $complaintStatus = 'Pending'; // ✅ Always set as Pending
+    $complaintStatus = 'Criminal'; // ✅ Always set as Criminal
     $complaintDescription = $_POST['complaintDescription'] ?? '';
+    $actionTaken = $_POST['actionTaken'] ?? '';
     $phoneNumber = $_POST['phoneNumber'] ?? '';
     $complainantName = $_POST['complainantName'] ?? '';
     $requestDate = date('Y-m-d H:i:s');
@@ -23,13 +24,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $complaintAddress = null;
     $complaintVictim = null;
 
-    // Insert new complaint
+    // Handle file upload
+    $evidenceFile = null;
+    if (!empty($_FILES['evidence']['name'])) {
+        $uploadDir = __DIR__ . "/../../uploads/"; // make sure this folder exists and is writable
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileName = time() . "_" . basename($_FILES['evidence']['name']);
+        $targetPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($_FILES['evidence']['tmp_name'], $targetPath)) {
+            $evidenceFile = $fileName; // store only filename in DB
+        }
+    }
+
+    // Insert new complaint with evidence
     $stmt = $conn->prepare("INSERT INTO complaints 
-        (userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complaintVictim, complainantName) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    (userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complaintVictim, complainantName, actionTaken, evidence) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt->bind_param(
-        "iiisssssssss",
+        "iiisssssssssss",
         $userID,
         $complaintCategoryID,
         $complaintTypeID,
@@ -41,8 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $complaintAccused,
         $complaintAddress,
         $complaintVictim,
-        $complainantName
+        $complainantName,
+        $actionTaken,
+        $evidenceFile
     );
+
     $stmt->execute();
     $stmt->close();
 
@@ -67,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="report-card mx-auto mt-5 p-4 bg-white rounded-3 shadow-sm" style="max-width: 700px;">
             <h3 class="fw-bold mb-4 text-center"><i class="fas fa-plus text-primary"></i>Katarungang Pambarangay</h3>
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label">Type of Complaint</label>
                     <select name="complaintTitle" class="form-select" id="complaintTitle" required>
@@ -118,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="mb-3">
                     <label class="form-label">Actions Taken</label>
-                    <textarea name="complaintDescription" class="form-control" rows="4"></textarea>
+                    <textarea name="actionTaken" class="form-control" rows="4"></textarea>
                 </div>
 
                 <div class="mb-3">
