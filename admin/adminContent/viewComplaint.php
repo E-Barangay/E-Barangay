@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complaintStatus'])) {
   $stmt->execute();
   $stmt->close();
 
-  header("Location: ../index.php?page=complaintsKP");
+  header("Location: ../index.php?page=complaints");
   exit;
 }
 
@@ -222,7 +222,7 @@ function getBorderClass($status)
             <label for="complaintStatus" class="form-label">Change Status</label>
             <select name="complaintStatus" id="complaintStatus" class="form-select" required>
               <option disabled>-- Select Status --</option>
-              <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
+              <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified', 'VAWC'] as $st): ?>
                 <option value="<?= $st ?>" <?= $complaint['complaintStatus'] == $st ? 'selected' : '' ?>>
                   <?= $st ?>
                 </option>
@@ -231,7 +231,7 @@ function getBorderClass($status)
           </div>
 
           <div class="d-flex justify-content-between">
-            <a href="../index.php?page=complaintsKP" class="btn btn-secondary">
+            <a href="../index.php?page=complaints" class="btn btn-secondary">
               <i class="fas fa-arrow-left me-1"></i>Back
             </a>
             <!-- FIXED: pure submit button, no nested <a> -->

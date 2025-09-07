@@ -55,24 +55,26 @@ $result = $stmt->get_result();
 
 function getStatusBadgeClass($status)
 {
-  return match ($status) {
-    'Closed' => 'bg-secondary text-white',
-    'Resolved' => 'bg-success text-white',
-    'inprogress' => 'bg-primary text-white',
-    default => 'bg-warning text-dark',
+  return match (strtolower($status)) {
+    'criminal', 'civil' => 'bg-danger text-white',
+    'mediation', 'conciliation', 'arbitration' => 'bg-info text-white', 
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white', 
+    default => 'bg-secondary text-white',
   };
 }
 
 function getBorderClass($status)
 {
-  return match ($status) {
-    'Closed' => 'border-secondary',
-    'Resolved' => 'border-success',
-    'inprogress' => 'border-primary',
-    default => 'border-warning',
+  return match (strtolower($status)) {
+    'criminal', 'civil' => 'border-danger',
+    'mediation', 'conciliation', 'arbitration' => 'border-info', 
+    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success', 
+    default => 'border-secondary',
   };
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -123,7 +125,7 @@ function getBorderClass($status)
         <div class="p-4 rounded-top bg-custom">
           <div class="d-flex align-items-center">
             <i class="fas fa-users-cog me-3 fs-4"></i>
-            <h1 class="h4 mb-0 fw-semibold">Violence against Women and Children</h1>
+            <h1 class="h4 mb-0 fw-semibold">Katarungang Pambarangay</h1>
           </div>
         </div>
 
@@ -132,7 +134,7 @@ function getBorderClass($status)
             <!-- Filter Form -->
             <div class="col-md-10">
               <form method="GET" action="index.php" class="row g-3">
-                <input type="hidden" name="page" value="complaintsVAWC">
+                <input type="hidden" name="page" value="complaints">
 
                 <div class="col-md-5">
                   <div class="input-group">
@@ -147,7 +149,7 @@ function getBorderClass($status)
                 <div class="col-md-3">
                   <select name="status" class="form-select">
                     <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
-                    <?php foreach (['Pending', 'Inprogress', 'Resolved', 'Closed'] as $st): ?>
+                    <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
                       <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
                     <?php endforeach; ?>
                   </select>
@@ -167,7 +169,7 @@ function getBorderClass($status)
 
             <!-- Add Button (outside the form) -->
             <div class="col-md-2">
-              <a href="adminContent/addComplaintVAWC.php" class="btn btn-custom w-100">
+              <a href="adminContent/addComplaint.php" class="btn btn-custom w-100">
                 <i class="fas fa-plus me-2"></i>Add
               </a>
             </div>
@@ -200,13 +202,13 @@ function getBorderClass($status)
                           </td>
                           <td>
                             <!-- View button -->
-                            <a href="adminContent/viewReport.php?complaintID=<?= $row['concernID'] ?>"
+                            <a href="adminContent/viewComplaint.php?complaintID=<?= $row['concernID'] ?>"
                               class="btn btn-sm btn-primary" title="View Details">
                               <i class="fas fa-eye"></i>
                             </a>
 
                             <!-- Delete button -->
-                            <a href="index.php?page=complaintsVAWC" class="btn btn-sm btn-danger"
+                            <a href="index.php?page=complaints" class="btn btn-sm btn-danger"
                               onclick="return confirm('Are you sure you want to delete this complaint?');">
                               <i class="fas fa-trash"></i>
                             </a>
@@ -239,7 +241,7 @@ function getBorderClass($status)
                           <p class="mb-1"><strong>Name:</strong> <?= htmlspecialchars($row['reporterName']) ?></p>
                           <p class="mb-1"><strong>Complaint:</strong> <?= htmlspecialchars($row['concernType']) ?></p>
                           <p class="mb-2"><strong>Contact:</strong> <?= htmlspecialchars($row['phoneNumber']) ?></p>
-                          <a href="adminContent/viewReport.php?complaintID=<?= $row['complaintID'] ?>"
+                          <a href="adminContent/viewComplaint.php?complaintID=<?= $row['complaintID'] ?>"
                             class="btn btn-sm btn-primary w-100">
                             <i class="fas fa-eye me-2"></i>View Details
                           </a>

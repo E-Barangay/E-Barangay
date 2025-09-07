@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $complaintTitle = $_POST['otherComplaint'];
     }
 
-    $complaintStatus = 'Pending'; // ✅ Always set as Pending
+    $complaintStatus = 'Criminal'; // ✅ Always set as Criminal
     $complaintDescription = $_POST['complaintDescription'] ?? '';
     $phoneNumber = $_POST['phoneNumber'] ?? '';
     $complainantName = $_POST['complainantName'] ?? '';
@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $requestDate = date('Y-m-d H:i:s');
 
     // Default values for unused columns
-    $userID = null;
     $complaintCategoryID = null;
     $complaintTypeID = null;
     $complaintAddress = null;
@@ -45,14 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // ✅ Insert new complaint
     $stmt = $conn->prepare("INSERT INTO complaints 
-        (userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, requestDate, 
-         complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complaintVictim, 
-         complainantName, victimAge, victimRelationship, actionTaken, evidence) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    (userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, requestDate, 
+     complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complaintVictim, 
+     complainantName, victimAge, victimRelationship, actionTaken, evidence) 
+    VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt->bind_param(
-        "iiissssssssssiss",
-        $userID,
+        "iisssssssssisss",
         $complaintCategoryID,
         $complaintTypeID,
         $complaintTitle,
@@ -73,11 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $stmt->close();
 
-    header("Location: ../index.php?page=complaintsVAWC");
+    header("Location: ../index.php?page=complaints");
     exit;
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -85,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VAWC</title>
+    <title>Katarungang Pambarangay</title>
     <link rel="icon" href="../../assets/images/logoSanAntonio.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
 </head>
@@ -93,13 +90,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <<body style="background:#19AFA5;">
     <div class="container px-3">
         <div class="report-card mx-auto mt-5 p-4 bg-white rounded-3 shadow-sm" style="max-width: 700px;">
-            <h3 class="fw-bold mb-4 text-center"><i class="fas fa-plus text-primary"></i>Violence against Women and
-                Children</h3>
+            <h3 class="fw-bold mb-4 text-center"><i class="fas fa-plus text-primary"></i>Katarungang Pambarangay</h3>
 
             <form method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label class="form-label">Type of Violence</label>
+                    <label class="form-label">Type of Complaint</label>
                     <select name="complaintTitle" class="form-select" id="complaintTitle" required>
+                        <option value="Noise Complaints">Noise Complaints</option>
+                        <option value="Boundary and Land Disputes">Boundary and Land Disputes</option>
+                        <option value="Neighborhood Quarrels">Neighborhood Quarrels</option>
+                        <option value="Animal-Related Complaints">Animal-Related Complaints</option>
+                        <option value="Youth-Related Issues">Youth-Related Issues</option>
+                        <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit Concerns
+                        </option>
+                        <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints</option>
+                        <option value="Alcohol-Related Disturbances">Alcohol-Related Disturbances</option>
+                        <option value="Traffic and Parking Issues">Traffic and Parking Issues</option>
+                        <option value="Physical Assault and Threats">Physical Assault and Threats</option>
+                        <option value="Water Supply Disputes">Water Supply Disputes</option>
+                        <option value="Business-Related Conflicts">Business-Related Conflicts</option>
+                        <option value="Curfew Violations">Curfew Violations</option>
+                        <option value="Smoking and Littering Violations">Smoking and Littering Violations</option>
+                        <option value="Illegal Structures and Encroachments">Illegal Structures and Encroachments
+                        </option>
                         <option value="Physical Abuse">Physical Abuse</option>
                         <option value="Sexual Abuse">Sexual Abuse</option>
                         <option value="Psychological Abuse/Emotional Abuse">Psychological Abuse/Emotional Abuse</option>
@@ -126,6 +139,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" name="phoneNumber" class="form-control" required pattern="^09\d{9}$"
                             title="Please enter a valid PH mobile number (e.g. 09123456789)">
                     </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Address:</label>
+                    <input name="complaintAddress" class="form-control" rows="4" required></input>
                 </div>
 
                 <div class="row mb-3">
@@ -169,10 +187,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="d-flex gap-2">
-                    <a href="../index.php?page=complaintsVAWC" class="btn btn-danger w-100">Back</a>
+                    <a href="../index.php?page=complaints" class="btn btn-danger w-100">Back</a>
                     <button type="submit" class="btn btn-success w-100">Submit Complaint</button>
                 </div>
-            </form>
         </div>
     </div>
 
