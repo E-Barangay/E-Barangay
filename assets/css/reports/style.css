@@ -78,3 +78,6 @@ make complaint */
     font-size: 16px;
     cursor: pointer;
 }
+.complaint-text {
+  font-size: 0.75rem; /* small font for mobile */
+}
