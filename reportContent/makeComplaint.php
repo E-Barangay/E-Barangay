@@ -18,54 +18,44 @@ if (isset($_POST['submit'])) {
 
 <div class="content outline p-md-5 p-4">
 
-    <div class="col">
-        <div class="row">
-            <div class="col-12 col-md-4">
-            </div>
-
-            <div class="col-12 col-md-4">
-                <div class="d-flex justify-content-center mb-3">
-                    <div class="card p-3 text-center" style="background-color: #0C8888; border: none;">
-                        <h2 class="fw-bold fs-5 text-light mb-0">Make A Complaint</h2>
+    <div class="row">
+        <div class="col-4 col-md-4">
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <a href="tel:09174528364" class="d-flex align-items-center text-decoration-none">
+                    <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #0C8888;">
+                        <img src="assets/images/reports/call logo.png" alt="Call Logo" class="img-fluid"
+                            style="width: 16px; height: 16px;">
                     </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-md-4">
+                    <div class="fs-6 ms-2 d-none d-md-block" style="color: #0C8888;">0917 452 8364</div>
+                </a>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-4 col-md-4">
-
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                    <a href="tel:09174528364" class="d-flex align-items-center text-decoration-none">
-                        <div class="card p-3 text-center rounded-4" style="background-color: #0C8888;">
-                            <img src="assets/images/reports/call logo.png" alt="Call Logo"
-                                style="width: 20px; height: 20px;">
-                        </div>
-                        <div class="fs-6 ms-2 d-none d-md-block" style="color: #0C8888;">0917 452 8364</div>
-                    </a>
+        <div class="col-4 col-md-4">
+            <div class="d-flex justify-content-center mb-3">
+                <div class="card p-2 p-md-3 text-center" style="background-color: #0C8888; border: none;">
+                    <h2 class="fw-bold fs-6 fs-md-5 text-light mb-0 d-none d-md-block">Make A Complaint</h2>
+                    <h2 class="fw-bold text-light mb-0 d-block d-md-none complaint-text" style>Make A Complaint</h2>
                 </div>
             </div>
-            <div class="col-4 col-md-4">
-            </div>
+        </div>
 
-            <div class="col-4 col-md-4">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                    <a href="https://www.facebook.com/sanantonioofficial" target="_blank"
-                        class="d-flex align-items-center text-decoration-none">
-                        <div class="card p-3 text-center rounded-4" style="background-color: #0C8888;">
-                            <img src="assets/images/reports/facebook logo.png" alt="Facebook Logo"
-                                style="width: 20px; height: 20px;">
-                        </div>
-                        <div class="fs-6 ms-2 d-none d-md-block" style="color: #0C8888;">San Antonio</div>
-                    </a>
-                </div>
+        <div class="col-4 col-md-4">
+            <div class="d-flex justify-content-center align-items-center mb-3">
+                <a href="https://www.facebook.com/sanantonioofficial" target="_blank"
+                    class="d-flex align-items-center text-decoration-none">
+                    <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #0C8888;">
+                        <img src="assets/images/reports/facebook logo.png" alt="Facebook Logo" class="img-fluid"
+                            style="width: 16px; height: 16px;">
+                    </div>
+                    <div class="fs-6 ms-2 d-none d-md-block" style="color: #0C8888;">San Antonio</div>
+                </a>
             </div>
-
         </div>
     </div>
+
+
+
 
 
 
