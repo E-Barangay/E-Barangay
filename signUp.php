@@ -1,5 +1,7 @@
 <?php
+
 session_start();
+
 include('sharedAssets/connect.php');
 
 if (isset($_POST["submit"])) {
@@ -112,23 +114,105 @@ if (isset($_POST["submit"])) {
 
     <!-- Style Sheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="assets/css/navbar/style.css">
     <link rel="stylesheet" href="assets/css/signup/style.css">
-
+    <link rel="stylesheet" href="assets/css/footer/style.css">
 </head>
 
 <body data-bs-theme="light">
-
-
+    
     <div class="container-fluid">
         <div class="row">
-            <!-- Left Side Image -->
-            <div class="col-md-6 d-none d-md-block p-0">
-                <img src="assets/images/bgHall.jpeg" class="left-img position-relative" alt="Barangay Background">
+            
+            <div class="col-lg-7 d-none d-md-block p-0">
+                <img src="assets/images/bgHall.jpeg" class="leftBackgroundImage" alt="Barangay Background">
             </div>
 
+            <div class="col-lg-5 col-12 my-auto px-5">
+                <div class="row">
+                    <div class="col d-flex justify-content-center">
+                        <img src="assets/images/logoSanAntonio.png" class="logoSanAntonio me-2" alt="Logo San Antonio">
+                        <img src="assets/images/logoSantoTomas.png" class="logoSantoTomas" alt="Logo Santo Tomas">
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col">
+                        <div class="d-flex flex-column">
+                            <span class="barangay mt-2">Barangay San Antonio</span>
+                            <span class="city">Santo Tomas City, Batangas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <div class="row my-3">
+                        <div class="col-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" placeholder="First Name" required>
+                                <label for="floatingInput">First Name</label>
+                            </div>
+                        </div>
+                        <div class="col-4 p-0">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" placeholder="Middle Name" required>
+                                <label for="floatingInput">Middle Name</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" placeholder="Last Name" required>
+                                <label for="floatingInput">Last Name</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                                <label for="floatingInput">Email address</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" placeholder="09123456789" required>
+                                <label for="floatingInput">Phone Number</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating mb-3 position-relative">
+                                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                                <label for="floatingPassword">Password</label>
+                                <i class="fa-regular fa-eye" id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-floating position-relative">
+                                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                                <label for="floatingPassword">Confirm Password</label>
+                                 <i class="fa-regular fa-eye" id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col text-center">
+                            <button class="btn btn-primary signUpButton mb-3 mt-2">Sign Up</button>
+                            <span class="pt-2" style="color: black;">Already have an account?</span> <a href="signIn.php" style="color: #19AFA5;">Login</a>
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="container-fluid">
+        <div class="row"> -->
+            <!-- Left Side Image -->
+            <!-- <div class="col-md-6 d-none d-md-block p-0">
+                <img src="assets/images/bgHall.jpeg" class="left-img" alt="Barangay Background">
+            </div> -->
+
             <!-- Right Side Sign In -->
-            <div class="col-md-6 col-12 d-flex justify-content-center align-items-start">
+            <!-- <div class="col-md-6 col-12 d-flex justify-content-center align-items-start">
                 <div class="container">
                     <div class="w-100 sign-in-card">
                         <div class="">
@@ -323,7 +407,7 @@ if (isset($_POST["submit"])) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
 
 
