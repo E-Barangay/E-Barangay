@@ -6,7 +6,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 $page = $_GET['page'] ?? 'dashboard';
-$validPages = ['dashboard', 'resident', 'announcement', 'complaintsKP', 'complaintsVAWC', 'document',];
+$validPages = ['dashboard', 'resident', 'announcement', 'complaints', 'document',];
 if (!in_array($page, $validPages)) {
   header("Location: ?page=dashboard");
   exit();
@@ -23,7 +23,7 @@ include("../sharedAssets/connect.php");
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" href="../assets/images/logoSanAntonio.png">
+  <link rel="icon" href="../assets/images/logoSanAntonio.png">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -258,15 +258,9 @@ include("../sharedAssets/connect.php");
           </a>
         </li>
         <li class="sidebar-item">
-          <a href="?page=complaintsKP" class="sidebar-link <?php if ($page === 'complaintsKP')
+          <a href="?page=complaints" class="sidebar-link <?php if ($page === 'complaints')
             echo 'active'; ?>">
-            <i class="bi bi-exclamation-diamond"></i> <span>COMPLAINT (KP)</span>
-          </a>
-        </li>
-        <li class="sidebar-item">
-          <a href="?page=complaintsVAWC" class="sidebar-link <?php if ($page === 'complaintsVAWC')
-            echo 'active'; ?>">
-            <i class="bi bi-exclamation-diamond"></i> <span>COMPLAINT (VAWC)</span>
+            <i class="bi bi-exclamation-diamond"></i> <span>COMPLAINTS</span>
           </a>
         </li>
         <li class="sidebar-item">
@@ -291,8 +285,7 @@ include("../sharedAssets/connect.php");
         'dashboard' => 'adminContent',
         'resident' => 'adminContent',
         'announcement' => 'adminContent',
-        'complaintsKP' => 'adminContent',
-        'complaintsVAWC' => 'adminContent',
+        'complaints' => 'adminContent',
         'document' => 'adminContent',
       ];
 
