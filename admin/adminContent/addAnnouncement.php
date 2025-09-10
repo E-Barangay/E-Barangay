@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Fixed: was using $date instead of $dateTime
-    $query = "INSERT INTO announcements (title, dateTime, description, image, isImportant)
-              VALUES ('$title', '$dateTime', '$description', '$imagePath', $isImportant)";
+    $query = "INSERT INTO announcements (title, dateTime, description, image)
+              VALUES ('$title', '$dateTime', '$description', '$imagePath')";
     if (mysqli_query($conn, $query)) {
         header("Location: ../index.php?page=announcement&success=1");
         exit;
