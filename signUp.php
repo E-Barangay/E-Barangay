@@ -107,7 +107,7 @@ if (isset($_POST["submit"])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sign Up</title>
+    <title>E-Barangay | Sign Up</title>
 
     <!-- Icon -->
     <link rel="icon" href="assets/images/logoSanAntonio.png">
@@ -123,13 +123,13 @@ if (isset($_POST["submit"])) {
 <body data-bs-theme="light">
     
     <div class="container-fluid">
-        <div class="row">
+        <div class="row min-vh-100">
             
-            <div class="col-lg-7 d-none d-md-block p-0">
+            <div class="col-lg-7 d-none d-lg-block p-0">
                 <img src="assets/images/bgHall.jpeg" class="leftBackgroundImage" alt="Barangay Background">
             </div>
 
-            <div class="col-lg-5 col-12 my-auto px-5">
+            <div class="col-lg-5 col-12 d-flex flex-column justify-content-center px-5">
                 <div class="row">
                     <div class="col d-flex justify-content-center">
                         <img src="assets/images/logoSanAntonio.png" class="logoSanAntonio me-2" alt="Logo San Antonio">
@@ -146,7 +146,7 @@ if (isset($_POST["submit"])) {
                 </div>
 
                 <form method="POST">
-                    <div class="row my-3">
+                    <div class="row my-4">
                         <div class="col-4">
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" id="floatingInput" placeholder="First Name" required>
@@ -186,8 +186,8 @@ if (isset($_POST["submit"])) {
                         </div>
                         <div class="col-12">
                             <div class="form-floating position-relative">
-                                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                                <label for="floatingPassword">Confirm Password</label>
+                                <input type="password" class="form-control" id="floatingConfirmPassword" placeholder="Confirm Password">
+                                <label for="floatingConfirmPassword">Confirm Password</label>
                                  <i class="fa-regular fa-eye" id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                             </div>
                         </div>
@@ -195,7 +195,7 @@ if (isset($_POST["submit"])) {
                     <div class="row">
                         <div class="col text-center">
                             <button class="btn btn-primary signUpButton mb-3 mt-2">Sign Up</button>
-                            <span class="pt-2" style="color: black;">Already have an account?</span> <a href="signIn.php" style="color: #19AFA5;">Login</a>
+                            <span class="pt-2" style="color: black;">Already have an account?</span> <a href="login.php" style="color: #19AFA5;">Login</a>
                         </div>
                     </div>
                 </form>
