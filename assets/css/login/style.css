@@ -51,6 +51,20 @@ html {
     border: 1px solid #19AFA5;        
 }
 
+.nextButton {
+    width: 100%;
+    height: 48px;
+    color: white;
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+}
+
+.nextButton:hover {
+    color: white;
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+}
+
 .signUpButton {
     width: 100%;
     height: 48px;
@@ -60,37 +74,7 @@ html {
 }
 
 .signUpButton:hover {
-    color: black;
+    color: white;
     background-color: #11A1A1;
     border: 1px solid #11A1A1;
-}
-
-.progress-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.progress-step {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #555;
-}
-
-.progress-step.active {
-    background: #19AFA5;
-    color: #fff;
-}
-
-.progress-line {
-    flex: 1;
-    height: 4px;
-    background: #ddd;
-    margin: 0 10px;
 }

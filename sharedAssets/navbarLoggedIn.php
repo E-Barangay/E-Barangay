@@ -3,22 +3,21 @@
 if (isset($_POST['logout'])) {
     session_destroy();
     header("Location: index.php");
-    exit(); // Important: stop script execution after redirect
+    exit();
 }
 
-$firstName = "User"; // default fallback
 if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
 
-    // Query to get the first name from your userInfo table
-    $query = "SELECT firstName FROM userinfo WHERE userInfoID = '$userID'";
-    $result = mysqli_query($conn, $query);
+    $userQuery = "SELECT * FROM users LEFT JOIN userInfo ON users.userID = userInfo.userID WHERE users.userID = '$userID'";
+    $userResult = executeQuery($userQuery);
 
-    if ($result && mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        $firstName = $row['firstName'];
+    if ($userResult && mysqli_num_rows($userResult) > 0) {
+        $userRow = mysqli_fetch_assoc($userResult);
+        $firstName = $userRow['firstName'];
     }
 }
+
 ?>
 
 <nav class="navbar navbar-expand-lg">

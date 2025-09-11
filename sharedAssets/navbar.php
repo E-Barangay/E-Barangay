@@ -24,7 +24,7 @@
                     <a class="nav-link active3" href="reports.php">Reports</a>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link active4" href="signIn.php">Sign In / Sign Up</a>
+                    <a class="nav-link active4" href="login.php">Login / Sign Up</a>
                 </li>
             </ul>
         </div>
