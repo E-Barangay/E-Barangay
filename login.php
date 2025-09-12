@@ -151,8 +151,8 @@ if (isset($_POST['submit'])) {
 
                             <div class="col-12">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" id="floatingInput" name="email" placeholder="Email address/Phone Number" required>
-                                    <label for="floatingInput">Email address/Phone Number</label>
+                                    <input type="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" id="emailInput" name="email" placeholder="Email address/Phone Number" required>
+                                    <label for="emailInput">Email address/Phone Number</label>
                                 </div>
                             </div>
 
@@ -160,9 +160,9 @@ if (isset($_POST['submit'])) {
 
                             <div class="col">
                                 <div class="form-floating">
-                                    <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
-                                    <label for="floatingPassword">Password</label>
-                                    <i class="fa-regular fa-eye" id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                                    <input type="password" class="form-control" value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>" id="passwordInput" name="password" placeholder="Password" required>
+                                    <label for="passwordInput">Password</label>
+                                    <i class="fa-regular fa-eye" onclick="togglePassword('passwordInput', this)" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                                 </div>
                             </div>
 
@@ -170,16 +170,16 @@ if (isset($_POST['submit'])) {
 
                             <div class="col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
-                                    <label for="floatingPassword">Password</label>
-                                    <i class="fa-regular fa-eye" id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                                    <input type="password" class="form-control" value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>" id="passwordInput" name="password" placeholder="Password" required>
+                                    <label for="passwordInput">Password</label>
+                                    <i class="fa-regular fa-eye" onclick="togglePassword('passwordInput', this)" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <div class="form-floating">
-                                    <input type="password" class="form-control" id="floatingConfirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
-                                    <label for="floatingConfirmPassword">Confirm Password</label>
-                                    <i class="fa-regular fa-eye" id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                                    <input type="password" class="form-control" value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>" id="confirmPasswordInput" name="confirmPassword" placeholder="Confirm Password" required>
+                                    <label for="confirmPasswordInput">Confirm Password</label>
+                                    <i class="fa-regular fa-eye" onclick="togglePassword('confirmPasswordInput', this)" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                                 </div>
                             </div>
 
@@ -213,8 +213,24 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
+    <script>
+        function togglePassword(inputId, icon) {
+            var input = document.getElementById(inputId);
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-                        
+
 </body>
 
 </html>
