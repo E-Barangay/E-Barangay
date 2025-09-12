@@ -67,7 +67,7 @@ html {
 }
 
 .signUpButton:hover {
-    color: black;
+    color: white;
     background-color: #11A1A1;
     border: 1px solid #11A1A1;
 }
