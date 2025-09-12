@@ -78,6 +78,98 @@ make complaint */
     font-size: 16px;
     cursor: pointer;
 }
+
 .complaint-text {
-  font-size: 0.75rem; /* small font for mobile */
+    font-size: 0.75rem;
 }
+
+.modal-footer .btn {
+    background-color: #19AFA5;
+    color: black;
+    transition: 0.3s;
+}
+
+/* modal button  */
+.modal-footer .btn:hover {
+    color: white;
+}
+
+.modal-content .btn {
+    color: white !important;
+    background-color: #19AFA5 !important;
+    border: none;
+}
+
+.modal-content .btn:hover {
+    color: black !important;
+    background-color: #19AFA5 !important;
+}
+
+
+
+/* printing style */
+
+  /* Modal images sizing */
+  .modal-body img {
+    max-width: 200px;
+    height: auto;
+    margin: 5px;
+    border: 1px solid #ccc;
+    padding: 3px;
+  }
+
+  .filterButton {
+    background-color: #19AFA5;
+    color: white;
+    border: 1px solid #19AFA5;
+    border-radius: 12px;
+  }
+
+  .filterButton:hover {
+    color: black;
+  }
+
+  /* Print styling */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    .printableArea,
+    .printableArea * {
+      visibility: visible;
+    }
+
+    .printableArea {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+
+    /* Hide buttons on print */
+    .filterButton,
+    .btn-close {
+      display: none !important;
+    }
+
+    /* Restrict image size on print */
+    img {
+      max-width: 300px !important;
+      height: auto !important;
+      margin: 5px 0 !important;
+      border: 1px solid #ccc !important;
+      padding: 3px !important;
+    }
+
+    /* Remove extra spacing for statements */
+    p {
+      white-space: pre-line;
+      margin: 0;
+    }
+
+    strong {
+      display: inline-block;
+      width: 120px;
+    }
+  }

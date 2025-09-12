@@ -53,5 +53,12 @@ fileInput.addEventListener('change', (e) => {
         images.push({ id, name: file.name, url });
     });
     renderPreviews();
-    e.target.value = ''; // reset input
 });
+
+
+setTimeout(() => {
+    let alert = document.querySelector('.alert-success');
+    if (alert) {
+        alert.style.display = 'none';
+    }
+}, 3000); // 3 seconds
