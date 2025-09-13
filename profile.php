@@ -1,5 +1,7 @@
 <?php
+
 include("sharedAssets/connect.php");
+
 session_start();
 
 if (!isset($_SESSION['userID'])) {
@@ -114,7 +116,6 @@ if (isset($_POST['saveBtn'])) {
 }
 ?>
 
-
 <!doctype html>
 <html lang="en">
 
@@ -127,8 +128,7 @@ if (isset($_POST['saveBtn'])) {
     <link rel="icon" href="assets/images/logoSanAntonio.png">
 
     <!-- Style Sheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="assets/css/navbar/style.css">
     <link rel="stylesheet" href="assets/css/profile/style.css">
@@ -136,137 +136,278 @@ if (isset($_POST['saveBtn'])) {
 </head>
 
 <body data-bs-theme="light">
+
     <?php
-    if (isset($_SESSION['userID'])) {
-        include("sharedAssets/navbarLoggedIn.php");
-    } else {
-        include("sharedAssets/navbar.php");
-    }
+        if (isset($_SESSION['userID'])) {
+            include("sharedAssets/navbarLoggedIn.php");
+        } else {
+            include("sharedAssets/navbar.php");
+        }
     ?>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-10">
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="card p-3 p-md-5 m-2 m-md-4">
-
-                        <div class="position-relative">
-                            <button type="submit" id="editBtnDesktop" name="saveBtn"
-                                class="btn btn-primary position-absolute top-0 end-0 d-none d-md-block">Edit</button>
-
-                            <!-- Profile Header Section -->
-                            <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start mb-4">
-                                <div class="flex-shrink-0 mb-3 mb-md-0">
-                                    <img src="<?php echo !empty($data['profilePicture'])
-                                        ? 'uploads/profile/' . $data['profilePicture']
-                                        : 'assets/images/defaultProfile.png'; ?>"
-                                        class="rounded-circle profile-preview"
-                                        style="width: 120px; height: 120px; object-fit: cover;">
-
-                                    <!-- File input for editing (hidden until Edit is pressed) -->
-                                    <input type="file" name="profilePicture" class="form-control mt-2 d-none"
-                                        id="profilePictureInput" accept="image/*">
-                                </div>
-
-                                <div class="ms-md-4 text-center text-md-start">
-                                    <h3 class="mb-2">
-                                        <?php echo $data['firstName'] . ' ' . $data['middleName'] . ' ' . $data['lastName'] ?>
-                                    </h3>
-                                    <p class="text-break mb-0"><?php echo $data['email'] ?></p>
-                                </div>
+    <div class="container pt-3">
+        <div class="row">
+            <div class="col">
+                <div class="card profileCard p-5" style="width:100%; height: 100%;">
+                    <div class="row pb-3">
+                        <div class="col-10 d-flex flex-row align-items-center">
+                            <img src="assets/images/defaultProfile.png" class="profilePicture" alt="Profile Picture">
+                            <div class="d-flex flex-column ps-4">
+                                <span>John Doe</span>
+                                <span>johndoe@gmail.com</span>
                             </div>
                         </div>
-
-                        <div class="d-flex justify-between-end mb-3 d-md-none">
-                            <button type="submit" id="editBtnMobile" name="saveBtn"
-                                class="btn btn-primary w-100">Edit</button>
-                        </div>
-
-                        <!-- Form Fields -->
-                        <div class="row g-3">
-
-                            <!-- User Info -->
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold">First Name</label>
-                                <input name="firstName" class="form-control"
-                                    value="<?php echo $data['firstName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold">Middle Name</label>
-                                <input name="middleName" class="form-control"
-                                    value="<?php echo $data['middleName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-4">
-                                <label class="form-label fw-semibold">Last Name</label>
-                                <input name="lastName" class="form-control"
-                                    value="<?php echo $data['lastName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Gender</label>
-                                <input name="gender" class="form-control" value="<?php echo $data['gender'] ?? '' ?>"
-                                    disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Birth Date</label>
-                                <input name="birthDate" class="form-control" type="date"
-                                    value="<?php echo $data['birthDate'] ?? '' ?>" disabled>
-                            </div>
-
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Phone Number</label>
-                                <input name="phoneNumber" class="form-control"
-                                    value="<?php echo $data['phoneNumber'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Email</label>
-                                <input name="email" class="form-control" value="<?php echo $data['email'] ?? '' ?>"
-                                    disabled>
-                            </div>
-
-                            <!-- Address -->
-                            <div class="col-12 col-md-3">
-                                <label class="form-label fw-semibold">House No.</label>
-                                <input name="houseNo" class="form-control" value="<?php echo $data['houseNo'] ?? '' ?>"
-                                    disabled>
-                            </div>
-                            <div class="col-12 col-md-3">
-                                <label class="form-label fw-semibold">Phase</label>
-                                <input name="phase" class="form-control" value="<?php echo $data['phase'] ?? '' ?>"
-                                    disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Purok</label>
-                                <input name="purok" class="form-control" value="<?php echo $data['purok'] ?? '' ?>"
-                                    disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Street</label>
-                                <input name="streetName" class="form-control"
-                                    value="<?php echo $data['streetName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Subdivision</label>
-                                <input name="subdivisionName" class="form-control"
-                                    value="<?php echo $data['subdivisionName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Barangay</label>
-                                <input name="barangayName" class="form-control"
-                                    value="<?php echo $data['barangayName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">City</label>
-                                <input name="cityName" class="form-control"
-                                    value="<?php echo $data['cityName'] ?? '' ?>" disabled>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">Province</label>
-                                <input name="provinceName" class="form-control"
-                                    value="<?php echo $data['provinceName'] ?? '' ?>" disabled>
-                            </div>
+                        <div class="col-2 d-flex flex-row justify-content-center align-items-center">
+                            <button class="btn btn-primary">Edit</button>
                         </div>
                     </div>
-                </form>
+
+                    <hr>
+                    
+                    <form method="POST">
+
+                        <div class="row pt-3">
+
+                            <div class="col-12 mb-3">
+                                Personal Information
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="firstNameInput" name="firstName" placeholder="First Name" required>
+                                    <label for="firstNameInput">First Name</label>
+                                </div>
+                            </div>
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" placeholder="Middle Name">
+                                    <label for="middleNameInput">Middle Name</label>
+                                </div>
+                            </div>
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="lastNameInput" name="lastName" placeholder="Last Name">
+                                    <label for="lastNameInput">Last Name</label>
+                                </div>
+                            </div>
+                            <div class="col-2 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="suffixInput" name="suffix" placeholder="Suffix">
+                                    <label for="suffixInput">Suffix</label>
+                                </div>
+                            </div>
+
+                            <div class="col-2 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="genderInput" name="suffix" placeholder="Suffix">
+                                    <label for="genderInput">Gender</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="birthDateInput" name="birthDate" placeholder="Date of Birth">
+                                    <label for="birthDateInput">Date of Birth</label>
+                                </div>
+                            </div>
+
+                            <div class="col-1 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="ageInput" name="age" placeholder="Age">
+                                    <label for="ageInput">Age</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="birthPlaceInput" name="age" placeholder="Place of Birth">
+                                    <label for="birthPlaceInput">Place of Birth</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="bloodType" name="bloodType" placeholder="Blood Type">
+                                    <label for="bloodType">Blood Type</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="recidencyType" name="recidencyType" placeholder="Type of Residency">
+                                    <label for="recidencyType">Type of Residency</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="civilStatus" name="civilStatus" placeholder="Age">
+                                    <label for="civilStatus">Civil Status</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="citizenship" name="citizenship" placeholder="Citizenship">
+                                    <label for="citizenship">Citizenship</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="occupation" name="occupation" placeholder="Occupation">
+                                    <label for="occupation">Occupation</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="remarks" name="remarks" placeholder="Remarks">
+                                    <label for="remarks">Remarks</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-12 mb-3">
+                                Contact Information
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="Phone Number">
+                                    <label for="phoneNumber">Phone Number</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6 mb-4">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
+                                    <label for="email">Email Address</label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-12 mb-3">
+                                Address
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" placeholder="Block & Lot No.">
+                                    <label for="blockLotNo">Block & Lot No.</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="phase" name="phase" placeholder="Phase">
+                                    <label for="phase">Phase</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="subdivision" name="subdivision" placeholder="Subdivision">
+                                    <label for="subdivision">Subdivision</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="street" name="street" placeholder="Street">
+                                    <label for="street">Street</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="barangay" name="barangay" placeholder="Barangay">
+                                    <label for="barangay">Barangay</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="City">
+                                    <label for="city">City</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="province" name="province" placeholder="Province">
+                                    <label for="province">Province</label>
+                                </div>
+                            </div>
+                        
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-12 mb-3">
+                                Permanent Address
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" placeholder="Block & Lot No.">
+                                    <label for="permanentBlockLotNo">Block & Lot No.</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase" placeholder="Phase">
+                                    <label for="permanentPhase">Phase</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentSubdivision" name="permanentSubdivision" placeholder="Subdivision">
+                                    <label for="permanentSubdivision">Subdivision</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreet" placeholder="Street">
+                                    <label for="permanentStreet">Street</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentBarangay" name="permanentBarangay" placeholder="Barangay">
+                                    <label for="permanentBarangay">Barangay</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentCity" name="permanentCity" placeholder="City">
+                                    <label for="permanentCity">City</label>
+                                </div>
+                            </div>
+
+                            <div class="col-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="permanentProvince" name="permanentProvince" placeholder="Province">
+                                    <label for="permanentProvince">Province</label>
+                                </div>
+                            </div>
+                        
+                        </div>
+
+                    </form>
+
+                </div>
             </div>
         </div>
     </div>
