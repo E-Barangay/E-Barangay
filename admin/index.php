@@ -6,7 +6,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 $page = $_GET['page'] ?? 'dashboard';
-$validPages = ['dashboard', 'resident', 'announcement', 'complaints', 'document',];
+$validPages = ['dashboard', 'resident', 'announcement', 'complaints', 'document', 'reports'];
 if (!in_array($page, $validPages)) {
   header("Location: ?page=dashboard");
   exit();
@@ -269,6 +269,12 @@ include("../sharedAssets/connect.php");
             <i class="bi bi-file-earmark-text"></i> <span>DOCUMENT</span>
           </a>
         </li>
+                <li class="sidebar-item">
+          <a href="?page=reports" class="sidebar-link <?php if ($page === 'reports')
+            echo 'active'; ?>">
+            <i class="bi bi-bar-chart"></i> <span>REPORTS</span>
+          </a>
+        </li>
       </ul>
       <div class="logout-wrapper">
         <a href="../sharedAssets/logOut.php" onclick="return confirm('Are you sure you want to logout?')"
@@ -287,6 +293,8 @@ include("../sharedAssets/connect.php");
         'announcement' => 'adminContent',
         'complaints' => 'adminContent',
         'document' => 'adminContent',
+        'reports' => 'adminContent',
+
       ];
 
       $folder = $pageMap[$page] ?? 'adminContent';
