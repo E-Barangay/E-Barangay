@@ -20,3 +20,41 @@ html {
     height: 100px;
     object-fit: cover;
 }
+
+.fullName {
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: bold;
+}
+
+.email {
+    font-size: clamp(14px, 1.5vw, 16px);
+}
+
+.personalInfo,
+.contactInfo,
+.addressInfo,
+.permanentAddressInfo {
+    font-size: clamp(18px, 1.2rem + 0.5vw, 22px);
+    font-weight: bold;
+    color: black;
+}
+
+.form-floating .form-control {
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    box-shadow: none !important; 
+    outline: none;     
+    border: 1px solid #19AFA5;        
+}
+
+.editButton {
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+}
+
+.editButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+}
