@@ -17,74 +17,101 @@ $userQuery = "SELECT * FROM users
             WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
-$userDataRow = mysqli_fetch_assoc($userResult); {
-    $firstName = $userDataRow['firstName'];
-    $middleName = $userDataRow['middleName'];
-    $lastName = $userDataRow['lastName'];
-    $suffix = $userDataRow['suffix'];
-    $gender = $userDataRow['gender'];
-    $birthDate = $userDataRow['birthDate'];
-    $birthPlace = $userDataRow['birthPlace'];
-    $bloodType = $userDataRow['bloodType'];
-    $residencyType = $userDataRow['residencyType'];
-    $civilStatus = $userDataRow['civilStatus'];
-    $citizenship = $userDataRow['citizenship'];
-    $occupation = $userDataRow['occupation'];
-    $remarks = $userDataRow['remarks'];
-    $phoneNumber = $userDataRow['phoneNumber'];
-    $email = $userDataRow['email'];
-    $blockLotNo = $userDataRow['houseNo'];
-    $phase = $userDataRow['phase']; 
-    $subdivisionName = $userDataRow['subdivisionName'];
-    $purok = $userDataRow['purok'];
-    $streetName = $userDataRow['streetName'];
-    $barangayName = $userDataRow['barangayName'];
-    $cityName = $userDataRow['cityName'];
-    $provinceName = $userDataRow['provinceName'];
-    $permanentBlockLotNo = $userDataRow['permanentHouseNo'];
-    $permanentPhase = $userDataRow['permanentPhase']; 
-    $permanentSubdivisionName = $userDataRow['permanentSubdivisionName'];
-    $permanentPurok = $userDataRow['permanentPurok'];
-    $permanentStreetName = $userDataRow['permanentStreetName'];
-    $permanentBarangayName = $userDataRow['permanentBarangayName'];
-    $permanentCityName = $userDataRow['permanentCityName'];
-    $permanentProvinceName = $userDataRow['permanentProvinceName'];
-};
+$userDataRow = mysqli_fetch_assoc($userResult);
 
-// if (isset($_POST['saveBtn'])) {
-//     $firstName = $_POST['firstName'];
-//     $middleName = $_POST['middleName'];
-//     $lastName = $_POST['lastName'];
-//     $suffix = $_POST['suffix'] ?? '';
-//     $gender = $_POST['gender'];
-//     $birthDate = $_POST['birthDate'];
-//     $phoneNumber = $_POST['phoneNumber'];
-//     $email = $_POST['email'];
-//     $provinceName = $_POST['provinceName'];
-//     $cityName = $_POST['cityName'];
-//     $barangayName = $_POST['barangayName'];
-//     $streetName = $_POST['streetName'];
-//     $houseNo = $_POST['houseNo'] ?? '';
-//     $phase = $_POST['phase'] ?? '';
-//     $subdivisionName = $_POST['subdivisionName'] ?? '';
-//     $purok = $_POST['purok'] ?? '';
+$firstName = $userDataRow['firstName'];
+$middleName = $userDataRow['middleName'];
+$lastName = $userDataRow['lastName'];
+$suffix = $userDataRow['suffix'];
+$gender = $userDataRow['gender'];
+$birthDate = $userDataRow['birthDate'];
+$birthPlace = $userDataRow['birthPlace'];
+$bloodType = $userDataRow['bloodType'];
+$residencyType = $userDataRow['residencyType'];
+$civilStatus = $userDataRow['civilStatus'];
+$citizenship = $userDataRow['citizenship'];
+$occupation = $userDataRow['occupation'];
+$remarks = $userDataRow['remarks'];
 
-// }
-    // ✅ userInfoID always exists now
-    // $userInfoID = $data['userInfoID'];
+$phoneNumber = $userDataRow['phoneNumber'];
+$email = $userDataRow['email'];
 
-    // --- UPDATE userInfo ---
-    // executeQuery("
-    //     UPDATE userInfo 
-    //     SET firstName='$firstName',
-    //         middleName='$middleName',
-    //         lastName='$lastName',
-    //         suffix='$suffix',
-    //         gender='$gender',
-    //         birthDate='$birthDate'
-    //     WHERE userInfoID=$userInfoID
-    // ");
+$blockLotNo = $userDataRow['houseNo'];
+$phase = $userDataRow['phase']; 
+$subdivisionName = $userDataRow['subdivisionName'];
+$purok = $userDataRow['purok'];
+$streetName = $userDataRow['streetName'];
+$barangayName = $userDataRow['barangayName'];
+$cityName = $userDataRow['cityName'];
+$provinceName = $userDataRow['provinceName'];
 
+$permanentBlockLotNo = $userDataRow['permanentHouseNo'];
+$permanentPhase = $userDataRow['permanentPhase']; 
+$permanentSubdivisionName = $userDataRow['permanentSubdivisionName'];
+$permanentPurok = $userDataRow['permanentPurok'];
+$permanentStreetName = $userDataRow['permanentStreetName'];
+$permanentBarangayName = $userDataRow['permanentBarangayName'];
+$permanentCityName = $userDataRow['permanentCityName'];
+$permanentProvinceName = $userDataRow['permanentProvinceName'];
+
+if (isset($_POST['saveButton'])) {
+    $firstName = $_POST['firstName'];
+    $middleName = $_POST['middleName'];
+    $lastName = $_POST['lastName'];
+    $suffix = $_POST['suffix'];
+    $gender = $_POST['gender'];
+    $age = $_POST['age'];
+    $birthDate = $_POST['birthDate'];
+    $birthPlace = $_POST['birthPlace'];
+    $bloodType = $_POST['bloodType'];
+    $residencyType = $_POST['recidencyType'];
+    $civilStatus = $_POST['civilStatus'];
+    $citizenship = $_POST['citizenship'];
+    $occupation = $_POST['occupation'];
+    $remarks = $_POST['remarks'];
+
+    $phoneNumber = $_POST['phoneNumber'];
+    $email = $_POST['email'];
+
+    $blockLotNo = $_POST['houseNo'];
+    $phase = $_POST['phase']; 
+    $subdivisionName = $_POST['subdivisionName'];
+    $purok = $_POST['purok'];
+    $streetName = $_POST['streetName'];
+    $barangayName = $_POST['barangayName'];
+    $cityName = $_POST['cityName'];
+    $provinceName = $_POST['provinceName'];
+
+    $permanentBlockLotNo = $_POST['permanentHouseNo'];
+    $permanentPhase = $_POST['permanentPhase']; 
+    $permanentSubdivisionName = $_POST['permanentSubdivisionName'];
+    $permanentPurok = $_POST['permanentPurok'];
+    $permanentStreetName = $_POST['permanentStreetName'];
+    $permanentBarangayName = $_POST['permanentBarangayName'];
+    $permanentCityName = $_POST['permanentCityName'];
+    $permanentProvinceName = $_POST['permanentProvinceName'];
+
+    $updateUserInfoQuery = "UPDATE userInfo SET firstName = '$firstName', middleName = '$middleName', lastName = '$lastName', 
+                        suffix = '$suffix', age = '$age', gender = '$gender', birthDate = '$birthDate', birthPlace = '$birthPlace',
+                        bloodType = '$bloodType', residencyType = '$residencyType', civilStatus = '$civilStatus', citizenship = '$citizenship',
+                        occupation = '$occupation', remarks = '$remarks' WHERE userID = $userID;";
+    $updateUserInfoResult = executeQuery($updateUserInfoQuery);
+
+    $updateUserContactQuery = "UPDATE users SET phoneNumber = '$phoneNumber', email = '$email' WHERE userID = $userID;";
+    $updateUserInfoResult = executeQuery($updateUserInfoQuery);
+
+    $updateAddressQuery = "UPDATE addresses SET houseNo = '$blockLotNo', phase = '$phase', subdivisionName = '$subdivisionName',
+                        purok = '$purok', streetName = '$streetName', barangayName = '$barangayName', cityName = '$cityName',
+                        provinceName = '$provinceName' WHERE userInfoID = $userID;";
+    $updateAddressResult = executeQuery($updateAddressQuery);
+
+    $updatePermanentAddressQuery = "UPDATE permanentAddresses SET permanentHouseNo = '$permanentBlockLotNo', permanentPhase = '$permanentPhase', 
+                        permanentSubdivisionName = '$permanentSubdivisionName', permanentPurok = '$permanentPurok', 
+                        permanentStreetName = '$permanentStreetName', permanentBarangayName = '$permanentBarangayName', 
+                        permanentCityName = '$permanentCityName', permanentProvinceName = '$permanentProvinceName' 
+                        WHERE userInfoID = $userID;";
+    $updatePermanentAddressResult = executeQuery($updatePermanentAddressQuery);
+}
     // --- Handle profile picture upload ---
     // if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK) {
     //     $uploadDir = "uploads/profile/";
@@ -101,40 +128,6 @@ $userDataRow = mysqli_fetch_assoc($userResult); {
     //         executeQuery("UPDATE userInfo SET profilePicture = '$newFileName' WHERE userInfoID = $userInfoID");
     //     }
     // }
-
-    // --- UPDATE users (contact info) ---
-    // executeQuery("
-    //     UPDATE users 
-    //     SET phoneNumber='$phoneNumber',
-    //         email='$email'
-    //     WHERE userID=$userID
-    // ");
-
-    // --- UPDATE or INSERT addresses ---
-//     $existingAddress = executeQuery("SELECT * FROM addresses WHERE userInfoID = $userInfoID");
-//     if (mysqli_num_rows($existingAddress) > 0) {
-//         executeQuery("
-//             UPDATE addresses 
-//             SET provinceName='$provinceName',
-//                 cityName='$cityName',
-//                 barangayName='$barangayName',
-//                 streetName='$streetName',
-//                 houseNo='$houseNo',
-//                 phase='$phase',
-//                 subdivisionName='$subdivisionName',
-//                 purok='$purok'
-//             WHERE userInfoID=$userInfoID
-//         ");
-//     } else {
-//         executeQuery("
-//             INSERT INTO addresses (userInfoID, provinceName, cityName, barangayName, streetName, houseNo, phase, subdivisionName, purok)
-//             VALUES ($userInfoID, '$provinceName', '$cityName', '$barangayName', '$streetName', '$houseNo', '$phase', '$subdivisionName', '$purok')
-//         ");
-//     }
-
-//     header("Location: profile.php");
-//     exit();
-// }
 ?>
 
 <!doctype html>
@@ -165,34 +158,34 @@ $userDataRow = mysqli_fetch_assoc($userResult); {
             include("sharedAssets/navbar.php");
         }
     ?>
-
-    <div class="container pt-3">
-        <div class="row">
-            <div class="col">
-                <div class="card profileCard p-5" style="width:100%; height: 100%;">
-                    <div class="row pb-3">
-                        <div class="col-lg-11 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
-                            <img src="assets/images/defaultProfile.png" class="profilePicture" alt="Profile Picture">
-                            <div class="d-flex flex-column ps-0 ps-md-4 pt-3 pt-md-0">          
-                                <span class="fullName">
-                                    <?php
-                                        $middleInitial = !empty($middleName) ? strtoupper($middleName[0]) . "." : ""; 
-                                        echo $firstName . " " . $middleInitial . " " . $lastName; 
-                                    ?>
-                                </span>
-                                <span class="email text-muted"><?php echo $email ?></span>
+                    
+    <form method="POST">
+        <div class="container pt-3">
+            <div class="row">
+                <div class="col">
+                    <div class="card profileCard p-5" style="width:100%; height: 100%;">
+                        <div class="row pb-3">
+                            <div class="col-lg-11 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+                                <img src="assets/images/defaultProfile.png" class="profilePicture" alt="Profile Picture">
+                                <input type="file" name="profilePicture" class="form-control mt-2 d-none" id="profilePictureInput" accept="image/*">
+                                <div class="d-flex flex-column ps-0 ps-md-4 pt-3 pt-md-0">          
+                                    <span class="fullName">
+                                        <?php
+                                            $middleInitial = !empty($middleName) ? strtoupper($middleName[0]) . "." : ""; 
+                                            echo $firstName . " " . $middleInitial . " " . $lastName; 
+                                        ?>
+                                    </span>
+                                    <span class="email text-muted"><?php echo $email ?></span>
+                                </div>
+                            </div>
+                            <div class="col-lg-1 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
+                                <button class="btn btn-primary editButton" id="editButton" type="button">Edit</button>
+                                <button class="btn btn-secondary cancelButton d-none me-2" id="cancelButton" type="button">Cancel</button>
+                                <button class="btn btn-success saveButton d-none" id="saveButton" type="submit" name="saveButton">Save</button>
                             </div>
                         </div>
-                        <div class="col-lg-1 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
-                            <button class="btn btn-primary editButton">Edit</button>
-                            <button class="btn btn-primary cancelButton d-none">Cancel</button>
-                            <button class="btn btn-primary saveButton d-none">Save</button>
-                        </div>
-                    </div>
 
-                    <hr>
-                    
-                    <form method="POST">
+                        <hr>
 
                         <div class="row pt-3">
 
@@ -202,100 +195,100 @@ $userDataRow = mysqli_fetch_assoc($userResult); {
 
                             <div class="col-lg-4 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="firstNameInput" name="firstName" value="<?php echo $firstName ?>" placeholder="First Name" required>
+                                    <input type="text" class="form-control" id="firstNameInput" name="firstName" value="<?php echo $firstName ?>" placeholder="First Name" disabled>
                                     <label for="firstNameInput">First Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" value="<?php echo $middleName ?>" placeholder="Middle Name">
+                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" value="<?php echo $middleName ?>" placeholder="Middle Name" disabled>
                                     <label for="middleNameInput">Middle Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lastNameInput" name="lastName" value="<?php echo $lastName ?>" placeholder="Last Name">
+                                    <input type="text" class="form-control" id="lastNameInput" name="lastName" value="<?php echo $lastName ?>" placeholder="Last Name" disabled>
                                     <label for="lastNameInput">Last Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-2 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="suffixInput" name="suffix" value="<?php echo $suffix ?>" placeholder="Suffix">
-                                    <label for="suffixInput">Suffix</label>
+                                    <input type="text" class="form-control" id="suffix" name="suffix" value="<?php echo $suffix ?>" placeholder="Suffix" disabled>
+                                    <label for="suffix">Suffix</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="genderInput" name="gender" value="<?php echo $gender ?>" placeholder="Suffix">
-                                    <label for="genderInput">Gender</label>
+                                    <input type="text" class="form-control" id="gender" name="gender" value="<?php echo $gender ?>" placeholder="Suffix" disabled>
+                                    <label for="gender">Gender</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-3 col-3 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="ageInput" name="age" placeholder="Age"
+                                    <input type="text" class="form-control" id="age" name="age" placeholder="Age" disabled
                                         value="<?php $birthDateObj = new DateTime($birthDate);
                                                     $today = new DateTime();
                                                     $age = $today->diff($birthDateObj)->y;
                                                     echo $age . " years old";
                                                 ?>">
-                                    <label for="ageInput">Age</label>
+                                    <label for="age">Age</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-9 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="birthDateInput" name="birthDate" value="<?php echo date("F j, Y", strtotime($birthDate)); ?>" placeholder="Date of Birth">
-                                    <label for="birthDateInput">Date of Birth</label>
+                                    <input type="text" class="form-control" id="birthDate" name="birthDate" value="<?php echo date("F j, Y", strtotime($birthDate)); ?>" placeholder="Date of Birth" disabled>
+                                    <label for="birthDate">Date of Birth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="birthPlaceInput" name="age" value="<?php echo $birthPlace ?>" placeholder="Place of Birth">
-                                    <label for="birthPlaceInput">Place of Birth</label>
+                                    <input type="text" class="form-control" id="birthPlace" name="birthPlace" value="<?php echo $birthPlace ?>" placeholder="Place of Birth" disabled>
+                                    <label for="birthPlace">Place of Birth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-5 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="bloodType" name="bloodType" value="<?php echo $bloodType ?>" placeholder="Blood Type">
+                                    <input type="text" class="form-control" id="bloodType" name="bloodType" value="<?php echo $bloodType ?>" placeholder="Blood Type" disabled>
                                     <label for="bloodType">Blood Type</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-7 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="recidencyType" name="recidencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency">
+                                    <input type="text" class="form-control" id="recidencyType" name="recidencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" disabled>
                                     <label for="recidencyType">Type of Residency</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="civilStatus" name="civilStatus" value="<?php echo $civilStatus ?>" placeholder="Age">
+                                    <input type="text" class="form-control" id="civilStatus" name="civilStatus" value="<?php echo $civilStatus ?>" placeholder="Civil Status" disabled>
                                     <label for="civilStatus">Civil Status</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="citizenship" name="citizenship" value="<?php echo $citizenship ?>" placeholder="Citizenship">
+                                    <input type="text" class="form-control" id="citizenship" name="citizenship" value="<?php echo $citizenship ?>" placeholder="Citizenship" disabled>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="occupation" name="occupation" value="<?php echo $occupation ?>" placeholder="Occupation">
+                                    <input type="text" class="form-control" id="occupation" name="occupation" value="<?php echo $occupation ?>" placeholder="Occupation" disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-5 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="remarks" name="remarks" value="<?php echo $remarks ?>" placeholder="Remarks">
+                                    <input type="text" class="form-control" id="remarks" name="remarks" value="<?php echo $remarks ?>" placeholder="Remarks" disabled>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
@@ -312,14 +305,14 @@ $userDataRow = mysqli_fetch_assoc($userResult); {
 
                             <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>" placeholder="Phone Number">
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>" placeholder="Phone Number" disabled>
                                     <label for="phoneNumber">Phone Number</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-6 col-md-8 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $email ?>" placeholder="Email Address">
+                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $email ?>" placeholder="Email Address" disabled>
                                     <label for="email">Email Address</label>
                                 </div>
                             </div>
@@ -336,56 +329,56 @@ $userDataRow = mysqli_fetch_assoc($userResult); {
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot No.">
+                                    <input type="text" class="form-control" id="blockLotNo" name="houseNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot No." disabled>
                                     <label for="blockLotNo">Block & Lot No.</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="phase" name="phase" value="<?php echo $phase ?>" placeholder="Phase">
+                                    <input type="text" class="form-control" id="phase" name="phase" value="<?php echo $phase ?>" placeholder="Phase" disabled>
                                     <label for="phase">Phase</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="subdivision" name="subdivision" value="<?php echo $subdivisionName ?>" placeholder="Subdivision">
+                                    <input type="text" class="form-control" id="subdivision" name="subdivision" value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
                                     <label for="subdivision">Subdivision</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="purok" name="purok" value="<?php echo $purok ?>" placeholder="Purok">
+                                    <input type="text" class="form-control" id="purok" name="purok" value="<?php echo $purok ?>" placeholder="Purok" disabled>
                                     <label for="purok">Purok</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="street" name="street" value="<?php echo $streetName ?>" placeholder="Street">
+                                    <input type="text" class="form-control" id="street" name="street" value="<?php echo $streetName ?>" placeholder="Street" disabled>
                                     <label for="street">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="barangay" name="barangay" value="<?php echo $barangayName ?>" placeholder="Barangay">
+                                    <input type="text" class="form-control" id="barangay" name="barangay" value="<?php echo $barangayName ?>" placeholder="Barangay" disabled>
                                     <label for="barangay">Barangay</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="city" name="city" value="<?php echo $cityName ?>" placeholder="City">
+                                    <input type="text" class="form-control" id="city" name="city" value="<?php echo $cityName ?>" placeholder="City" disabled>
                                     <label for="city">City</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="province" name="province" value="<?php echo $provinceName ?>" placeholder="Province">
+                                    <input type="text" class="form-control" id="province" name="province" value="<?php echo $provinceName ?>" placeholder="Province" disabled>
                                     <label for="province">Province</label>
                                 </div>
                             </div>
@@ -402,119 +395,99 @@ $userDataRow = mysqli_fetch_assoc($userResult); {
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>" placeholder="Block & Lot No.">
+                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>" placeholder="Block & Lot No." disabled>
                                     <label for="permanentBlockLotNo">Block & Lot No.</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase" value="<?php echo $permanentPhase ?>" placeholder="Phase">
+                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase" value="<?php echo $permanentPhase ?>" placeholder="Phase" disabled>
                                     <label for="permanentPhase">Phase</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentSubdivisionName" name="permanentSubdivisionName" value="<?php echo $permanentSubdivisionName ?>" placeholder="Subdivision">
+                                    <input type="text" class="form-control" id="permanentSubdivisionName" name="permanentSubdivisionName" value="<?php echo $permanentSubdivisionName ?>" placeholder="Subdivision" disabled>
                                     <label for="permanentSubdivisionName">Subdivision</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>" placeholder="Purok">
+                                    <input type="text" class="form-control" id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>" placeholder="Purok" disabled>
                                     <label for="permanentPurok">Purok</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreet" value="<?php echo $permanentStreetName ?>" placeholder="Street">
+                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreet" value="<?php echo $permanentStreetName ?>" placeholder="Street" disabled>
                                     <label for="permanentStreet">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentBarangay" name="permanentBarangay" value="<?php echo $permanentBarangayName ?>" placeholder="Barangay">
+                                    <input type="text" class="form-control" id="permanentBarangay" name="permanentBarangay" value="<?php echo $permanentBarangayName ?>" placeholder="Barangay" disabled>
                                     <label for="permanentBarangay">Barangay</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentCity" name="permanentCity" value="<?php echo $permanentCityName ?>" placeholder="City">
+                                    <input type="text" class="form-control" id="permanentCity" name="permanentCity" value="<?php echo $permanentCityName ?>" placeholder="City" disabled>
                                     <label for="permanentCity">City</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentProvince" name="permanentProvince" value="<?php echo $permanentProvinceName ?>" placeholder="Province">
+                                    <input type="text" class="form-control" id="permanentProvince" name="permanentProvince" value="<?php echo $permanentProvinceName ?>" placeholder="Province" disabled>
                                     <label for="permanentProvince">Province</label>
                                 </div>
                             </div>
                         
                         </div>
 
-                    </form>
-
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
 
     <?php include("sharedAssets/footer.php") ?>
 
     <script>
-        const inputs = document.querySelectorAll('.form-control');
-        const btnDesktop = document.getElementById('editBtnDesktop');
-        const btnMobile = document.getElementById('editBtnMobile');
-        const fileInput = document.getElementById('profilePictureInput');
-        let isEdit = false;
+        var editButton = document.getElementById('editButton');
+        var cancelButton = document.getElementById('cancelButton');
+        var saveButton = document.getElementById('saveButton');
+        var inputs = document.querySelectorAll('.form-control');
 
-        function handleButtonClick(e) {
-            if (!isEdit) {
-                e.preventDefault(); // Stop submission on first click
-                inputs.forEach(input => input.removeAttribute('disabled'));
+        var isEdit = false;
 
-                // Show file input for profile picture
-                if (fileInput) {
-                    fileInput.classList.remove('d-none');
-                }
-
-                // Change both buttons to "Save"
-                [btnDesktop, btnMobile].forEach(button => {
-                    if (button) {
-                        button.textContent = 'Save';
-                        button.classList.replace('btn-primary', 'btn-success');
-                    }
-                });
-
-                isEdit = true; // Next click will submit
-            }
-            // else → allow form submission
-        }
-
-        if (btnDesktop) {
-            btnDesktop.addEventListener('click', handleButtonClick);
-        }
-
-        if (btnMobile) {
-            btnMobile.addEventListener('click', handleButtonClick);
-        }
-
-        // Optional: live preview of new profile picture
-        if (fileInput) {
-            fileInput.addEventListener('change', function (e) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    document.querySelector('.profile-preview').src = event.target.result;
-                };
-                reader.readAsDataURL(e.target.files[0]);
+        editButton.addEventListener('click', function () {
+            isEdit = true;
+            inputs.forEach(function (input) {
+                input.removeAttribute('disabled');
             });
-        }
+
+            editButton.classList.add('d-none');
+            cancelButton.classList.remove('d-none');
+            saveButton.classList.remove('d-none');
+        });
+
+        cancelButton.addEventListener('click', function () {
+            isEdit = false;
+            inputs.forEach(function (input) {
+                input.setAttribute('disabled', true);
+            });
+
+            editButton.classList.remove('d-none');
+            cancelButton.classList.add('d-none');
+            saveButton.classList.add('d-none');
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
