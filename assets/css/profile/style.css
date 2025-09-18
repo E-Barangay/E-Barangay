@@ -15,10 +15,34 @@ html {
     border-radius: 20px;
 }
 
+.profile {
+    position: relative;
+    width: 125px;
+    height: 125px;
+    margin-right: 20px;
+}
+
 .profilePicture {
     width: 125px;
     height: 125px;
     object-fit: cover;
+}
+
+.addButton,
+.deleteButton {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    bottom: 10px;
+    right: 5px;
+    border: none;
+    background-color: #19AFA5;
+    padding: 4px 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .fullName {
