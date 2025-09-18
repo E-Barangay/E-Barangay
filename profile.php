@@ -36,7 +36,7 @@ $remarks = $userDataRow['remarks'];
 $phoneNumber = $userDataRow['phoneNumber'];
 $email = $userDataRow['email'];
 
-$blockLotNo = $userDataRow['houseNo'];
+$blockLotNo = $userDataRow['blockLotNo'];
 $phase = $userDataRow['phase']; 
 $subdivisionName = $userDataRow['subdivisionName'];
 $purok = $userDataRow['purok'];
@@ -45,7 +45,7 @@ $barangayName = $userDataRow['barangayName'];
 $cityName = $userDataRow['cityName'];
 $provinceName = $userDataRow['provinceName'];
 
-$permanentBlockLotNo = $userDataRow['permanentHouseNo'];
+$permanentBlockLotNo = $userDataRow['permanentBlockLotNo'];
 $permanentPhase = $userDataRow['permanentPhase']; 
 $permanentSubdivisionName = $userDataRow['permanentSubdivisionName'];
 $permanentPurok = $userDataRow['permanentPurok'];
@@ -64,7 +64,7 @@ if (isset($_POST['saveButton'])) {
     $birthDate = $_POST['birthDate'];
     $birthPlace = $_POST['birthPlace'];
     $bloodType = $_POST['bloodType'];
-    $residencyType = $_POST['recidencyType'];
+    $residencyType = $_POST['residencyType'];
     $civilStatus = $_POST['civilStatus'];
     $citizenship = $_POST['citizenship'];
     $occupation = $_POST['occupation'];
@@ -73,7 +73,7 @@ if (isset($_POST['saveButton'])) {
     $phoneNumber = $_POST['phoneNumber'];
     $email = $_POST['email'];
 
-    $blockLotNo = $_POST['houseNo'];
+    $blockLotNo = $_POST['blockLotNo'];
     $phase = $_POST['phase']; 
     $subdivisionName = $_POST['subdivisionName'];
     $purok = $_POST['purok'];
@@ -82,7 +82,7 @@ if (isset($_POST['saveButton'])) {
     $cityName = $_POST['cityName'];
     $provinceName = $_POST['provinceName'];
 
-    $permanentBlockLotNo = $_POST['permanentHouseNo'];
+    $permanentBlockLotNo = $_POST['permanentBlockLotNo'];
     $permanentPhase = $_POST['permanentPhase']; 
     $permanentSubdivisionName = $_POST['permanentSubdivisionName'];
     $permanentPurok = $_POST['permanentPurok'];
@@ -100,12 +100,12 @@ if (isset($_POST['saveButton'])) {
     $updateUserContactQuery = "UPDATE users SET phoneNumber = '$phoneNumber', email = '$email' WHERE userID = $userID;";
     $updateUserInfoResult = executeQuery($updateUserInfoQuery);
 
-    $updateAddressQuery = "UPDATE addresses SET houseNo = '$blockLotNo', phase = '$phase', subdivisionName = '$subdivisionName',
+    $updateAddressQuery = "UPDATE addresses SET blockLotNo = '$blockLotNo', phase = '$phase', subdivisionName = '$subdivisionName',
                         purok = '$purok', streetName = '$streetName', barangayName = '$barangayName', cityName = '$cityName',
                         provinceName = '$provinceName' WHERE userInfoID = $userID;";
     $updateAddressResult = executeQuery($updateAddressQuery);
 
-    $updatePermanentAddressQuery = "UPDATE permanentAddresses SET permanentHouseNo = '$permanentBlockLotNo', permanentPhase = '$permanentPhase', 
+    $updatePermanentAddressQuery = "UPDATE permanentAddresses SET permanentBlockLotNo = '$permanentBlockLotNo', permanentPhase = '$permanentPhase', 
                         permanentSubdivisionName = '$permanentSubdivisionName', permanentPurok = '$permanentPurok', 
                         permanentStreetName = '$permanentStreetName', permanentBarangayName = '$permanentBarangayName', 
                         permanentCityName = '$permanentCityName', permanentProvinceName = '$permanentProvinceName' 
@@ -128,6 +128,14 @@ if (isset($_POST['saveButton'])) {
     //         executeQuery("UPDATE userInfo SET profilePicture = '$newFileName' WHERE userInfoID = $userInfoID");
     //     }
     // }
+
+if (isset($_POST['deleteButton'])) {
+    $profilePicture = $_POST['profilePicture'];
+
+    $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = '$profilePicture' WHERE userID = $userID";
+    $updateProfilePictureResult = executeQuery($updateProfilePictureQuery);
+}
+
 ?>
 
 <!doctype html>
@@ -166,9 +174,30 @@ if (isset($_POST['saveButton'])) {
                     <div class="card profileCard p-5" style="width:100%; height: 100%;">
                         <div class="row pb-3">
                             <div class="col-lg-11 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
-                                <img src="assets/images/defaultProfile.png" class="profilePicture" alt="Profile Picture">
+                                <div class="profile">
+
+                                    <?php if (empty($userRow['profilePicture'])) { ?>
+
+                                        <img src="uploads/profile/defaultProfile.png" class="profilePicture" alt="Profile Picture">
+                                        
+                                        <button class="btn btn-success addButton d-none" type="submit" id="addButton" name="addButton">
+                                            <i class="fa-solid fa-plus" style="font-size:15px; color:white;"></i>
+                                        </button>
+
+                                    <?php } else { ?>
+
+                                        <img src="uploads/profile/<?php echo $userRow['profilePicture'] ?>" class="profilePicture" alt="Profile Picture">
+
+                                        <button class="btn btn-danger deleteButton d-none" type="submit" id="deleteButton" name="deleteButton">
+                                            <i class="fa-solid fa-trash" style="font-size: 15px; color: white;"></i>
+                                        </button>
+
+                                    <?php } ?>
+
+                                </div>
+                                
                                 <input type="file" name="profilePicture" class="form-control mt-2 d-none" id="profilePictureInput" accept="image/*">
-                                <div class="d-flex flex-column ps-0 ps-md-4 pt-3 pt-md-0">          
+                                <div class="d-flex flex-column pt-3 pt-md-0">          
                                     <span class="fullName">
                                         <?php
                                             $middleInitial = !empty($middleName) ? strtoupper($middleName[0]) . "." : ""; 
@@ -260,8 +289,8 @@ if (isset($_POST['saveButton'])) {
 
                             <div class="col-lg-3 col-7 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="recidencyType" name="recidencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" disabled>
-                                    <label for="recidencyType">Type of Residency</label>
+                                    <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" disabled>
+                                    <label for="residencyType">Type of Residensy</label>
                                 </div>
                             </div>
 
@@ -329,7 +358,7 @@ if (isset($_POST['saveButton'])) {
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="blockLotNo" name="houseNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot No." disabled>
+                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot No." disabled>
                                     <label for="blockLotNo">Block & Lot No.</label>
                                 </div>
                             </div>
@@ -343,7 +372,7 @@ if (isset($_POST['saveButton'])) {
 
                             <div class="col-lg-4 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="subdivision" name="subdivision" value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
+                                    <input type="text" class="form-control" id="subdivision" name="subdivisionName" value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
                                     <label for="subdivision">Subdivision</label>
                                 </div>
                             </div>
@@ -357,28 +386,28 @@ if (isset($_POST['saveButton'])) {
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="street" name="street" value="<?php echo $streetName ?>" placeholder="Street" disabled>
+                                    <input type="text" class="form-control" id="street" name="streetName" value="<?php echo $streetName ?>" placeholder="Street" disabled>
                                     <label for="street">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="barangay" name="barangay" value="<?php echo $barangayName ?>" placeholder="Barangay" disabled>
+                                    <input type="text" class="form-control" id="barangay" name="barangayName" value="<?php echo $barangayName ?>" placeholder="Barangay" disabled>
                                     <label for="barangay">Barangay</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="city" name="city" value="<?php echo $cityName ?>" placeholder="City" disabled>
+                                    <input type="text" class="form-control" id="city" name="cityName" value="<?php echo $cityName ?>" placeholder="City" disabled>
                                     <label for="city">City</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="province" name="province" value="<?php echo $provinceName ?>" placeholder="Province" disabled>
+                                    <input type="text" class="form-control" id="province" name="provinceName" value="<?php echo $provinceName ?>" placeholder="Province" disabled>
                                     <label for="province">Province</label>
                                 </div>
                             </div>
@@ -423,28 +452,28 @@ if (isset($_POST['saveButton'])) {
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreet" value="<?php echo $permanentStreetName ?>" placeholder="Street" disabled>
+                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreetName" value="<?php echo $permanentStreetName ?>" placeholder="Street" disabled>
                                     <label for="permanentStreet">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentBarangay" name="permanentBarangay" value="<?php echo $permanentBarangayName ?>" placeholder="Barangay" disabled>
+                                    <input type="text" class="form-control" id="permanentBarangay" name="permanentBarangayName" value="<?php echo $permanentBarangayName ?>" placeholder="Barangay" disabled>
                                     <label for="permanentBarangay">Barangay</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentCity" name="permanentCity" value="<?php echo $permanentCityName ?>" placeholder="City" disabled>
+                                    <input type="text" class="form-control" id="permanentCity" name="permanentCityName" value="<?php echo $permanentCityName ?>" placeholder="City" disabled>
                                     <label for="permanentCity">City</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentProvince" name="permanentProvince" value="<?php echo $permanentProvinceName ?>" placeholder="Province" disabled>
+                                    <input type="text" class="form-control" id="permanentProvince" name="permanentProvinceName" value="<?php echo $permanentProvinceName ?>" placeholder="Province" disabled>
                                     <label for="permanentProvince">Province</label>
                                 </div>
                             </div>
@@ -464,6 +493,8 @@ if (isset($_POST['saveButton'])) {
         var cancelButton = document.getElementById('cancelButton');
         var saveButton = document.getElementById('saveButton');
         var inputs = document.querySelectorAll('.form-control');
+        var addButton = document.getElementById('addButton');
+        var deleteButton = document.getElementById('deleteButton');
 
         var isEdit = false;
 
@@ -476,6 +507,9 @@ if (isset($_POST['saveButton'])) {
             editButton.classList.add('d-none');
             cancelButton.classList.remove('d-none');
             saveButton.classList.remove('d-none');
+
+            if (addButton) addButton.classList.remove('d-none');
+            if (deleteButton) deleteButton.classList.remove('d-none');
         });
 
         cancelButton.addEventListener('click', function () {
@@ -487,6 +521,9 @@ if (isset($_POST['saveButton'])) {
             editButton.classList.remove('d-none');
             cancelButton.classList.add('d-none');
             saveButton.classList.add('d-none');
+            
+            if (addButton) addButton.classList.add('d-none');
+            if (deleteButton) deleteButton.classList.add('d-none');
         });
     </script>
 
