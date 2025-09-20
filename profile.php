@@ -28,6 +28,7 @@ $birthDate = $userDataRow['birthDate'];
 $birthPlace = $userDataRow['birthPlace'];
 $bloodType = $userDataRow['bloodType'];
 $residencyType = $userDataRow['residencyType'];
+$LengthOfStay = $userDataRow['lengthOfStay'];
 $civilStatus = $userDataRow['civilStatus'];
 $citizenship = $userDataRow['citizenship'];
 $occupation = $userDataRow['occupation'];
@@ -112,28 +113,26 @@ if (isset($_POST['saveButton'])) {
                         WHERE userInfoID = $userID;";
     $updatePermanentAddressResult = executeQuery($updatePermanentAddressQuery);
 }
-    // --- Handle profile picture upload ---
-    // if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK) {
-    //     $uploadDir = "uploads/profile/";
-    //     $ext = pathinfo($_FILES['profilePicture']['name'], PATHINFO_EXTENSION);
-    //     $newFileName = uniqid("pp_", true) . "." . strtolower($ext);
-    //     $targetPath = $uploadDir . $newFileName;
 
-    //     // Delete old if exists
-    //     if (!empty($data['profilePicture']) && file_exists($uploadDir . $data['profilePicture'])) {
-    //         unlink($uploadDir . $data['profilePicture']);
-    //     }
+if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK) {
+    $uploadProfilePicture = $_FILES['profilePicture']['name'];
+    $targetPath = "uploads/profiles/" . basename($uploadProfilePicture);
 
-    //     if (move_uploaded_file($_FILES['profilePicture']['tmp_name'], $targetPath)) {
-    //         executeQuery("UPDATE userInfo SET profilePicture = '$newFileName' WHERE userInfoID = $userInfoID");
-    //     }
-    // }
+    if (move_uploaded_file($_FILES['profilePicture']['tmp_name'], $targetPath)) {
+        $profileUpdateQuery = "UPDATE userInfo SET profilePicture = '$uploadProfilePicture' WHERE userID = $userID";
+        $profileUpdateResult = executeQuery($profileUpdateQuery);
+    }
 
-if (isset($_POST['deleteButton'])) {
-    $profilePicture = $_POST['profilePicture'];
+    header("Location: profile.php");
+    exit();
+}
 
-    $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = '$profilePicture' WHERE userID = $userID";
+if (isset($_POST['confirmButton'])) {
+    $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = NULL WHERE userID = $userID";
     $updateProfilePictureResult = executeQuery($updateProfilePictureQuery);
+
+    header("Location: profile.php");
+    exit();
 }
 
 ?>
@@ -167,36 +166,63 @@ if (isset($_POST['deleteButton'])) {
         }
     ?>
                     
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <div class="container pt-3">
             <div class="row">
                 <div class="col">
-                    <div class="card profileCard p-5" style="width:100%; height: 100%;">
-                        <div class="row pb-3">
-                            <div class="col-lg-11 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+                    <div class="card profileCard p-3 p-sm-5" style="width:100%; height: 100%;">
+                        <div class="row pb-2 pb-sm-3">
+                            <div class="col-lg-11 col-md-10 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+
                                 <div class="profile">
+                                    
+                                    <?php if (empty($userDataRow['profilePicture'])) { ?>
 
-                                    <?php if (empty($userRow['profilePicture'])) { ?>
+                                        <img src="uploads/profiles/defaultProfile.png" class="profilePicture" id="profilePreview" alt="Profile Picture">
 
-                                        <img src="uploads/profile/defaultProfile.png" class="profilePicture" alt="Profile Picture">
-                                        
-                                        <button class="btn btn-success addButton d-none" type="submit" id="addButton" name="addButton">
+                                        <label for="profilePictureInput" class="btn btn-primary addButton d-none" id="addButton">
                                             <i class="fa-solid fa-plus" style="font-size:15px; color:white;"></i>
-                                        </button>
+                                        </label>
 
                                     <?php } else { ?>
 
-                                        <img src="uploads/profile/<?php echo $userRow['profilePicture'] ?>" class="profilePicture" alt="Profile Picture">
+                                        <img src="uploads/profiles/<?php echo $userDataRow['profilePicture'] ?>" class="profilePicture" id="profilePreview" alt="Profile Picture">
 
-                                        <button class="btn btn-danger deleteButton d-none" type="submit" id="deleteButton" name="deleteButton">
+                                        <button class="btn btn-danger deleteButton d-none" type="button" id="deleteButton" data-bs-toggle="modal" data-bs-target="#removeProfileModal">
                                             <i class="fa-solid fa-trash" style="font-size: 15px; color: white;"></i>
                                         </button>
+
+                                        <div class="modal fade" id="removeProfileModal" tabindex="-1" aria-labelledby="removeProfileLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+
+                                                    <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                                                        <h1 class="modal-title fs-5" id="removeProfileLabel">Remove Profile Picture</h1>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        Are you sure you want to remove your profile picture?  
+                                                        You can upload a new one later.
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                                                            Confirm
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                     <?php } ?>
 
                                 </div>
-                                
-                                <input type="file" name="profilePicture" class="form-control mt-2 d-none" id="profilePictureInput" accept="image/*">
+
+                                <input type="file" name="profilePicture" class="form-control d-none" id="profilePictureInput" accept="image/*">
+
                                 <div class="d-flex flex-column pt-3 pt-md-0">          
                                     <span class="fullName">
                                         <?php
@@ -207,16 +233,16 @@ if (isset($_POST['deleteButton'])) {
                                     <span class="email text-muted"><?php echo $email ?></span>
                                 </div>
                             </div>
-                            <div class="col-lg-1 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
+                            <div class="col-lg-1 col-md-2 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
                                 <button class="btn btn-primary editButton" id="editButton" type="button">Edit</button>
                                 <button class="btn btn-secondary cancelButton d-none me-2" id="cancelButton" type="button">Cancel</button>
-                                <button class="btn btn-success saveButton d-none" id="saveButton" type="submit" name="saveButton">Save</button>
+                                <button class="btn btn-primary saveButton d-none" id="saveButton" type="submit" name="saveButton">Save</button>
                             </div>
                         </div>
 
                         <hr>
 
-                        <div class="row pt-3">
+                        <div class="row pt-2 pt-sm-3">
 
                             <div class="col-12 mb-3">
                                 <div class="personalInfo"> Personal Information</div>
@@ -254,7 +280,7 @@ if (isset($_POST['deleteButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-2 col-md-3 col-3 mb-3">
+                            <div class="col-lg-2 col-md-3 col-5 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="age" name="age" placeholder="Age" disabled
                                         value="<?php $birthDateObj = new DateTime($birthDate);
@@ -266,7 +292,7 @@ if (isset($_POST['deleteButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-4 col-9 mb-3">
+                            <div class="col-lg-3 col-md-4 col-7 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="birthDate" name="birthDate" value="<?php echo date("F j, Y", strtotime($birthDate)); ?>" placeholder="Date of Birth" disabled>
                                     <label for="birthDate">Date of Birth</label>
@@ -280,47 +306,56 @@ if (isset($_POST['deleteButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-5 mb-3">
+                            <div class="col-lg-2 col-md-3 col-6 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="bloodType" name="bloodType" value="<?php echo $bloodType ?>" placeholder="Blood Type" disabled>
                                     <label for="bloodType">Blood Type</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-7 mb-3">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" disabled>
-                                    <label for="residencyType">Type of Residensy</label>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3 col-6 mb-3">
+                            <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="civilStatus" name="civilStatus" value="<?php echo $civilStatus ?>" placeholder="Civil Status" disabled>
                                     <label for="civilStatus">Civil Status</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-6 mb-3">
+                            <div class="col-lg-3 col-md-5 col-5 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="citizenship" name="citizenship" value="<?php echo $citizenship ?>" placeholder="Citizenship" disabled>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-5 col-12 mb-3">
+                            <div class="col-lg-4 col-md-8 col-7 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="occupation" name="occupation" value="<?php echo $occupation ?>" placeholder="Occupation" disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-5 col-12 mb-4">
+                            <div class="col-lg-2 col-md-4 col-6 mb-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?php echo $LengthOfStay ?>" placeholder="Length Of Stay" disabled>
+                                    <label for="lengthOfStay">Length Of Stay</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" disabled>
+                                    <label for="residencyType">Type of Residency</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-12 mb-4">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="remarks" name="remarks" value="<?php echo $remarks ?>" placeholder="Remarks" disabled>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
+
+                            
 
                         </div>
 
@@ -384,28 +419,28 @@ if (isset($_POST['deleteButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                            <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="street" name="streetName" value="<?php echo $streetName ?>" placeholder="Street" disabled>
                                     <label for="street">Street</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                            <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="barangay" name="barangayName" value="<?php echo $barangayName ?>" placeholder="Barangay" disabled>
                                     <label for="barangay">Barangay</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-6 mb-3">
+                            <div class="col-lg-3 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="city" name="cityName" value="<?php echo $cityName ?>" placeholder="City" disabled>
                                     <label for="city">City</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-6 mb-4">
+                            <div class="col-lg-3 col-12 mb-4">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="province" name="provinceName" value="<?php echo $provinceName ?>" placeholder="Province" disabled>
                                     <label for="province">Province</label>
@@ -450,28 +485,28 @@ if (isset($_POST['deleteButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                            <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="permanentStreet" name="permanentStreetName" value="<?php echo $permanentStreetName ?>" placeholder="Street" disabled>
                                     <label for="permanentStreet">Street</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                            <div class="col-lg-3 col-md-4 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="permanentBarangay" name="permanentBarangayName" value="<?php echo $permanentBarangayName ?>" placeholder="Barangay" disabled>
                                     <label for="permanentBarangay">Barangay</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-6 mb-3">
+                            <div class="col-lg-3 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="permanentCity" name="permanentCityName" value="<?php echo $permanentCityName ?>" placeholder="City" disabled>
                                     <label for="permanentCity">City</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-6 mb-3">
+                            <div class="col-lg-3 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="permanentProvince" name="permanentProvinceName" value="<?php echo $permanentProvinceName ?>" placeholder="Province" disabled>
                                     <label for="permanentProvince">Province</label>
@@ -488,44 +523,7 @@ if (isset($_POST['deleteButton'])) {
 
     <?php include("sharedAssets/footer.php") ?>
 
-    <script>
-        var editButton = document.getElementById('editButton');
-        var cancelButton = document.getElementById('cancelButton');
-        var saveButton = document.getElementById('saveButton');
-        var inputs = document.querySelectorAll('.form-control');
-        var addButton = document.getElementById('addButton');
-        var deleteButton = document.getElementById('deleteButton');
-
-        var isEdit = false;
-
-        editButton.addEventListener('click', function () {
-            isEdit = true;
-            inputs.forEach(function (input) {
-                input.removeAttribute('disabled');
-            });
-
-            editButton.classList.add('d-none');
-            cancelButton.classList.remove('d-none');
-            saveButton.classList.remove('d-none');
-
-            if (addButton) addButton.classList.remove('d-none');
-            if (deleteButton) deleteButton.classList.remove('d-none');
-        });
-
-        cancelButton.addEventListener('click', function () {
-            isEdit = false;
-            inputs.forEach(function (input) {
-                input.setAttribute('disabled', true);
-            });
-
-            editButton.classList.remove('d-none');
-            cancelButton.classList.add('d-none');
-            saveButton.classList.add('d-none');
-            
-            if (addButton) addButton.classList.add('d-none');
-            if (deleteButton) deleteButton.classList.add('d-none');
-        });
-    </script>
+    <script src="assets/js/profile/profile.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
