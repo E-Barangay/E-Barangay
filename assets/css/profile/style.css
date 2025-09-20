@@ -25,6 +25,8 @@ html {
 .profilePicture {
     width: 125px;
     height: 125px;
+    border-radius: 50%;
+    object-position: center;
     object-fit: cover;
 }
 
@@ -79,6 +81,26 @@ html {
 }
 
 .editButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+}
+
+.saveButton {
+    background-color: #19AFA5;
+    border: 1px solid #11A1A1;
+}
+
+.saveButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+}
+
+.confirmButton {
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+}
+
+.confirmButton:hover {
     background-color: #11A1A1;
     border: 1px solid #11A1A1;
 }
