@@ -59,7 +59,7 @@ html {
 
 .viewButton:hover {
     background-color: #11A1A1;
-    color: black;
+    color: white;
     border: 1px solid #19AFA5;
 }
 
@@ -71,6 +71,11 @@ html {
 .whatIsNew {
     font-size: clamp(18px, 2.5vw, 24px); 
     font-weight: bold;
+}
+
+.noNewAnnouncements {
+    font-size: 16px;
+    text-align: center;
 }
 
 .newCard {
@@ -87,7 +92,8 @@ html {
 }
 
 .barangay {
-    font-size: 14px; font-weight: bold;
+    font-size: 14px; 
+    font-weight: bold;
 }
 
 .date {
@@ -141,7 +147,7 @@ html {
 }
 
 .viewDetailsButton:hover {
-    color: black;
+    color: white;
     background-color: #11A1A1; 
     border: 1px solid #11A1A1; 
     border-radius: 12px;
