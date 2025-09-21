@@ -10,6 +10,15 @@ $newAnnouncementResult = executeQuery($newAnnouncementQuery);
 $recentAnnouncementQuery = "SELECT * FROM announcements WHERE dateTime < NOW() - INTERVAL 7 DAY ORDER BY dateTime DESC";
 $recentAnnouncementResult = executeQuery($recentAnnouncementQuery);
 
+$totalRecentCardQuery = "SELECT COUNT(*) as total FROM announcements WHERE dateTime < NOW() - INTERVAL 7 DAY";
+$totalRecentCardResult = executeQuery($totalRecentCardQuery);
+
+$totalRecentRow = mysqli_fetch_assoc($totalRecentCardResult);
+$totalRecent = $totalRecentRow['total'];
+
+$cardsPerPage = 6;
+$totalPages = ceil($totalRecent / $cardsPerPage);
+
 ?>
 
 <!doctype html>
@@ -80,42 +89,55 @@ $recentAnnouncementResult = executeQuery($recentAnnouncementQuery);
             </div>
         </div>
 
-        <div class="row pt-3">
+        <div class="row pb-3 pt-4">
 
-            <?php while($newAnnouncementRow = mysqli_fetch_assoc($newAnnouncementResult)) { ?>
+            <?php if (mysqli_num_rows($newAnnouncementResult) == 0) { ?>
 
-                <div class="col-lg-4 col-md-6 col-12 pb-4">
-                    <div class="card newCard">
-                        <div class="row">
-                            <div class="col d-flex flex-row align-items-center px-4 py-3">
-                                <img src="assets/images/logoSanAntonio.png" class="logo" alt="Logo">
-                                <div class="d-flex flex-column justify-content-center ps-2">
-                                    <span class="barangay">Barangay San Antonio</span>
-                                    <span class="date"><?php echo date("F d, Y", strtotime($newAnnouncementRow['dateTime'])); ?></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <img src="assets/images/announcements/<?php echo $newAnnouncementRow['image'] ?>" class="newAnnouncementImage" alt="New Announcement Image">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-4 pt-3">
-                                <span class="title"><?php echo $newAnnouncementRow['title'] ?></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col px-4 pt-2 pb-3">
-                                <p class="description m-0">
-                                    <?php echo $newAnnouncementRow['description'] ?>
-                                </p>
-                            </div>
-                        </div>
+                <div class="col">
+                    <div class="noNewAnnouncements text-muted">
+                        No new announcements.
                     </div>
                 </div>
 
+            <?php } else { ?>
+
+                <?php while($newAnnouncementRow = mysqli_fetch_assoc($newAnnouncementResult)) { ?>
+
+                    <div class="col-lg-4 col-md-6 col-12 pb-4">
+                        <div class="card newCard">
+                            <div class="row">
+                                <div class="col d-flex flex-row align-items-center px-4 py-3">
+                                    <img src="assets/images/logoSanAntonio.png" class="logo" alt="Logo">
+                                    <div class="d-flex flex-column justify-content-center ps-2">
+                                        <span class="barangay">Barangay San Antonio</span>
+                                        <span class="date"><?php echo date("F d, Y", strtotime($newAnnouncementRow['dateTime'])); ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <img src="assets/images/announcements/<?php echo $newAnnouncementRow['image']; ?>" class="newAnnouncementImage" alt="New Announcement Image">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col px-4 pt-3">
+                                    <span class="title"><?php echo $newAnnouncementRow['title']; ?></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col px-4 pt-2 pb-3">
+                                    <p class="description m-0">
+                                        <?php echo $newAnnouncementRow['description']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <?php } ?>
+
             <?php } ?>
+
             
         </div>
 
@@ -131,7 +153,7 @@ $recentAnnouncementResult = executeQuery($recentAnnouncementQuery);
             
                 <?php while($recentAnnouncementRow = mysqli_fetch_assoc($recentAnnouncementResult)) { ?>
 
-                    <div class="col-lg-4 col-md-6 col-12 pb-4">
+                    <div class="col-lg-4 col-md-6 col-12 pb-4 d-flex align-items-center">
                         <div class="card recentCard">
                             <div class="row">
                                 <div class="col">
@@ -204,10 +226,115 @@ $recentAnnouncementResult = executeQuery($recentAnnouncementQuery);
                 <?php } ?>
 
             </div>
+
+            <div class="row mt-3">
+                <div class="col d-flex justify-content-center align-items-center">
+
+                    <nav aria-label="pageNavigation">
+
+                        <ul class="pagination" id="pagination">
+
+                            <li class="page-item" onclick="previousPage()">
+                                <a class="page-link" aria-label="Previous">Previous</a>
+                            </li>
+
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(<?php echo $i; ?>)">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <li class="page-item" onclick="nextPage()">
+                                <a class="page-link" aria-label="Next">Next</a>
+                            </li>
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+            </div>
+
         </div>
     </div>
 
     <?php include("sharedAssets/footer.php") ?>
+
+    <script>
+        
+        var page = 1;
+        var cardsPerPage = <?php echo $cardsPerPage; ?>;
+        var totalPages = <?php echo $totalPages; ?>;
+
+        function goToPage(pageNumber) {
+            if (pageNumber >= 1 && pageNumber <= totalPages) {
+                page = pageNumber;
+                updatePage();
+            }
+        }
+
+        function nextPage() {
+            if (page < totalPages) {
+                page += 1;
+                updatePage();
+            }
+        }
+
+        function previousPage() {
+            if (page > 1) {
+                page -= 1;
+                updatePage();
+            }
+        }
+
+        function updatePage() {
+            var allrecentCards = document.getElementsByClassName('recentCard');
+            var startIndex = (page - 1) * cardsPerPage;
+            var endIndex = page * cardsPerPage;
+
+            for (var i = 0; i < allrecentCards.length; i++) {
+                allrecentCards[i].style.display = 'none';
+            }
+
+            for (var i = startIndex; i < endIndex && i < allrecentCards.length; i++) {
+                allrecentCards[i].style.display = 'block';
+            }
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            var paginationItems = document.getElementById('pagination').getElementsByClassName('page-item');
+
+            for (var i = 0; i < paginationItems.length - 2; i++) {
+                var pageNum = i + 1;
+                if (pageNum === page) {
+                    paginationItems[i + 1].classList.add('active');
+                } else {
+                    paginationItems[i + 1].classList.remove('active');
+                }
+            }
+
+            if (page === 1) {
+                paginationItems[0].classList.add('disabled');
+            } else {
+                paginationItems[0].classList.remove('disabled');
+            }
+
+            if (page === totalPages) {
+                paginationItems[paginationItems.length - 1].classList.add('disabled');
+            } else {
+                paginationItems[paginationItems.length - 1].classList.remove('disabled');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updatePage();
+        });
+
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 
