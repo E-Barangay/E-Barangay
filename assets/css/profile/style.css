@@ -69,7 +69,17 @@ html {
     border-radius: 8px;
 }
 
+.form-floating .form-select {
+    border-radius: 8px;
+}
+
 .form-control:focus {
+    box-shadow: none !important; 
+    outline: none;     
+    border: 1px solid #19AFA5;        
+}
+
+.form-select:focus {
     box-shadow: none !important; 
     outline: none;     
     border: 1px solid #19AFA5;        
