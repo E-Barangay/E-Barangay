@@ -14,21 +14,18 @@ if (isset($_GET['documentTypeID'])) {
     $document = $_GET['documentTypeID'];
     switch ($document) {
         case "1":
-            $document = "registration";
-            break;
-        case "2":
             $document = "barangayClearance";
             break;
-        case "3":
+        case "2":
             $document = "newBusinessClearance";
             break;
-        case "4":
+        case "3":
             $document = "newConstructionClearance";
             break;
-        case "5":
+        case "4":
             $document = "newIndigencyRecord";
             break;
-        case "6":
+        case "5":
             $document = "firstTimeJobSeeker";
             break;
         case "7":
@@ -43,18 +40,6 @@ if (isset($_GET['documentTypeID'])) {
         case "10":
             $document = "goodHealthRecord";
             break;
-        case "11":
-            $document = "pendingResidentRegistration";
-            break;
-        case "12":
-            $document = "migrantList";
-            break;
-        case "13":
-            $document = "transientList";
-            break;
-        case "14":
-            $document = "foreignList";
-            break;
         default:
             header("Location: ../documents.php");
             break;
@@ -62,13 +47,10 @@ if (isset($_GET['documentTypeID'])) {
 }
 
 $userQuery = "SELECT * FROM users 
-              LEFT JOIN userInfo ON users.userID = userInfo.userID 
-              LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID 
-              LEFT JOIN streets ON addresses.streetID = streets.streetID
-              LEFT JOIN barangays ON streets.barangayID = barangays.barangayID
-              LEFT JOIN cities ON barangays.cityID = cities.cityID
-              LEFT JOIN provinces ON cities.provinceID = provinces.provinceID
-              WHERE users.userID = $userID";
+            LEFT JOIN userInfo ON users.userID = userInfo.userID 
+            LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
+            LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+            WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
 $userRow = mysqli_fetch_assoc($userResult);
@@ -77,13 +59,17 @@ $firstName = $userRow['firstName'];
 $middleName = $userRow['middleName'];
 $lastName = $userRow['lastName'];
 $birthDate = $userRow['birthDate'];
+$age = date_diff(date_create($birthDate), date_create('now'))->y;
 $gender = $userRow['gender'];
 $profilePicture = $userRow['profilePicture'];
+$citizenship = $userRow['citizenship'];
 $residencyType = $userRow['residencyType'];
 $streetName = $userRow['streetName'];
-$barangayName = $userRow['barangayName'];
-$cityName = $userRow['cityName'];
-$provinceName = $userRow['provinceName'];
+$barangayName = ucwords(strtolower($userRow['barangayName']));
+$cityName     = ucwords(strtolower($userRow['cityName']));
+$provinceName = ucwords(strtolower($userRow['provinceName']));
+
+$fullName = $firstName . " " . ($middleName ? $middleName[0] . ". " : "") . $lastName;
 
 $documentQuery = "SELECT * FROM documentTypes WHERE documentTypeID = $documentTypeID";
 $documentResult = executeQuery($documentQuery);
@@ -151,9 +137,11 @@ if (isset($_POST['submit'])) {
                     <?php include("sharedAssets/header.php") ?>
 
                     <div class="row mt-3 justify-content-center">
+                        <div class="col">
 
-                        <?php include("documentTypes/" . $document . ".php"); ?>
+                            <?php include("documentTypes/" . $document . ".php"); ?>
 
+                        </div>
                     </div>
 
                     <?php include("sharedAssets/footer.php") ?>
