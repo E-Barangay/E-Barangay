@@ -138,13 +138,7 @@ $mioDocumentsResult = executeQuery($mioDocumentsQuery);
                             <!-- Filter -->
                             <div class="col d-flex flex-column justify-content-center">
                                 <a href="?content=allDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>">All Documents</a>
-                                <a href="?content=barangayHallDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>">Barangay Hall</a>
-                                <a href="?content=mioDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>">Migrant Information Office</a>
-                            </div>
-
-                            <!-- Document Request -->
-                            <div class="col d-flex justify-content-center">
-                                <a href="?content=documentRequest" class="btn btn-primary submittedRequestButton m-2 mt-5 <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>">Submitted Request</a>
+                                <a href="?content=documentRequest" class="btn btn-primary filterButton m-2 <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>">Submitted Request</a>
                             </div>
 
                         </div>
