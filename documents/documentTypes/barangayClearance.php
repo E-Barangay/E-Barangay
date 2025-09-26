@@ -16,8 +16,8 @@
     <div>AMELIA A. MALACAMAN</div>
     <div class="pt-3">Barangay Record Keeper</div>
     <div>LEXTER M. DOLOR</div>
-    </div>
-    <div class="col-8">
+</div>
+<div class="col-8">
     <div class="row">
         <div class="col">
             <div>To whom it may concern,</div>

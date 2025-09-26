@@ -14,31 +14,31 @@ if (isset($_GET['documentTypeID'])) {
     $document = $_GET['documentTypeID'];
     switch ($document) {
         case "1":
-            $document = "barangayClearance";
+            $document = "barangayBusinessClearance";
             break;
         case "2":
-            $document = "newBusinessClearance";
+            $document = "barangayClearance";
             break;
         case "3":
-            $document = "newConstructionClearance";
+            $document = "constructionClearance";
             break;
         case "4":
-            $document = "newIndigencyRecord";
+            $document = "firstTimeJobSeeker";
             break;
         case "5":
-            $document = "firstTimeJobSeeker";
+            $document = "goodHealth";
+            break;
+        case "6":
+            $document = "goodMoral";
             break;
         case "7":
             $document = "jointCohabitation";
             break;
-        case "8":
-            $document = "constructionClearance";
-            break;
         case "9":
-            $document = "goodMoral";
+            $document = "residency";
             break;
         case "10":
-            $document = "goodHealthRecord";
+            $document = "soloParent";
             break;
         default:
             header("Location: ../documents.php");
@@ -137,11 +137,9 @@ if (isset($_POST['submit'])) {
                     <?php include("sharedAssets/header.php") ?>
 
                     <div class="row mt-3 justify-content-center">
-                        <div class="col">
 
-                            <?php include("documentTypes/" . $document . ".php"); ?>
+                        <?php include("documentTypes/" . $document . ".php"); ?>
 
-                        </div>
                     </div>
 
                     <?php include("sharedAssets/footer.php") ?>
