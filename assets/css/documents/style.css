@@ -40,9 +40,9 @@ input.form-control:focus {
 }
 
 .filterButton:hover {
-    background-color: #19AFA5;
-    color: black;
-    border: 1px solid #19AFA5;
+    background-color: #11A1A1;
+    color: white;
+    border: 1px solid #11A1A1;
 }
 
 .submittedRequestButton {
@@ -55,25 +55,27 @@ input.form-control:focus {
 
 .submittedRequestButton:hover {
     background-color: #19AFA5;
-    color: black;
+    color: white;
     border: 1px solid #19AFA5;
 }
 
 .filterButton.active {
     background-color: #0A6E6E;
     border: 1px solid #0A6E6E;
+    color: white;
 }
 
 .submittedRequestButton.active {
     background-color: #0A6E6E;
     border: 1px solid #0A6E6E;
+    color: white;
 }
 
 .contentCard {
     height: 100vh;
     border-radius: 20px;
     border: 1px solid #19AFA5;
-     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .form-select:focus {
@@ -100,32 +102,8 @@ input.form-control:focus {
 }
 
 .documentButton:hover {
-    background-color: #19AFA5;
-    border: 1px solid #19AFA5;
-    color: black;
-}
-
-.filterButtonPop {
-    position: fixed;
-    width: 3.5rem;
-    height: 3.5rem;
-    bottom: 2rem;
-    right: 2rem;
-    border-radius: 50%;
-    border: none;
-    background-color: #19AFA5;
-    text-align: center;
-    z-index: 1;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.filterButtonPop:hover {
     background-color: #11A1A1;
-}
-
-.dropdown-item.active {
-    background-color: #19AFA5;
+    border: 1px solid #11A1A1;
     color: white;
 }
 
