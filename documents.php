@@ -11,17 +11,8 @@ if (isset($_GET['content'])) {
     switch ($content) {
         case "allDocuments":
             if (!isset($_SESSION['userID'])) {
-                header("Location: signIn.php");
+                header("Location: login.php");
             }
-            break;
-        case "barangayHallDocuments":
-            $content = "barangayHallDocuments";
-            break;
-        case "mioDocuments":
-            $content = "mioDocuments";
-            break;
-        case "barangayHealthDocuments":
-            $content = "barangayHealthDocuments";
             break;
         case "documentRequest":
             $content = "documentRequest";
@@ -39,19 +30,13 @@ $userResult = executeQuery($userQuery);
 
 $searchTerm = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-$allDocumentsQuery = "SELECT * FROM documentTypes";
-$barangayHallDocumentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 1";
-$mioDocumentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 2";
+$documentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 1";
 
 if (!empty($searchTerm)) {
-    $allDocumentsQuery .= " WHERE documentName LIKE '%$searchTerm%'";
-    $barangayHallDocumentsQuery .= " AND documentName LIKE '%$searchTerm%'";
-    $mioDocumentsQuery .= " AND documentName LIKE '%$searchTerm%'";
+    $documentsQuery .= " WHERE documentName LIKE '%$searchTerm%'";
 }
 
-$allDocumentsResult = executeQuery($allDocumentsQuery);
-$barangayHallDocumentsResult = executeQuery($barangayHallDocumentsQuery);
-$mioDocumentsResult = executeQuery($mioDocumentsQuery);
+$documentsResult = executeQuery($documentsQuery);
 
 ?>
 
@@ -90,41 +75,14 @@ $mioDocumentsResult = executeQuery($mioDocumentsQuery);
         <div class="row">
             <div class="col-12 col-lg-3 p-0">
 
-                <!-- Pop up when screen is in small size -->
-
                 <form method="GET">
 
-                    <!-- Search Bar -->
-                    <div class="searchBarPop position-relative d-block d-sm-none mb-4 mx-1">
-                        <input type="hidden" name="content" value="<?php echo $content; ?>">
-                        <input class="form-control rounded-pill ps-5" name="search" type="search" placeholder="Search Documents" value="<?php echo $searchTerm ?>">
-                        <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
-                    </div>
-
-                    <!-- Filter Button -->
-                    <div class="d-block d-sm-none dropdown">
-                        <button class="filterButtonPop dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-filter"></i></button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>" href="?content=allDocuments">All Documents</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>" href="?content=barangayHallDocuments">Barangay Hall</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'mioDocuments') ? 'active' : ''; ?>" href="?content=mioDocuments">Migrant Information Office</a></li>
-                            <li><a class="dropdown-item <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>" href="?content=documentRequest">Submitted Request</a></li>
-                        </ul>
-                    </div>
-
-                </form>
-
-                <!-- Pop up when screen is in big size -->
-
-                <form method="GET">
-
-                    <div class="filterCard card m-1 p-2 d-none d-sm-block">
+                    <div class="filterCard card m-1 p-2">
 
                         <div class="row">
                             <div class="col m-2">
                                 <div class="position-relative">
 
-                                    <!-- Search Bar -->
                                     <input type="hidden" name="content" value="<?php echo $content; ?>">
                                     <input class="form-control rounded-pill ps-5" name="search" type="search" placeholder="Search Documents" value="<?php echo $searchTerm ?>">
                                     <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
@@ -135,10 +93,9 @@ $mioDocumentsResult = executeQuery($mioDocumentsQuery);
 
                         <div class="row d-flex flex-column mt-4">
 
-                            <!-- Filter -->
                             <div class="col d-flex flex-column justify-content-center">
                                 <a href="?content=allDocuments" class="btn btn-primary filterButton m-2 <?php echo ($content == 'allDocuments') ? 'active' : ''; ?>">All Documents</a>
-                                <a href="?content=documentRequest" class="btn btn-primary filterButton m-2 <?php echo ($content == 'barangayHallDocuments') ? 'active' : ''; ?>">Submitted Request</a>
+                                <a href="?content=documentRequest" class="btn btn-primary filterButton m-2 <?php echo ($content == 'documentRequest') ? 'active' : ''; ?>">Submitted Request</a>
                             </div>
 
                         </div>
@@ -160,6 +117,204 @@ $mioDocumentsResult = executeQuery($mioDocumentsQuery);
         </div>
     </div>
 
+    <div class="modal fade" id="businessClearanceModal" tabindex="-1" aria-labelledby="businessClearanceLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="businessClearanceLabel">Business Clearance</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="barangayClearanceModal" tabindex="-1" aria-labelledby="barangayClearanceLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="barangayClearanceLabel">Barangay Clearance</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="constructionClearanceModal" tabindex="-1" aria-labelledby="constructionClearanceLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="constructionClearanceLabel">Construction Clearance</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="firstTimeJobSeekerModal" tabindex="-1" aria-labelledby="firstTimeJobSeekerLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="firstTimeJobSeekerLabel">First Time Job Seeker</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="goodHealthModal" tabindex="-1" aria-labelledby="goodHealthLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="goodHealthLabel">Good Health</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="goodMoralModal" tabindex="-1" aria-labelledby="goodMoralLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="goodMoralLabel">Good Moral</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="jointCohabitationModal" tabindex="-1" aria-labelledby="jointCohabitationLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="jointCohabitationLabel">Joint Cohabitation</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="residencyModal" tabindex="-1" aria-labelledby="residencyLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="residencyLabel">Residency</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="soloParentModal" tabindex="-1" aria-labelledby="soloParentLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                    <h1 class="modal-title fs-5" id="soloParentLabel">Solo Parent</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                        Confirm Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <?php include("sharedAssets/footer.php") ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>

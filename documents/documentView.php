@@ -46,6 +46,8 @@ if (isset($_GET['documentTypeID'])) {
     }
 }
 
+
+
 $userQuery = "SELECT * FROM users 
             LEFT JOIN userInfo ON users.userID = userInfo.userID 
             LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
