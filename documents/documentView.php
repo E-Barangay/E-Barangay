@@ -14,7 +14,7 @@ if (isset($_GET['documentTypeID'])) {
     $document = $_GET['documentTypeID'];
     switch ($document) {
         case "1":
-            $document = "barangayBusinessClearance";
+            $document = "businessClearance";
             break;
         case "2":
             $document = "barangayClearance";
