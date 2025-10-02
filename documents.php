@@ -116,18 +116,6 @@ $documentsResult = executeQuery($documentsQuery);
             </div>
         </div>
 
-        <?php 
-            include("documentContent/modals/barangayClearance.php"); 
-            include("documentContent/modals/businessClearance.php"); 
-            include("documentContent/modals/constructionClearance.php"); 
-            include("documentContent/modals/firstTimeJobSeeker.php.php"); 
-            include("documentContent/modals/goodHealth.php"); 
-            include("documentContent/modals/goodMoral.php");
-            include("documentContent/modals/jointCohabitation.php"); 
-            include("documentContent/modals/residency.php"); 
-            include("documentContent/modals/soloParent.php");
-        ?>
-
     </form>
     
     <?php include("sharedAssets/footer.php") ?>
