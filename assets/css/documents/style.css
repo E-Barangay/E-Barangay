@@ -107,6 +107,18 @@ input.form-control:focus {
     color: white;
 }
 
+.proceedButton {
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+    color: white;
+}
+
+.proceedButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+    color: white;
+}
+
 #scrollable {
     scrollbar-width: none;
     -ms-overflow-style: none;
