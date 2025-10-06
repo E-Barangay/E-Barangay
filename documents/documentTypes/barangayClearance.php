@@ -28,60 +28,26 @@
     </div>
     <div class="row">
         <div class="col-9">
-            <div>
-                <p><strong>Name:</strong> <?php echo $firstName . " " . $middleName . " " . $lastName ?></p>
-                <p><strong>Address:</strong> <?php echo $streetName . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
-                <p><strong>Permanent Address:</strong> <?php echo $streetName . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
-                <p><strong>Place of Birth:</strong> <?php echo $streetName . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
-                <p><strong>Date of Birth:</strong> <?php echo date("F j, Y", strtotime($birthDate)); ?></p>
-                <p><strong>Age:</strong> 
-                    <?php 
-                        $birthDateObj = new DateTime($birthDate);
-                        $today = new DateTime();
-                        $age = $today->diff($birthDateObj)->y;
-                        echo $age . " years old"; 
-                    ?>
-                </p>
-                <p><strong>Gender: </strong><?php echo $gender ?></p>
-                <p><strong>Civil Status: </strong>Single</p>
-                <p><strong>Length of Stay: </strong>20 years</p>
-                <div class="d-flex">
-                    <p><strong>Type of Residency:</strong></p>
-                    <select class="form-select form-select-sm ms-2 residencySelect" id="residency" name="residency" aria-label="Select Residency">
-                        <option value="<?php echo $residecyType ?>" selected><?php echo $residencyType ?></option>
-                        <option value="Migrant">Migrant</option>
-                        <option value="Transient">Transient</option>
-                        <option value="Foreign">Foreign</option>
-                    </select>
-                </div>
-                <p><strong>Landlord: </strong></p>
-                <p><strong>Company: </strong></p>
-                <div class="d-flex">
-                    <p><strong>Purpose:</strong></p>
-                    <select class="form-select form-select-sm ms-2 purposeSelect" name="purpose" aria-label="Purpose Select">
-                        <option selected>Choose Purpose</option>
-                        <option value="Employment">Employment</option>
-                        <option value="Job Requirement / Local Employment">Job Requirement / Local Employment</option>
-                        <option value="Overseas Employment (OFW)">Overseas Employment (OFW)</option>
-                        <option value="School Requirement / Enrollment">School Requirement / Enrollment</option>
-                        <option value="Scholarship Application">Scholarship Application</option>
-                        <option value="Medical Assistance">Medical Assistance</option>
-                        <option value="Hospital Requirement">Hospital Requirement</option>
-                        <option value="Legal Requirement / Court Use">Legal Requirement / Court Use</option>
-                        <option value="NBI / Police Clearance">NBI / Police Clearance</option>
-                        <option value="Passport Application / Renewal">Passport Application / Renewal</option>
-                        <option value="Driver’s License">Driver’s License</option>
-                        <option value="Loan Application">Loan Application</option>
-                    </select>
-                </div>
-                <p><strong>Remarks:</strong> No Derogatory Record</p>
-                <p><strong>Issued On:</strong> <?php echo date("F j, Y", time()); ?></p>
-                <p><strong>Issued At:</strong> Barangay San Antonio, Santo Tomas City, Batangas</p>
-            </div>
+            <p><strong>Name:</strong> <?php echo $fullName ?></p>
+            <p><strong>Address:</strong> <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName ?></p>
+            <p><strong>Permanent Address:</strong> <?php echo $permanentBlockLotNo . ", " . $permanentPhase . ", " . $permanentSubdivisionName . ", " . $permanentPurok . ", " . $permanentStreetName . ", " . $permanentBarangayName . ", " . $permanentCityName . ", " . $permanentProvinceName; ?></p>
+            <p><strong>Place of Birth:</strong> <?php echo $birthPlace ?></p>
+            <p><strong>Date of Birth:</strong> <?php echo date("F j, Y", strtotime($birthDate)); ?></p>
+            <p><strong>Age: </strong> <?php echo $age . " years old"; ?></p>
+            <p><strong>Gender:</strong> <?php echo $gender ?></p>
+            <p><strong>Civil Status:</strong> <?php echo $civilStatus ?></p>
+            <p><strong>Length of Stay:</strong> <?php echo $lengthOfStay ? (int)$lengthOfStay . ((int)$lengthOfStay == 1 ? ' year' : ' years') : ''; ?></p>
+            <p><strong>Type of Residency:</strong> <?php echo $residencyType ?></p>
+            <p><strong>Landlord:</strong></p>
+            <p><strong>Company:</strong></p>
+            <p><strong>Purpose:</strong> <?php echo $purpose ?></p>
+            <p><strong>Remarks:</strong> <?php echo $remarks ?></p>
+            <p><strong>Issued On:</strong> <?php echo date("F j, Y", time()); ?></p>
+            <p><strong>Issued At:</strong> Barangay San Antonio, Santo Tomas City, Batangas</p>
         </div>
         <div class="col-3">
-            <img src="../assets/images/<?php echo $profilePicture ?>" class="bg-secondary align-items-center" style="width: 100%; height: 150px" alt="">
-            <img src="../assets/images/<?php echo $profilePicture ?>" class="bg-secondary text-center mt-2" style="width: 100%; height: 150px;" alt="">
+            <img src="../uploads/profiles/<?php echo $profilePicture ?>" style="width: 100%; height: 150px" alt="">
+            <img src="../assets/images/<?php echo $thumbMark ?>" class="bg-secondary text-center mt-2" style="width: 100%; height: 150px;" alt="">
             <div class="signature-label mt-5 text-center border-top">Signature</div>
         </div>
     </div>

@@ -25,18 +25,69 @@ if (isset($_GET['content'])) {
     header("Location: ?content=allDocuments");
 }
 
-$userQuery = "SELECT * FROM users LEFT JOIN userInfo ON users.userID = userInfo.userID";
+$userID = $_SESSION['userID'];
+
+$userQuery = "SELECT * FROM users 
+            LEFT JOIN userInfo ON users.userID = userInfo.userID 
+            LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
+            LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+            WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
+
+$userDataRow = mysqli_fetch_assoc($userResult);
+$firstName = $userDataRow['firstName'];
+$middleName = $userDataRow['middleName'];
+$lastName = $userDataRow['lastName'];
+$fullName = $firstName . " " . ($middleName ? $middleName[0] . ". " : "") . $lastName;
+
+function formatAddress($value) {
+    return ucwords(strtolower($value));
+}
+
+$blockLotNo = $userDataRow['blockLotNo'];
+$phase = $userDataRow['phase']; 
+$subdivisionName = $userDataRow['subdivisionName'];
+$purok = $userDataRow['purok'];
+$streetName = $userDataRow['streetName'];
+$barangayName = $userDataRow['barangayName'];
+$cityName = $userDataRow['cityName'];
+$provinceName = $userDataRow['provinceName'];
+
+$permanentBlockLotNo = $userDataRow['permanentBlockLotNo'];
+$permanentPhase = $userDataRow['permanentPhase']; 
+$permanentSubdivisionName = $userDataRow['permanentSubdivisionName'];
+$permanentPurok = $userDataRow['permanentPurok'];
+$permanentStreetName = $userDataRow['permanentStreetName'];
+$permanentBarangayName = formatAddress($userDataRow['permanentBarangayName']);
+$permanentCityName = formatAddress($userDataRow['permanentCityName']);
+$permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
 
 $searchTerm = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
 $documentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 1";
 
 if (!empty($searchTerm)) {
-    $documentsQuery .= " WHERE documentName LIKE '%$searchTerm%'";
+    $documentsQuery .= " AND documentName LIKE '%$searchTerm%'";
 }
 
 $documentsResult = executeQuery($documentsQuery);
+
+if (isset($_POST['proceedButton'])) {
+    $documentTypeID = $_POST['documentTypeID'];
+
+    $_SESSION['purpose'] = $_POST['purpose'] ?? '';
+    $_SESSION['businessName'] = $_POST['businessName'] ?? '';
+    $_SESSION['businessAddress'] = $_POST['businessAddress'] ?? '';
+    $_SESSION['businessNature'] = $_POST['businessNature'] ?? '';
+    $_SESSION['controlNo'] = $_POST['controlNo'] ?? '';
+    $_SESSION['ownership'] = $_POST['ownership'] ?? '';
+    $_SESSION['spouseName'] = $_POST['spouseName'] ?? '';
+    $_SESSION['marriageYear'] = $_POST['marriageYear'] ?? '';
+    $_SESSION['childNo'] = $_POST['childNo'] ?? '';
+    
+    header("Location: documents/documentView.php?documentTypeID=$documentTypeID");
+    exit();
+}
 
 ?>
 
@@ -71,11 +122,11 @@ $documentsResult = executeQuery($documentsQuery);
 
     ?>
 
-    <form method="GET">
-
         <div class="container pt-3">
             <div class="row">
                 <div class="col-12 col-lg-3 p-0">
+
+                    <form method="GET">
 
                         <div class="filterCard card m-1 p-2">
 
@@ -101,13 +152,15 @@ $documentsResult = executeQuery($documentsQuery);
                             </div>
                         </div>
 
+                    </form>
+
                 </div>
 
                 <div class="col-12 col-lg-9 p-0">
                     <div class="contentCard card m-1 p-2">
                         <div class="row px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
 
-                            <?php include("documentContent/" . $content . ".php"); ?>
+                            <?php include("contents/documentContent/" . $content . ".php"); ?>
 
                         </div>
                     </div>

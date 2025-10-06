@@ -46,10 +46,9 @@ if (isset($_GET['documentTypeID'])) {
     }
 }
 
-
-
 $userQuery = "SELECT * FROM users 
             LEFT JOIN userInfo ON users.userID = userInfo.userID 
+            LEFT JOIN documents ON users.userID = documents.userID
             LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
             LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
             WHERE users.userID = $userID";
@@ -60,18 +59,39 @@ $userRow = mysqli_fetch_assoc($userResult);
 $firstName = $userRow['firstName'];
 $middleName = $userRow['middleName'];
 $lastName = $userRow['lastName'];
+$fullName = $firstName . " " . ($middleName ? $middleName[0] . ". " : "") . $lastName;
 $birthDate = $userRow['birthDate'];
 $age = date_diff(date_create($birthDate), date_create('now'))->y;
+$birthPlace = $userRow['birthPlace'];
 $gender = $userRow['gender'];
 $profilePicture = $userRow['profilePicture'];
 $citizenship = $userRow['citizenship'];
+$civilStatus = $userRow['civilStatus'];
+$lengthOfStay = $userRow['lengthOfStay'];
 $residencyType = $userRow['residencyType'];
-$streetName = $userRow['streetName'];
-$barangayName = ucwords(strtolower($userRow['barangayName']));
-$cityName     = ucwords(strtolower($userRow['cityName']));
-$provinceName = ucwords(strtolower($userRow['provinceName']));
+$remarks = $userRow['remarks'];
 
-$fullName = $firstName . " " . ($middleName ? $middleName[0] . ". " : "") . $lastName;
+function formatAddress($value) {
+    return ucwords(strtolower($value));
+}
+
+$blockLotNo = $userRow['blockLotNo'];
+$phase = $userRow['phase']; 
+$subdivisionName = $userRow['subdivisionName'];
+$purok = $userRow['purok'];
+$streetName = $userRow['streetName'];
+$barangayName = formatAddress($userRow['barangayName']);
+$cityName = formatAddress($userRow['cityName']);
+$provinceName = formatAddress($userRow['provinceName']);
+
+$permanentBlockLotNo = $userRow['permanentBlockLotNo'];
+$permanentPhase = $userRow['permanentPhase']; 
+$permanentSubdivisionName = $userRow['permanentSubdivisionName'];
+$permanentPurok = $userRow['permanentPurok'];
+$permanentStreetName = $userRow['permanentStreetName'];
+$permanentBarangayName = formatAddress($userRow['permanentBarangayName']);
+$permanentCityName = formatAddress($userRow['permanentCityName']);
+$permanentProvinceName = formatAddress($userRow['permanentProvinceName']);
 
 $documentQuery = "SELECT * FROM documentTypes WHERE documentTypeID = $documentTypeID";
 $documentResult = executeQuery($documentQuery);
@@ -80,14 +100,47 @@ $documentRow = mysqli_fetch_assoc($documentResult);
 
 $documentName = $documentRow['documentName'];
 
-if (isset($_POST['submit'])) {
-    $purpose = $_POST['purpose'];
+$purpose = $_SESSION['purpose'] ?? '';
+$businessName = $_SESSION['businessName'] ?? '';
+$businessAddress = $_SESSION['businessAddress'] ?? '';
+$businessNature = $_SESSION['businessNature'] ?? '';
+$controlNo = $_SESSION['controlNo'] ?? '';
+$spouseName = $_SESSION['spouseName'] ?? '';
+$marriageYear = $_SESSION['marriageYear'] ?? '';
+$ownership = $_SESSION['ownership'] ?? '';
+$childNo = $_SESSION['childNo'] ?? '';
 
-    $submitQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate) VALUES ($documentTypeID, $userID, '$purpose', NOW())";
-    executeQuery($submitQuery);
+if (isset($_POST['confirmButton'])) {
+    
+    if ($documentTypeID == 1) {
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW())";
+    } elseif ($documentTypeID == 2 || $documentTypeID == 5 || $documentTypeID == 9) {
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate) VALUES ($documentTypeID, $userID, '$purpose', NOW())";
+    } elseif ($documentTypeID == 7) {
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW())";
+    } elseif ($documentTypeID == 10) {
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, requestDate) VALUES ($documentTypeID, $userID, $childNo, NOW())";
+    } else {
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, requestDate) VALUES ($documentTypeID, $userID, NOW())";
+    }
+
+    $documentRequestResult = executeQuery($documentRequestQuery);
+
+    unset(
+        $_SESSION['purpose'],
+        $_SESSION['businessName'],
+        $_SESSION['businessAddress'],
+        $_SESSION['businessNature'],
+        $_SESSION['controlNo'],
+        $_SESSION['ownership'],
+        $_SESSION['spouseName'],
+        $_SESSION['marriageYear'],
+        $_SESSION['childNo']
+    );
 
     header("Location: ../documents.php?content=documentRequest");
     exit();
+    
 }
 
 ?>
@@ -122,7 +175,7 @@ if (isset($_POST['submit'])) {
             align-items: center;
         }
 
-        .submitButton {
+        .confirmButton {
             background-color: #19AFA5;
             border: none;
         }
@@ -150,7 +203,7 @@ if (isset($_POST['submit'])) {
                         <a href="../documents.php">
                             <button class="btn btn-secondary cancelButton me-2" type="button">Cancel</button>
                         </a>
-                        <button class="btn btn-primary submitButton" id="submitButton" type="submit" name="submit">Submit</button>
+                        <button class="btn btn-primary confirmButton" id="confirmButton" type="submit" name="confirmButton">Confirm Request</button>
                     </div>
 
                 </div>
