@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that furthermore that he/she is living with his/her 3 children, age ____, who depend(s) on his/her support.</p>
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that furthermore that <?php echo ($gender === "Male" ? 'he' : 'she') . " is living with " . ($gender === "Male" ? 'his' : 'her') . " " . $childNo . ($childNo == 1 ? ' child' : ' children') . ", age ____, who " . ($childNo == 1 ? 'depend' : 'depends') . " on " . ($gender === "Male" ? 'his' : 'her') . " support."; ?></p>
         </div>
     </div>
     <div class="row">

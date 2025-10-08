@@ -50,12 +50,12 @@ while ($documentsRow = mysqli_fetch_assoc($documentsResult)) {
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" value="<?php echo $fullName ?>" id="ownerName" name="ownerName" placeholder="Owner's Name" required>
+                                <input type="text" class="form-control" value="<?php echo $fullName ?>" id="ownerName" name="ownerName" placeholder="Owner's Name" required readonly>
                                 <label for="ownerName">Owner's Name</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" value="<?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName  ?>" id="ownerAddress" name="ownerAddress" placeholder="Owner's Address" required>
+                                <input type="text" class="form-control" value="<?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName  ?>" id="ownerAddress" name="ownerAddress" placeholder="Owner's Address" required readonly>
                                 <label for="ownerAddress">Owner's Address</label>
                             </div>
 
