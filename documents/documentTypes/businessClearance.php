@@ -31,8 +31,8 @@
             <p style="text-indent: 48px; text-align: justify;">_____ Interposes No objection on the issuance of the corresponding Mayor's Permit being applied for.</p>
             <p style="text-indent: 48px; text-align: justify;">_____ Recommends the issuance of a "Temporary Mayor's Permit" for not more than three (3) months and within that period shall submit the requirements sought, otherwise this Barangay shall take the necessary actions within legal bounds to issue a temporary restraining order until such time that the requirements sought are complied with.</p>
 
-            <p style="text-indent: 48px; text-align: justify;"><strong>Date Issued:</strong> N/A</p>
-            <p style="text-indent: 48px; text-align: justify;"><strong>Date Expired:</strong> N/A</p>
+            <p style="text-indent: 48px; text-align: justify;"><strong>Date Issued:</strong> <?php echo date("F jS, Y"); ?></p>
+            <p style="text-indent: 48px; text-align: justify;"><strong>Date Expired:</strong> <?php echo date("F j, Y", strtotime("December 31")); ?></p>
             <p style="text-indent: 48px; text-align: justify;"><strong>O.R. Number:</strong> N/A</p>
             <p style="text-indent: 48px; text-align: justify;"><strong>Amount Paid:</strong> N/A</p>
         </div>

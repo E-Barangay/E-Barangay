@@ -46,7 +46,7 @@
             <p><strong>Issued At:</strong> Barangay San Antonio, Santo Tomas City, Batangas</p>
         </div>
         <div class="col-3">
-            <img src="../uploads/profiles/<?php echo $profilePicture ?>" style="width: 100%; height: 150px" alt="">
+            <img src="../uploads/profiles/<?php echo $profilePicture ?>" style="width: 100%; height: 150px; object-fit: cover; object-position: center; " alt="">
             <img src="../assets/images/<?php echo $thumbMark ?>" class="bg-secondary text-center mt-2" style="width: 100%; height: 150px;" alt="">
             <div class="signature-label mt-5 text-center border-top">Signature</div>
         </div>

@@ -6,12 +6,12 @@
     </div>
     <div class="row pt-4">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", resident of Barangay San Antonio, Santo Tomas City Batangas has the intention to construct their unit for House Renovation located at the " . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for $purpose located at the " . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is further certified that the barangay interposes no objection on the said project. This certification is being issued ensuring that they follow Building Code of the Philippines in constructing their house.</p>
+            <p style="text-indent: 48px; text-align: justify;">This is further certified that the barangay interposes no objection on the said project. This certification is being issued ensuring that they follow <strong>BUILDING CODE</strong> of the Philippines in constructing their house.</p>
         </div>
     </div>
     <div class="row">

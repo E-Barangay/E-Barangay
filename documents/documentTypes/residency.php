@@ -11,7 +11,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">Issued this <?php echo date("jS") ?> day of <?php echo date("F, Y") ?> at Barangay San Antonio, Santo Tomas City, Batangas upon the request of the party concerned for $purpose</p>
+            <p style="text-indent: 48px; text-align: justify;">Issued this <?php echo date("jS") ?> day of <?php echo date("F, Y") . " at Barangay San Antonio, Santo Tomas City, Batangas upon the request of the party concerned " . $purpose ?></p>
         </div>
     </div>
     <div class="row">
