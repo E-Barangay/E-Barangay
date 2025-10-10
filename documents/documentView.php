@@ -68,6 +68,8 @@ $profilePicture = $userRow['profilePicture'];
 $citizenship = $userRow['citizenship'];
 $civilStatus = $userRow['civilStatus'];
 $lengthOfStay = $userRow['lengthOfStay'];
+$currentYear = date('Y');
+$residingYear = $currentYear - $lengthOfStay;
 $residencyType = $userRow['residencyType'];
 $remarks = $userRow['remarks'];
 
