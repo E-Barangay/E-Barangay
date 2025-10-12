@@ -9,7 +9,7 @@ if (isset($_SESSION['userID'])) {
         SELECT ui.firstName, ui.middleName, ui.lastName, ui.suffix, ui.age,
                u.phoneNumber
         FROM userInfo ui
-        INNER JOIN users u ON ui.userInfoID = u.userInfoID
+        INNER JOIN users u ON ui.userID = u.userID
         WHERE u.userID = '$userID'
         LIMIT 1
     ";
