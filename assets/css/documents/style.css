@@ -107,6 +107,10 @@ input.form-control:focus {
     color: white;
 }
 
+.noDocument, .noRequest {
+    font-size: 16px;
+}
+
 .proceedButton {
     background-color: #19AFA5;
     border: 1px solid #19AFA5;

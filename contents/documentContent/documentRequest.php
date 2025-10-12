@@ -6,31 +6,55 @@ $documentRequestResult = executeQuery($documentRequestQuery);
 ?>
 
 <div class="col">
-    <table class="table table-striped text-center">
-        <thead>
-            <tr>
-                <th class="align-middle" scope="col">No.</th>
-                <th class="align-middle" scope="col">Date Issued</th>
-                <th class="align-middle" scope="col">Document Type</th>
-                <th class="align-middle" scope="col">Purpose</th>
-                <th class="align-middle" scope="col">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
+    <div class="card p-3 text-center" style="background-color: #0C8888; border: none;">
+        <h2 class="fw-bold fs-5 text-light mb-0">Your Submitted Complaints</h2>
+    </div>
 
-            $counter = 1;
-            while ($documentRequestRow = mysqli_fetch_assoc($documentRequestResult)) { ?>
+    <div class="table-responsive">
+        <table class="table table-striped text-center">
 
+            <thead>
                 <tr>
-                    <th scope="row" class="align-middle"><?php echo $counter++; ?></th>
-                    <td class="align-middle"><?php echo date("F j, Y h:i a", strtotime($documentRequestRow['requestDate'])); ?></td>
-                    <td class="align-middle"><?php echo $documentRequestRow['documentName'] ?></td>
-                    <td class="align-middle"><?php echo $documentRequestRow['purpose'] ?></td>
-                    <td class="align-middle"><?php echo $documentRequestRow['documentStatus'] ?></td>
+                    <th class="align-middle" scope="col">Document Type</th>
+                    <th class="align-middle" scope="col">Purpose</th>
+                    <th class="align-middle" scope="col">Date Issued</th>
+                    <th class="align-middle" scope="col">Status</th>
                 </tr>
+            </thead>
 
-            <?php } ?>
-        </tbody>
-    </table>
+            <tbody>
+
+                <?php
+
+                    $counter = 1;
+
+                    if(mysqli_num_rows($documentRequestResult) > 0) {
+                        while ($documentRequestRow = mysqli_fetch_assoc($documentRequestResult)) { ?>
+
+                            <tr>
+                                <td class="align-middle"><?php echo $documentRequestRow['documentName'] ?></td>
+                                <td class="align-middle"><?php echo $documentRequestRow['purpose'] ?></td>
+                                <td class="align-middle"><?php echo date("F j, Y h:i a", strtotime($documentRequestRow['requestDate'])); ?></td>
+                                <td class="align-middle"><?php echo $documentRequestRow['documentStatus'] ?></td>
+                            </tr>
+
+                    <?php } 
+                
+                    } else { ?>
+                        
+                        <tr>
+
+                            <td colspan="7" class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                                <p class="text-muted m-0">You have not made any document requests yet.</p>
+                            </td>
+                            
+                        </tr>
+
+                    <?php } ?>
+
+            </tbody>
+
+        </table>
+    </div>
 </div>
