@@ -12,7 +12,7 @@
             <img src="../assets/images/logoSantoTomas.png" class="img-fluid" alt="Logo 2" style="height: 125px;">
         </div>
     </div>
-    <div class="row border-top border-bottom mt-3">
+    <div class="row mt-3" style="border-top: 3px solid black; border-bottom: 3px solid black" >
         <div class="col text-center py-2">
             <div class="h5 m-0"><?php echo $documentName ?></div>
         </div>
