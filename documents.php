@@ -72,6 +72,8 @@ if (!empty($searchTerm)) {
 
 $documentsResult = executeQuery($documentsQuery);
 
+$searchDisplay = !empty($searchTerm) ? htmlspecialchars($searchTerm) : 'document';
+
 if (isset($_POST['proceedButton'])) {
     $documentTypeID = $_POST['documentTypeID'];
 
@@ -135,7 +137,7 @@ if (isset($_POST['proceedButton'])) {
                                     <div class="position-relative">
 
                                         <input type="hidden" name="content" value="<?php echo $content; ?>">
-                                        <input class="form-control rounded-pill ps-5" name="search" type="search" placeholder="Search Documents" value="<?php echo $searchTerm ?>">
+                                        <input class="form-control rounded-pill ps-5" name="search" type="search" id="searchInput" placeholder="Search Documents" value="<?php echo $searchTerm ?>">
                                         <i class="fa-solid fa-magnifying-glass searchIcon text-muted"></i>
                                         
                                     </div>
@@ -157,7 +159,7 @@ if (isset($_POST['proceedButton'])) {
                 </div>
 
                 <div class="col-12 col-lg-9 p-0">
-                    <div class="contentCard card m-1 p-2">
+                    <div class="contentCard card m-1 p-2" id="contentCard">
                         <div class="row px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
 
                             <?php include("contents/documentContent/" . $content . ".php"); ?>
@@ -172,6 +174,27 @@ if (isset($_POST['proceedButton'])) {
     </form>
     
     <?php include("sharedAssets/footer.php") ?>
+
+    <script>
+        const search = document.getElementById('searchInput');
+        const container = document.getElementById('contentCard');
+
+        search.addEventListener('keyup', () => {
+            const term = search.value.trim();
+            const url = term
+                ? 'documents.php?content=allDocuments&search=' + encodeURIComponent(term)
+                : 'documents.php?content=allDocuments';
+
+            fetch(url)
+                .then(r => r.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newContent = doc.querySelector('#contentCard').innerHTML;
+                    container.innerHTML = newContent;
+                });
+        });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
     
