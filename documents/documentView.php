@@ -116,7 +116,7 @@ if (isset($_POST['confirmButton'])) {
     
     if ($documentTypeID == 2) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW())";
-    } elseif ($documentTypeID == 1 || $documentTypeID == 5 || $documentTypeID == 9) {
+    } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 9) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate) VALUES ($documentTypeID, $userID, '$purpose', NOW())";
     } elseif ($documentTypeID == 7) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW())";
