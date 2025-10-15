@@ -1,13 +1,14 @@
 <?php
 
-$documentRequestQuery = "SELECT * FROM documents LEFT JOIN documentTypes ON documents.documentTypeID = documentTypes.documentTypeID";
+$documentRequestQuery = "SELECT * FROM documents LEFT JOIN documentTypes ON documents.documentTypeID = documentTypes.documentTypeID ORDER BY requestDate DESC";
 $documentRequestResult = executeQuery($documentRequestQuery);
 
 ?>
 
-<div class="col">
-    <div class="card p-3 text-center" style="background-color: #0C8888; border: none;">
-        <h2 class="fw-bold fs-5 text-light mb-0">Your Submitted Complaints</h2>
+<div class="col p-1">
+    
+    <div class="card py-2 mt-2 text-center" style="background-color: #19AFA5; border: none; border-radius: 12px;">
+        <span class="m-0" style="font-size: clamp(16px, 4vw, 20px); font-weight: bold; color: white;">Your Submitted Request</span>
     </div>
 
     <div class="table-responsive">
@@ -15,10 +16,10 @@ $documentRequestResult = executeQuery($documentRequestQuery);
 
             <thead>
                 <tr>
-                    <th class="align-middle" scope="col">Document Type</th>
-                    <th class="align-middle" scope="col">Purpose</th>
-                    <th class="align-middle" scope="col">Date Issued</th>
-                    <th class="align-middle" scope="col">Status</th>
+                    <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Document Type</th>
+                    <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Purpose</th>
+                    <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Date Requested</th>
+                    <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Status</th>
                 </tr>
             </thead>
 
@@ -32,10 +33,10 @@ $documentRequestResult = executeQuery($documentRequestQuery);
                         while ($documentRequestRow = mysqli_fetch_assoc($documentRequestResult)) { ?>
 
                             <tr>
-                                <td class="align-middle"><?php echo $documentRequestRow['documentName'] ?></td>
-                                <td class="align-middle"><?php echo $documentRequestRow['purpose'] ?></td>
-                                <td class="align-middle"><?php echo date("F j, Y h:i a", strtotime($documentRequestRow['requestDate'])); ?></td>
-                                <td class="align-middle"><?php echo $documentRequestRow['documentStatus'] ?></td>
+                                <td class="align-middle" style="white-space: nowrap;"><?php echo $documentRequestRow['documentName'] ?></td>
+                                <td class="align-middle" style="white-space: nowrap;"><?php echo !empty($documentRequestRow['purpose']) ? $documentRequestRow['purpose'] : '<span class="text-muted">N/A</span>'; ?></td>
+                                <td class="align-middle" style="white-space: nowrap;"><?php echo date("F j, Y h:i a", strtotime($documentRequestRow['requestDate'])); ?></td>
+                                <td class="align-middle" style="white-space: nowrap;"><?php echo $documentRequestRow['documentStatus'] ?></td>
                             </tr>
 
                     <?php } 

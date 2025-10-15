@@ -39,6 +39,11 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                             <?php if ($documentsRow['documentTypeID'] == 2) { ?>
                                 
                                 <p class="mb-3">Please fill in your business details and choose the purpose of your request:</p>
+                                
+                                <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'missingPurpose'): ?>
+                                    <div class="alert alert-warning">Please select a purpose before proceeding.</div>
+                                    <?php unset($_SESSION['warning']); ?>
+                                <?php endif; ?>
 
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="businessName" name="businessName" placeholder="Business Name" required>
@@ -173,6 +178,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <input type="hidden" name="modalID" value="<?php echo $modalID; ?>">
                             <input type="hidden" value="<?php echo $documentsRow['documentTypeID']; ?>" name="documentTypeID">
                             <button type="submit" class="btn btn-primary proceedButton" name="proceedButton">
                                 Proceed

@@ -6,7 +6,7 @@
     </div>
     <div class="row pt-4">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for $purpose located at the " . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for " . $purpose . " located at the " . $barangayName . ", " . $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " . $provinceName ?></p>
         </div>
     </div>
     <div class="row">
