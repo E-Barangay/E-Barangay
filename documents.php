@@ -77,14 +77,6 @@ $searchDisplay = !empty($searchTerm) ? htmlspecialchars($searchTerm) : 'document
 if (isset($_POST['proceedButton'])) {
     $documentTypeID = $_POST['documentTypeID'];
 
-    if (empty($_POST['purpose'])) {
-        $_SESSION['warning'] = "missingPurpose";
-        $_SESSION['warning'] = "missingPurpose";
-        $_SESSION['openModal'] = $_POST['modalID'];
-        header("Location: documents.php?content=allDocuments");
-        exit();
-    }
-
     $_SESSION['purpose'] = $_POST['purpose'] ?? '';
     $_SESSION['businessName'] = $_POST['businessName'] ?? '';
     $_SESSION['businessAddress'] = $_POST['businessAddress'] ?? '';
