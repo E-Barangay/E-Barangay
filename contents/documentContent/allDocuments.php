@@ -38,12 +38,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                             <?php if ($documentsRow['documentTypeID'] == 2) { ?>
                                 
-                                <p class="mb-3">Please fill in your business details and choose the purpose of your request:</p>
-                                
-                                <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'missingPurpose'): ?>
-                                    <div class="alert alert-warning">Please select a purpose before proceeding.</div>
-                                    <?php unset($_SESSION['warning']); ?>
-                                <?php endif; ?>
+                                <p class="mb-3">Please fill out your business details and choose the purpose of your request:</p>
 
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="businessName" name="businessName" placeholder="Business Name" required>
@@ -67,7 +62,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating mb-3">
                                     <select class="form-select" id="businessNature" name="businessNature" required>
-                                        <option selected disabled>Choose Nature of Business</option>
+                                        <option value="" selected>Choose Nature of Business</option>
                                         <option value="Sari-Sari Store">Sari-Sari Store</option>
                                         <option value="Food & Beverage">Food & Beverage</option>
                                         <option value="Retail">Retail</option>
@@ -87,7 +82,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating mb-3">
                                     <select class="form-select" id="businessClearancePurpose" name="purpose" required>
-                                        <option selected disabled>Choose Purpose</option>
+                                        <option value="" selected>Choose Purpose</option>
                                         <option value="New">New</option>
                                         <option value="Renewal">Renewal</option>
                                         <option value="Closure">Closure</option>
@@ -98,7 +93,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating">
                                     <select class="form-select" id="ownership" name="ownership" required>
-                                        <option selected disabled>Choose Ownership</option>
+                                        <option value="" selected>Choose Ownership</option>
                                         <option value="Sole Proprietorship">Sole Proprietorship</option>
                                         <option value="Partnership">Partnership</option>
                                         <option value="Corporation">Corporation</option>
@@ -113,7 +108,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating">
                                     <select class="form-select selectPurpose" id="purpose" name="purpose" required>
-                                        <option selected disabled>Choose Purpose</option>
+                                        <option value="" selected>Choose Purpose</option>
                                         <option value="Employment">Employment</option>
                                         <option value="Job Requirement / Local Employment">Job Requirement / Local Employment</option>
                                         <option value="Overseas Employment (OFW)">Overseas Employment (OFW)</option>
@@ -136,7 +131,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating">
                                     <select class="form-select" id="constructionClearancePurpose" name="purpose" required>
-                                        <option selected disabled>Choose Purpose</option>
+                                        <option value="" selected>Choose Purpose</option>
                                         <option value="New Construction">New Construction</option>
                                         <option value="House Renovation">House Renovation</option>
                                         <option value="Extension / Expansion">Extension / Expansion</option>
@@ -148,20 +143,24 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                 </div>
 
                             <?php } elseif ($documentsRow['documentTypeID'] == 7) { ?>
+
+                                <p class="mb-3">Please fill out your marriage details below.</p>
                             
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="spouseName" name="spouseName" placeholder="Spouse Name" required>
                                     <label for="spouseName">Spouse Name</label>
                                 </div>
 
-                                <div class="form-floating mb-3">
+                                <div class="form-floating">
                                     <input type="number" class="form-control" id="marriageYear" name="marriageYear" placeholder="Year of Marriage" min="1900" max="<?php echo date('Y'); ?>" required>
                                     <label for="marriageYear">Year of Marriage</label>
                                 </div>
 
                             <?php } elseif ($documentsRow['documentTypeID'] == 10) { ?>
 
-                                <div class="form-floating mb-3">
+                                <p class="mb-3">Please enter the number of children you have.</p>
+
+                                <div class="form-floating">
                                     <input type="number" class="form-control" id="childNo" name="childNo" placeholder="Number of Children" required>
                                     <label for="childNo">Number of Children</label>
                                 </div>
@@ -178,7 +177,6 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <input type="hidden" name="modalID" value="<?php echo $modalID; ?>">
                             <input type="hidden" value="<?php echo $documentsRow['documentTypeID']; ?>" name="documentTypeID">
                             <button type="submit" class="btn btn-primary proceedButton" name="proceedButton">
                                 Proceed
