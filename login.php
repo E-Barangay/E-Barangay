@@ -54,7 +54,10 @@ if (isset($_POST['submit'])) {
         }
 
     } else {
-        if ($password !== $confirmPassword) {
+        if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
+            $_SESSION['alert'] = 'weakPassword';
+            $loginStep = 'notExistingPassword';
+        } elseif ($password !== $confirmPassword) {
             $_SESSION['alert'] = 'mismatchPassword';
             $loginStep = 'notExistingPassword';
         } else {
@@ -109,7 +112,7 @@ if (isset($_POST['submit'])) {
                 <img src="assets/images/bgHall.jpeg" class="leftBackgroundImage" alt="Barangay Background">
             </div>
 
-            <div class="col-lg-5 col-12 d-flex flex-column justify-content-center px-5">
+            <div class="col-lg-5 col-12 d-flex flex-column justify-content-center px-3 px-sm-5">
                 
                 <div class="row">
                     <div class="col d-flex justify-content-center">
@@ -134,7 +137,10 @@ if (isset($_POST['submit'])) {
                                 <div class="alert alert-warning">Email not found. Please sign up to create an account.</div>
                                 <?php unset($_SESSION['warning']); ?>
                             <?php endif; ?>
-
+                            <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'weakPassword'): ?>
+                                <div class="alert alert-danger">Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
+                                <?php unset($_SESSION['alert']); ?>
+                            <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'mismatchPassword'): ?>
                                 <div class="alert alert-danger">Passwords do not match.</div>
                                 <?php unset($_SESSION['alert']); ?>
