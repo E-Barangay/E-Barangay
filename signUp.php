@@ -18,6 +18,8 @@ if (isset($_POST["signUp"])) {
     
     if (mysqli_num_rows($checkEmailResult) > 0) {
         $_SESSION['warning'] = 'emailExists';
+    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
+        $_SESSION['alert'] = 'weakPassword';
     } elseif ($password !== $confirmPassword) {
         $_SESSION['alert'] = 'mismatchPassword';
     } else {
@@ -67,7 +69,7 @@ if (isset($_POST["signUp"])) {
                 <img src="assets/images/bgHall.jpeg" class="leftBackgroundImage" alt="Barangay Background">
             </div>
 
-            <div class="col-lg-5 col-12 d-flex flex-column justify-content-center px-5">
+            <div class="col-lg-5 col-12 d-flex flex-column justify-content-center px-3 px-sm-5">
                 <div class="row">
                     <div class="col d-flex justify-content-center">
                         <img src="assets/images/logoSanAntonio.png" class="logoSanAntonio me-2" alt="Logo San Antonio">
@@ -92,28 +94,31 @@ if (isset($_POST["signUp"])) {
                                 <div class="alert alert-warning">This email is already registered. Please use a different one or log in.</div>
                                 <?php unset($_SESSION['warning']); ?>
                             <?php endif; ?>
-
+                            <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'weakPassword'): ?>
+                                <div class="alert alert-danger">Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
+                                <?php unset($_SESSION['alert']); ?>
+                            <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'mismatchPassword'): ?>
                                 <div class="alert alert-danger">Passwords do not match.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                         </div>
 
-                        <div class="col-4">
+                        <div class="col-lg-4 col-md-4 col-6">
                             <div class="form-floating mb-3">
                                 <input type="text" name="firstName" value="<?php echo isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : ''; ?>" class="form-control" id="firstNameInput" placeholder="First Name" required>
                                 <label for="firstNameInput">First Name</label>
                             </div>
                         </div>
 
-                        <div class="col-4 p-0">
+                        <div class="col-lg-4 col-md-4 col-6 p-lg-0 p-md-0">
                             <div class="form-floating mb-3">
                                 <input type="text" name="middleName" value="<?php echo isset($_POST['middleName']) ? htmlspecialchars($_POST['middleName']) : ''; ?>" class="form-control" id="middleNameInput" placeholder="Middle Name" required>
                                 <label for="middleNameInput">Middle Name</label>
                             </div>
                         </div>
 
-                        <div class="col-4">
+                        <div class="col-lg-4 col-md-4 col-12">
                             <div class="form-floating mb-3">
                                 <input type="text" name="lastName" value="<?php echo isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : ''; ?>" class="form-control" id="lastNameInput" placeholder="Last Name" required>
                                 <label for="lastNameInput">Last Name</label>

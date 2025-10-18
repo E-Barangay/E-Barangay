@@ -171,11 +171,6 @@ if (isset($_POST['confirmButton'])) {
         html {
             scroll-behavior: smooth;
         }
-        
-        .purposeSelect {
-            height: 30px;
-            align-items: center;
-        }
 
         .confirmButton {
             background-color: #19AFA5;
