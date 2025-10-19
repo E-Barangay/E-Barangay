@@ -6,6 +6,13 @@ session_start();
 
 $loginStep = 'email';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'assets/phpmailer/src/Exception.php';
+require 'assets/phpmailer/src/PHPMailer.php';    
+require 'assets/phpmailer/src/SMTP.php';
+
 if (isset($_POST['next'])) {
     $email = $_POST['email'];
 
@@ -16,44 +23,362 @@ if (isset($_POST['next'])) {
 
     if (mysqli_num_rows($emailCheckResult) > 0) {
         $user = mysqli_fetch_assoc($emailCheckResult);
-        $_SESSION['email'] = $email;
+        
+        if ($user['isNew'] === 'Yes') {
+            $_SESSION['email'] = $email;
 
-        if (empty($user['password'])) {
-            $loginStep = "notExistingPassword";
+            $verificationCode = random_int(100000, 999999);
+            $_SESSION['verificationCode'] = $verificationCode;
+            $_SESSION['verificationCodeExpiry'] = time() + (10 * 60);
+
+            $_SESSION['success'] = 'emailSent';
+            $loginStep = "verification";
+
+            $mail = new PHPMailer(true);
+
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'brgysanantonioputol@gmail.com';
+                $mail->Password   = 'jcal kski idji qghl';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port       = 587;
+                $mail->AddEmbeddedImage('assets/images/logoSanAntonio.png', 'logoSanAntonio');
+                $mail->AddEmbeddedImage('assets/images/logoSantoTomas.png', 'logoSantoTomas');
+
+                $mail->setFrom('brgysanantonioputol@gmail.com', 'San Antonio e-Desk');
+                $mail->addAddress($email);
+
+                $mail->isHTML(true);
+                $mail->Subject = "Your San Antonio e-Desk Verification Code";
+                $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                            <tr>
+                                <td align="center">
+                                    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                        <tr style="background-color: #19AFA5;">
+                                            <td align="center" style="padding: 20px;">
+                                                <img src="cid:logoSanAntonio" alt="San Antonio Logo" style="height:80px;">
+                                                <img src="cid:logoSantoTomas" alt="Santo Tomas Logo" style="height:80px; margin-left:10px;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 30px;">
+                                                <h2 style="text-align:center; color:#19AFA5; margin-top:0;">Barangay San Antonio</h2>
+                                                <p style="text-align:center; margin:0; color:#555;">Santo Tomas City, Batangas</p>
+                                                <p style="text-align:center; margin:0; color:#555;">Office of the Barangay Chairman</p>
+                                                <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+
+                                                <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
+
+                                                <p style="font-size:15px; color:#333;">
+                                                    We received a request to verify your account for <strong>San Antonio e-Desk</strong>.
+                                                </p>
+
+                                                <p style="font-size:15px; color:#333;">Your One-Time Password (OTP) is:</p>
+
+                                                <h2 style="text-align:center; letter-spacing:5px; font-size:32px; color:#19AFA5; margin:20px 0;">' . $verificationCode . '</h2>
+
+                                                <p style="font-size:15px; color:#333;">
+                                                    Please enter this code on the verification page to complete your process. This code will expire in <strong>10 minutes</strong> for your security.
+                                                </p>
+
+                                                <p style="font-size:15px; color:#333;">
+                                                    If you didn’t request this verification, please ignore this email or contact our support team immediately.
+                                                </p>
+
+                                                <p style="font-size:15px; color:#333;">Thank you for keeping your account secure!</p>
+
+                                                <p style="margin-top:30px; color:#333;">
+                                                    Warm regards,<br>
+                                                    <strong>San Antonio e-Desk</strong><br>
+                                                    Barangay San Antonio, Santo Tomas City, Batangas
+                                                </p>
+
+                                                <div style="text-align:center; font-size:13px; color:#888; margin-top:20px;">
+                                                    Telefax: (043) 784-3812 | sanantonioputol@gmail.com
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color:#19AFA5;">
+                                            <td align="center" style="padding:15px; color:white; font-size:13px;">
+                                                © 2025 San Antonio e-Desk. All Rights Reserved.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>';
+                $mail->send();
+            } catch (Exception $e) {
+                echo "Email failed. Error: {$mail->ErrorInfo}";
+            }
+
+            $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode' WHERE email = '$email'";
+            executeQuery($verificationCodeInsertion);
+
+        } elseif ($user['isNew'] === 'No' && isset($_SESSION['resetMode']) && $_SESSION['resetMode'] === true) {
+            $_SESSION['email'] = $email;
+
+            $verificationCode = random_int(100000, 999999);
+            $_SESSION['verificationCode'] = $verificationCode;
+            $_SESSION['verificationCodeExpiry'] = time() + (10 * 60);
+
+            $_SESSION['success'] = 'resetVerificationSent';
+            $loginStep = 'verification';
+
+            $mail = new PHPMailer(true);
+
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'brgysanantonioputol@gmail.com';
+                $mail->Password   = 'jcal kski idji qghl';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port       = 587;
+                $mail->AddEmbeddedImage('assets/images/logoSanAntonio.png', 'logoSanAntonio');
+                $mail->AddEmbeddedImage('assets/images/logoSantoTomas.png', 'logoSantoTomas');
+
+                $mail->setFrom('brgysanantonioputol@gmail.com', 'San Antonio e-Desk');
+                $mail->addAddress($email);
+
+                $mail->isHTML(true);
+                $mail->Subject = "San Antonio e-Desk Password Reset Verification Code";
+                $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                            <tr>
+                                <td align="center">
+                                    <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                        <tr style="background-color: #19AFA5;">
+                                            <td align="center" style="padding: 20px;">
+                                                <img src="cid:logoSanAntonio" alt="San Antonio Logo" style="height:80px;">
+                                                <img src="cid:logoSantoTomas" alt="Santo Tomas Logo" style="height:80px; margin-left:10px;">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 30px;">
+                                                <h2 style="text-align:center; color:#19AFA5; margin-top:0;">Barangay San Antonio</h2>
+                                                <p style="text-align:center; margin:0; color:#555;">Santo Tomas City, Batangas</p>
+                                                <p style="text-align:center; margin:0; color:#555;">Office of the Barangay Chairman</p>
+                                                <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+
+                                                <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
+
+                                                <p style="font-size:15px; color:#333;">
+                                                    We received a request to reset your password for your <strong>San Antonio e-Desk</strong> account.
+                                                </p>
+
+                                                <p style="font-size:15px; color:#333;">Use the verification code below to continue resetting your password:</p>
+
+                                                <h2 style="text-align:center; letter-spacing:5px; font-size:32px; color:#19AFA5; margin:20px 0;">' . $verificationCode . '</h2>
+
+                                                <p style="font-size:15px; color:#333;">
+                                                    Please enter this code on the password reset page to proceed. This code will expire in <strong>10 minutes</strong> for your security.
+                                                </p>
+
+                                                <p style="font-size:15px; color:#333;">
+                                                    If you didn’t request a password reset, please ignore this email or contact our support team immediately.
+                                                </p>
+
+                                                <p style="font-size:15px; color:#333;">Thank you for keeping your account secure!</p>
+
+                                                <p style="margin-top:30px; color:#333;">
+                                                    Warm regards,<br>
+                                                    <strong>San Antonio e-Desk</strong><br>
+                                                    Barangay San Antonio, Santo Tomas City, Batangas
+                                                </p>
+
+                                                <div style="text-align:center; font-size:13px; color:#888; margin-top:20px;">
+                                                    Telefax: (043) 784-3812 | sanantonioputol@gmail.com
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr style="background-color:#19AFA5;">
+                                            <td align="center" style="padding:15px; color:white; font-size:13px;">
+                                                © 2025 San Antonio e-Desk. All Rights Reserved.
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>';
+                $mail->send();
+            } catch (Exception $e) {
+                echo "Email failed. Error: {$mail->ErrorInfo}";
+            }
+
+            $verificationCodeUpdate = "UPDATE users SET verificationCode = '$verificationCode' WHERE email = '$email'";
+            executeQuery($verificationCodeUpdate);
+        
         } else {
-            $loginStep = "existingPassword";
+            $_SESSION['email'] = $email;
+            
+            $loginStep = 'existingPassword';
         }
     } else {
-        $loginStep = 'email';
         $_SESSION['warning'] = 'notFoundEmail';
+        
+        $loginStep = 'email';
     }
 }
 
-if (isset($_POST['submit'])) {
+if (isset($_POST['resetPassword'])) {
+    $_SESSION['warning'] = 'enterEmailToReset';
+    $_SESSION['resetMode'] = true;
+    $loginStep = 'email';
+}
+
+if (isset($_POST['resend'])) {
+    $email = $_SESSION['email'];
+
+    $verificationCode = random_int(100000, 999999);
+    $_SESSION['verificationCode'] = $verificationCode;
+    $_SESSION['verificationCodeExpiry'] = time() + (10 * 60);
+
+    $_SESSION['success'] = 'codeResent';
+    $loginStep = "verification";
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'brgysanantonioputol@gmail.com';
+        $mail->Password   = 'jcal kski idji qghl';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
+        $mail->AddEmbeddedImage('assets/images/logoSanAntonio.png', 'logoSanAntonio');
+        $mail->AddEmbeddedImage('assets/images/logoSantoTomas.png', 'logoSantoTomas');
+
+        $mail->setFrom('brgysanantonioputol@gmail.com', 'San Antonio e-Desk');
+        $mail->addAddress($email);
+
+        $mail->isHTML(true);
+        $mail->Subject = "Your San Antonio e-Desk Verification Code";
+        $mail->Body = '<div style="font-family: Arial, sans-serif; background-color:#f4f6f7; padding: 0; margin: 0;">
+                <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f7; padding: 40px 0;">
+                    <tr>
+                        <td align="center">
+                            <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                                <tr style="background-color: #19AFA5;">
+                                    <td align="center" style="padding: 20px;">
+                                        <img src="cid:logoSanAntonio" alt="San Antonio Logo" style="height:80px;">
+                                        <img src="cid:logoSantoTomas" alt="Santo Tomas Logo" style="height:80px; margin-left:10px;">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 30px;">
+                                        <h2 style="text-align:center; color:#19AFA5; margin-top:0;">Barangay San Antonio</h2>
+                                        <p style="text-align:center; margin:0; color:#555;">Santo Tomas City, Batangas</p>
+                                        <p style="text-align:center; margin:0; color:#555;">Office of the Barangay Chairman</p>
+                                        <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+
+                                        <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
+
+                                        <p style="font-size:15px; color:#333;">
+                                            We received a request to verify your account for <strong>San Antonio e-Desk</strong>.
+                                        </p>
+
+                                        <p style="font-size:15px; color:#333;">Your One-Time Password (OTP) is:</p>
+
+                                        <h2 style="text-align:center; letter-spacing:5px; font-size:32px; color:#19AFA5; margin:20px 0;">' . $verificationCode . '</h2>
+
+                                        <p style="font-size:15px; color:#333;">
+                                            Please enter this code on the verification page to complete your process. This code will expire in <strong>10 minutes</strong> for your security.
+                                        </p>
+
+                                        <p style="font-size:15px; color:#333;">
+                                            If you didn’t request this verification, please ignore this email or contact our support team immediately.
+                                        </p>
+
+                                        <p style="font-size:15px; color:#333;">Thank you for keeping your account secure!</p>
+
+                                        <p style="margin-top:30px; color:#333;">
+                                            Warm regards,<br>
+                                            <strong>San Antonio e-Desk</strong><br>
+                                            Barangay San Antonio, Santo Tomas City, Batangas
+                                        </p>
+
+                                        <div style="text-align:center; font-size:13px; color:#888; margin-top:20px;">
+                                            Telefax: (043) 784-3812 | sanantonioputol@gmail.com
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr style="background-color:#19AFA5;">
+                                    <td align="center" style="padding:15px; color:white; font-size:13px;">
+                                        © 2025 San Antonio e-Desk. All Rights Reserved.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>';
+        $mail->send();
+    } catch (Exception $e) {
+        echo "Email failed. Error: {$mail->ErrorInfo}";
+    }
+
+    $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode' WHERE email = '$email'";
+    executeQuery($verificationCodeInsertion);  
+}
+
+if (isset($_POST['verify'])) {
+    $email = $_SESSION['email'];
+    $verificationCode = $_POST['verificationCode'];
+
+    $verificationCodeCheckQuery = "SELECT * FROM users WHERE email = '$email'";
+    $verificationCodeCheckResult = executeQuery($verificationCodeCheckQuery);
+    $verificationCodeRow = mysqli_fetch_assoc($verificationCodeCheckResult);
+
+    if ($verificationCode === $verificationCodeRow['verificationCode']) {
+        if ($verificationCodeRow['isNew'] === 'No') {
+            unset($_SESSION['resetMode']);
+            $_SESSION['email'] = $email;
+
+            $_SESSION['success'] = 'verifiedReset';
+            $loginStep = 'newPassword';
+        } else {
+            $_SESSION['email'] = $email;
+            $loginStep = 'notExistingPassword';
+        }
+    } else {
+        $_SESSION['alert'] = 'invalidVerificationCode';
+        $loginStep = 'verification';
+    }
+}
+
+if (isset($_POST['login'])) {
     $email = $_SESSION['email'];
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    $checkUserQuery = "SELECT * FROM users WHERE email = '$email'";
-    $checkUserResult = executeQuery($checkUserQuery);
-    $userRow = mysqli_fetch_assoc($checkUserResult);
+    if ($loginStep === 'existingPassword') {
+        $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
+        $userCheckResult = executeQuery($userCheckQuery);
+        $userRow = mysqli_fetch_assoc($userCheckResult);
+        
+        if ($userRow && !empty($userRow['password'])) {
+            if ($password === $userRow['password']) {
+                $_SESSION['userID'] = $userRow['userID'];
+                $_SESSION['role'] = $userRow['role'];
 
-    if ($userRow && !empty($userRow['password'])) {
-        if ($password === $userRow['password']) {
-            $_SESSION['userID'] = $userRow['userID'];
-            $_SESSION['role'] = $userRow['role'];
-
-            if ($userRow['role'] === 'admin') {
-                header("Location: admin/index.php");
+                if ($userRow['role'] === 'admin') {
+                    header("Location: admin/index.php");
+                } else {
+                    header("Location: index.php");
+                }
             } else {
-                header("Location: index.php");
+                $_SESSION['alert'] = 'invalidPassword';
+                $loginStep = 'existingPassword';
             }
-        } else {
-            $_SESSION['alert'] = 'invalidPassword';
-            $loginStep = 'existingPassword';
-        }
-
-    } else {
+        } 
+    } elseif ($loginStep === 'notExistingPassword' || $loginStep === 'newPassword') {
         if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
             $_SESSION['alert'] = 'weakPassword';
             $loginStep = 'notExistingPassword';
@@ -137,6 +462,30 @@ if (isset($_POST['submit'])) {
                                 <div class="alert alert-warning">Email not found. Please sign up to create an account.</div>
                                 <?php unset($_SESSION['warning']); ?>
                             <?php endif; ?>
+                            <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'enterEmailToReset'): ?>
+                                <div class="alert alert-warning">Please enter your email to reset your password.</div>
+                                <?php unset($_SESSION['warning']); ?>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'emailSent'): ?>
+                                <div class="alert alert-success">Verification code sent successfully! Please check your email to continue.</div>
+                                <?php unset($_SESSION['success']); ?>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'codeResent'): ?>
+                                <div class="alert alert-success">A new verification code has been sent to your email.</div>
+                                <?php unset($_SESSION['success']); ?>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'resetVerificationSent'): ?>
+                                <div class="alert alert-success">A verification code has been sent to your email to reset your password.</div>
+                                <?php unset($_SESSION['success']); ?>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'verifiedReset'): ?>
+                                <div class="alert alert-success">Verification successful! Please create a new password for your account.</div>
+                                <?php unset($_SESSION['success']); ?>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidVerificationCode'): ?>
+                                <div class="alert alert-danger">Invalid verification code.</div>
+                                <?php unset($_SESSION['alert']); ?>
+                            <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'weakPassword'): ?>
                                 <div class="alert alert-danger">Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
                                 <?php unset($_SESSION['alert']); ?>
@@ -145,20 +494,27 @@ if (isset($_POST['submit'])) {
                                 <div class="alert alert-danger">Passwords do not match.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
-
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidPassword'): ?>
                                 <div class="alert alert-danger">Invalid Password.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                         </div>
 
-
                         <?php if ($loginStep == "email") { ?>
 
-                            <div class="col-12">
+                            <div class="col">
                                 <div class="form-floating">
                                     <input type="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" id="emailInput" name="email" placeholder="Email address/Phone Number" required>
                                     <label for="emailInput">Email address/Phone Number</label>
+                                </div>
+                            </div>
+
+                        <?php } elseif ($loginStep == "verification") { ?>
+
+                           <div class="col">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" value="<?php echo isset($_POST['verificationCode']) ? htmlspecialchars($_POST['verificationCode']) : ''; ?>" id="verificationInput" name="verificationCode" placeholder="Enter 6-digit verification code" inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length > 6) this.value = this.value.slice(0, 6);" required>
+                                    <label for="verificationInput">Enter 6-digit verification code</label>
                                 </div>
                             </div>
 
@@ -181,6 +537,25 @@ if (isset($_POST['submit'])) {
                                     <i class="fa-regular fa-eye" onclick="togglePassword('passwordInput', this)" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
                                 </div>
                             </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>" id="confirmPasswordInput" name="confirmPassword" placeholder="Confirm Password" required>
+                                    <label for="confirmPasswordInput">Confirm Password</label>
+                                    <i class="fa-regular fa-eye" onclick="togglePassword('confirmPasswordInput', this)" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                                </div>
+                            </div>
+
+                        <?php } elseif ($loginStep == "newPassword") { ?>
+
+                            <div class="col-12 mb-3">
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password']) : ''; ?>" id="passwordInput" name="password" placeholder="New Password" required>
+                                    <label for="passwordInput">New Password</label>
+                                    <i class="fa-regular fa-eye" onclick="togglePassword('passwordInput', this)" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                                </div>
+                            </div>
+
                             <div class="col-12">
                                 <div class="form-floating">
                                     <input type="password" class="form-control" value="<?php echo isset($_POST['confirmPassword']) ? htmlspecialchars($_POST['confirmPassword']) : ''; ?>" id="confirmPasswordInput" name="confirmPassword" placeholder="Confirm Password" required>
@@ -197,24 +572,63 @@ if (isset($_POST['submit'])) {
 
                         <div class="row">
                             <div class="col text-center">
-                                <button class="btn btn-primary nextButton mb-4 mt-2" type="submit" name="next">Next</button>
-                                <span class="pt-2" style="color: black;">Need an account?</span> <a href="signUp.php" style="color: #19AFA5;">Sign Up</a>
+                                <button class="btn btn-primary nextButton mb-3" type="submit" name="next">Next</button>
+                                <span style="color: black;">Need an account?</span> <a href="signUp.php" style="color: #19AFA5;">Sign Up</a>
                             </div>
                         </div>
 
-                    <?php } elseif ($loginStep == "existingPassword" || $loginStep == "notExistingPassword") { ?>
+                    <?php } elseif ($loginStep == "verification") { ?>
 
                         <div class="row">
                             <div class="col text-center">
-                                <button class="btn btn-primary signUpButton mb-4 mt-2" type="submit" name="submit">Login</button>
-                                <span class="pt-2" style="color: black;">Need an account?</span> <a href="signUp.php" style="color: #19AFA5;">Sign Up</a>
+                                <button class="btn btn-primary verifyButton mb-3" type="submit" name="verify">Verify</button>
+                                <span style="color: black;">Didn’t get the code?</span>
+                                <button type="submit" name="resend" formnovalidate class="btn btn-link p-0" style="color: #19AFA5; text-decoration: none;">Resend Code</button>
+                            </div>
+                        </div>
+
+                    <?php } elseif ($loginStep == "existingPassword") { ?>
+
+                        <div class="row">
+                            <div class="col text-center">
+                                <button class="btn btn-primary loginButton mb-3" type="submit" name="login">Login</button>
+                                <span style="color: black;">Having trouble?</span> <button type="button" class="btn btn-link resetPasswordButton p-0" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">Reset Password</button>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                                        <h1 class="modal-title fs-5" id="resetPasswordModalLabel">Reset Password</h1>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body text-center">
+                                        <p class="mb-2">Are you sure you want to reset your password for:</p>
+                                        <div style="font-size: 16px; color: #19AFA5;"><?php echo $email ?></div>
+                                    </div>
+
+                                    <div class="modal-footer border-0">
+                                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" formnovalidate name="resetPassword" class="btn btn-primary confirmResetButton px-4">Confirm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <?php } elseif ($loginStep == "notExistingPassword" || $loginStep == "newPassword") { ?>
+
+                        <div class="row">
+                            <div class="col text-center">
+                                <button class="btn btn-primary setPasswordButton mb-3" type="submit" name="login">Set Password</button>
                             </div>
                         </div>
 
                     <?php } ?>
                     
                 </form>
-                
+
             </div>
         </div>
     </div>
