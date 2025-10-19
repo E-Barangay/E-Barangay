@@ -358,27 +358,25 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    if ($loginStep === 'existingPassword') {
-        $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
-        $userCheckResult = executeQuery($userCheckQuery);
-        $userRow = mysqli_fetch_assoc($userCheckResult);
-        
-        if ($userRow && !empty($userRow['password'])) {
-            if ($password === $userRow['password']) {
-                $_SESSION['userID'] = $userRow['userID'];
-                $_SESSION['role'] = $userRow['role'];
+    $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
+    $userCheckResult = executeQuery($userCheckQuery);
+    $userRow = mysqli_fetch_assoc($userCheckResult);
+    
+    if ($userRow && !empty($userRow['password'])) {
+        if ($password === $userRow['password']) {
+            $_SESSION['userID'] = $userRow['userID'];
+            $_SESSION['role'] = $userRow['role'];
 
-                if ($userRow['role'] === 'admin') {
-                    header("Location: admin/index.php");
-                } else {
-                    header("Location: index.php");
-                }
+            if ($userRow['role'] === 'admin') {
+                header("Location: admin/index.php");
             } else {
-                $_SESSION['alert'] = 'invalidPassword';
-                $loginStep = 'existingPassword';
+                header("Location: index.php");
             }
-        } 
-    } elseif ($loginStep === 'notExistingPassword' || $loginStep === 'newPassword') {
+        } else {
+            $_SESSION['alert'] = 'invalidPassword';
+            $loginStep = 'existingPassword';
+        }
+    } else {
         if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
             $_SESSION['alert'] = 'weakPassword';
             $loginStep = 'notExistingPassword';
