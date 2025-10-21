@@ -49,10 +49,20 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
         include("sharedAssets/navbar.php");
     }
     ?>
-
-    <div class="container-fluid p-0 pt-4 overflow-hidden">
+        
+    <div class="container-fluid p-0 pt-3 overflow-hidden">
         <div class="row">
             <div class="col p-0">
+
+                <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
+                    <div class="alert alert-success text-center mb-4">Your password has been set successfully! You can now explore our services.</div>
+                    <?php unset($_SESSION['success']); ?>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordResetted'): ?>
+                    <div class="alert alert-success text-center mb-4">Your password has been reset successfully!</div>
+                    <?php unset($_SESSION['success']); ?>
+                <?php endif; ?>
+
                 <div class="card bannerCard">
                     <img src="assets/images/banner.jpeg" class="bannerImage" alt="Banner Image">
                     <div class="bannerContent">
