@@ -345,6 +345,8 @@ if (isset($_POST['verify'])) {
             $loginStep = 'newPassword';
         } else {
             $_SESSION['email'] = $email;
+            
+            $_SESSION['success'] = 'verifiedNewUser';
             $loginStep = 'notExistingPassword';
         }
     } else {
@@ -353,55 +355,109 @@ if (isset($_POST['verify'])) {
     }
 }
 
+if (isset($_POST['setPassword'])) {
+    $email = $_SESSION['email'];
+    $password = $_POST['password'] ?? '';
+    $confirmPassword = $_POST['confirmPassword'] ?? '';
+
+    $isWeak = !preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password);
+
+    $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
+    $userCheckResult = executeQuery($userCheckQuery);
+
+    if (mysqli_num_rows($userCheckResult) > 0) {
+        $userRow = mysqli_fetch_assoc($userCheckResult);
+
+        if ($userRow['isNew'] === 'Yes') {  
+            if ($isWeak) {
+                $_SESSION['alert'] = 'weakPassword';
+                $loginStep = 'notExistingPassword';
+            } elseif ($password !== $confirmPassword) {
+                $_SESSION['alert'] = 'mismatchPassword';
+                $loginStep = 'notExistingPassword';
+            } else {
+                $password = str_replace("'", "", $password);
+
+                $updatePasswordQuery = "UPDATE users SET password = '$password', isNew = 'No' WHERE email = '$email'";
+                executeQuery($updatePasswordQuery);
+
+                $loginQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+                $loginResult = executeQuery($loginQuery);
+
+                if (mysqli_num_rows($loginResult) > 0) {
+                    $user = mysqli_fetch_assoc($loginResult);
+                    $_SESSION['userID'] = $user['userID'];
+                    $_SESSION['role'] = $user['role'];
+
+                    if ($user['role'] === 'admin') {
+                        header("Location: admin/index.php");
+                    } else {
+                        $_SESSION['success'] = 'passwordCreated';
+
+                        header("Location: index.php");
+                    }
+                }
+            }
+        } elseif ($userRow['isNew'] === 'No') {
+            if ($isWeak) {
+                $_SESSION['alert'] = 'weakPassword';
+                $loginStep = 'newPassword';
+            } elseif ($password !== $confirmPassword) {
+                $_SESSION['alert'] = 'mismatchPassword';
+                $loginStep = 'newPassword';
+            } else {
+                $password = str_replace("'", "", $password);
+
+                $updatePasswordQuery = "UPDATE users SET password = '$password', isNew = 'No' WHERE email = '$email'";
+                executeQuery($updatePasswordQuery);
+
+                $loginQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+                $loginResult = executeQuery($loginQuery);
+
+                if (mysqli_num_rows($loginResult) > 0) {
+                    $user = mysqli_fetch_assoc($loginResult);
+                    $_SESSION['userID'] = $user['userID'];
+                    $_SESSION['role'] = $user['role'];
+
+                    if ($user['role'] === 'admin') {
+                        header("Location: admin/index.php");
+                    } else {
+                        $_SESSION['success'] = 'passwordResetted';
+
+                        header("Location: index.php");
+                    }
+                }
+            }
+        }
+    }
+}
+
 if (isset($_POST['login'])) {
     $email = $_SESSION['email'];
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
+    $isWeak = !preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password);
+
     $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
     $userCheckResult = executeQuery($userCheckQuery);
-    $userRow = mysqli_fetch_assoc($userCheckResult);
-    
-    if ($userRow && !empty($userRow['password'])) {
-        if ($password === $userRow['password']) {
-            $_SESSION['userID'] = $userRow['userID'];
-            $_SESSION['role'] = $userRow['role'];
 
-            if ($userRow['role'] === 'admin') {
-                header("Location: admin/index.php");
-            } else {
-                header("Location: index.php");
-            }
-        } else {
-            $_SESSION['alert'] = 'invalidPassword';
-            $loginStep = 'existingPassword';
-        }
-    } else {
-        if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
-            $_SESSION['alert'] = 'weakPassword';
-            $loginStep = 'notExistingPassword';
-        } elseif ($password !== $confirmPassword) {
-            $_SESSION['alert'] = 'mismatchPassword';
-            $loginStep = 'notExistingPassword';
-        } else {
-            $password = str_replace("'", "", $password);
+    if (mysqli_num_rows($userCheckResult) > 0) {
+        $userRow = mysqli_fetch_assoc($userCheckResult);
 
-            $updatePasswordQuery = "UPDATE users SET password = '$password', isNew = 'No' WHERE email = '$email'";
-            executeQuery($updatePasswordQuery);
+        if ($userRow['isNew'] === 'No') {
+            if ($password === $userRow['password']) {
+                $_SESSION['userID'] = $userRow['userID'];
+                $_SESSION['role'] = $userRow['role'];
 
-            $loginQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-            $loginResult = executeQuery($loginQuery);
-
-            if (mysqli_num_rows($loginResult) > 0) {
-                $user = mysqli_fetch_assoc($loginResult);
-                $_SESSION['userID'] = $user['userID'];
-                $_SESSION['role'] = $user['role'];
-
-                if ($user['role'] === 'admin') {
+                if ($userRow['role'] === 'admin') {
                     header("Location: admin/index.php");
                 } else {
                     header("Location: index.php");
                 }
+            } else {
+                $_SESSION['alert'] = 'invalidPassword';
+                $loginStep = 'existingPassword';
             }
         }
     }
@@ -474,6 +530,10 @@ if (isset($_POST['login'])) {
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'resetVerificationSent'): ?>
                                 <div class="alert alert-success">A verification code has been sent to your email to reset your password.</div>
+                                <?php unset($_SESSION['success']); ?>
+                            <?php endif; ?>
+                            <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'verifiedNewUser'): ?>
+                                <div class="alert alert-success">Your email has been successfully verified! Please create a password to complete your account setup.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'verifiedReset'): ?>
@@ -619,7 +679,7 @@ if (isset($_POST['login'])) {
 
                         <div class="row">
                             <div class="col text-center">
-                                <button class="btn btn-primary setPasswordButton mb-3" type="submit" name="login">Set Password</button>
+                                <button class="btn btn-primary setPasswordButton mb-3" type="submit" name="setPassword">Set Password & Login</button>
                             </div>
                         </div>
 
