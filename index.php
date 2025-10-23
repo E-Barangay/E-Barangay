@@ -16,7 +16,7 @@ $totalRecentCardResult = executeQuery($totalRecentCardQuery);
 $totalRecentRow = mysqli_fetch_assoc($totalRecentCardResult);
 $totalRecent = $totalRecentRow['total'];
 
-$cardsPerPage = 3;
+$cardsPerPage = 6;
 $totalPages = ceil($totalRecent / $cardsPerPage);
 
 ?>
@@ -51,7 +51,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
     ?>
         
     <div class="container-fluid p-0 pt-3 overflow-hidden">
-        <div class="row">
+        <div class="row m-0">
             <div class="col p-0">
 
                 <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
@@ -63,7 +63,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                     <?php unset($_SESSION['success']); ?>
                 <?php endif; ?>
 
-                <div class="card bannerCard">
+                <div class="card bannerCard p-0 m-0">
                     <img src="assets/images/banner.jpeg" class="bannerImage" alt="Banner Image">
                     <div class="bannerContent">
                         <div class="header">
@@ -81,7 +81,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
         </div>
     </div>
 
-    <div class="container pt-5">
+    <div class="container pt-4 pt-sm-5">
 
         <div class="row">
             <div class="col">
@@ -99,7 +99,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
             </div>
         </div>
 
-        <div class="row pb-3 pt-4">
+        <div class="row py-4">
 
             <?php if (mysqli_num_rows($newAnnouncementResult) == 0) { ?>
 
@@ -151,19 +151,19 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
             
         </div>
 
-        <div class="row pt-1">
+        <div class="row">
             <div class="col">
-                <div class="recents">
+                <div class="recents pb-4">
                     Recents
                 </div>
             </div>
         </div>
 
-        <div class="row pt-3">
+        <div class="row gy-4 recentsRow">
             
             <?php while($recentAnnouncementRow = mysqli_fetch_assoc($recentAnnouncementResult)) { ?>
 
-                <div class="col-lg-4 col-md-6 col-12 pb-4 d-flex align-items-center">
+                <div class="col-lg-4 col-md-6 col-12">
                     <div class="card recentCard">
                         <div class="row">
                             <div class="col">
@@ -237,8 +237,8 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
 
         </div>
 
-        <div class="row mt-3">
-            <div class="col d-flex justify-content-center align-items-center">
+        <div class="row">
+            <div class="col d-flex justify-content-center align-items-center mt-5">
 
                 <nav aria-label="pageNavigation">
 
@@ -299,16 +299,16 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
         }
 
         function updatePage() {
-            var allrecentCards = document.getElementsByClassName('recentCard');
+            var allRecentCols = document.querySelectorAll('.recentsRow > .col-lg-4, .recentsRow > .col-md-6, .recentsRow > .col-12');
             var startIndex = (page - 1) * cardsPerPage;
             var endIndex = page * cardsPerPage;
 
-            for (var i = 0; i < allrecentCards.length; i++) {
-                allrecentCards[i].style.display = 'none';
+            for (var i = 0; i < allRecentCols.length; i++) {
+                allRecentCols[i].style.display = 'none';
             }
 
-            for (var i = startIndex; i < endIndex && i < allrecentCards.length; i++) {
-                allrecentCards[i].style.display = 'block';
+            for (var i = startIndex; i < endIndex && i < allRecentCols.length; i++) {
+                allRecentCols[i].style.display = '';
             }
 
             updatePagination();
