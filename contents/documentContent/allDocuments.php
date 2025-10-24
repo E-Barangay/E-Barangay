@@ -12,9 +12,9 @@ if(mysqli_num_rows($documentsResult) > 0)   {
     ?>
 
         <div class="col-6 col-md-4 col-lg-4 p-1">
-            <div class="documentCard card my-2">
+            <div class="documentCard card my-0 my-sm-2">
                 <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top"
-                    style="width: 100%; height: 500px; object-fit: contain;" alt="Document">
+                    style="width: 100%; height: 500px; object-fit: cover;" alt="Document">
                 <div class="mt-auto">
                     <button class="btn btn-primary documentButton mt-2" type="button" data-bs-toggle="modal" data-bs-target="#<?php echo toCamelCase($documentsRow['documentName']) . "Modal"; ?>">
                         <?php echo $documentsRow['documentName'] ?>
@@ -38,7 +38,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                             <?php if ($documentsRow['documentTypeID'] == 2) { ?>
                                 
-                                <p class="mb-3">Please fill out your business details and choose the purpose of your request:</p>
+                                <p class="note mb-3">Please fill out your business details and choose the purpose of your request:</p>
 
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="businessName" name="businessName" placeholder="Business Name" required>
@@ -62,7 +62,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating mb-3">
                                     <select class="form-select" id="businessNature" name="businessNature" required>
-                                        <option value="" selected>Choose Nature of Business</option>
+                                        <option value="" selected disabled>Choose Nature of Business</option>
                                         <option value="Sari-Sari Store">Sari-Sari Store</option>
                                         <option value="Food & Beverage">Food & Beverage</option>
                                         <option value="Retail">Retail</option>
@@ -76,13 +76,13 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                 </div>
 
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="controlNo" name="controlNo" placeholder="Control No.">
+                                    <input type="number" class="form-control" id="controlNo" name="controlNo" placeholder="Control No." min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)">
                                     <label for="controlNo">Control No.</label>
                                 </div>
 
                                 <div class="form-floating mb-3">
                                     <select class="form-select" id="businessClearancePurpose" name="purpose" required>
-                                        <option value="" selected>Choose Purpose</option>
+                                        <option value="" selected disabled>Choose Purpose</option>
                                         <option value="New">New</option>
                                         <option value="Renewal">Renewal</option>
                                         <option value="Closure">Closure</option>
@@ -93,7 +93,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <div class="form-floating">
                                     <select class="form-select" id="ownership" name="ownership" required>
-                                        <option value="" selected>Choose Ownership</option>
+                                        <option value="" selected disabled>Choose Ownership</option>
                                         <option value="Sole Proprietorship">Sole Proprietorship</option>
                                         <option value="Partnership">Partnership</option>
                                         <option value="Corporation">Corporation</option>
@@ -104,11 +104,11 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                             <?php } elseif ($documentsRow['documentTypeID'] == 1 || $documentsRow['documentTypeID'] == 5 || $documentsRow['documentTypeID'] == 9) { ?>
                                 
-                                <p class="mb-3">Please select the purpose for your request:</p>
+                                <p class="note mb-3">Please select the purpose for your request:</p>
 
                                 <div class="form-floating">
                                     <select class="form-select selectPurpose" id="purpose" name="purpose" required>
-                                        <option value="" selected>Choose Purpose</option>
+                                        <option value="" selected disabled>Choose Purpose</option>
                                         <option value="Employment">Employment</option>
                                         <option value="Job Requirement / Local Employment">Job Requirement / Local Employment</option>
                                         <option value="Overseas Employment (OFW)">Overseas Employment (OFW)</option>
@@ -127,11 +127,11 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                             <?php } elseif ($documentsRow['documentTypeID'] == 3) { ?>
                                 
-                                <p class="mb-3">Please select the purpose for your request:</p>
+                                <p class="note mb-3">Please select the purpose for your request:</p>
 
                                 <div class="form-floating">
                                     <select class="form-select" id="constructionClearancePurpose" name="purpose" required>
-                                        <option value="" selected>Choose Purpose</option>
+                                        <option value="" selected disabled>Choose Purpose</option>
                                         <option value="New Construction">New Construction</option>
                                         <option value="House Renovation">House Renovation</option>
                                         <option value="Extension / Expansion">Extension / Expansion</option>
@@ -144,7 +144,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                             <?php } elseif ($documentsRow['documentTypeID'] == 7) { ?>
 
-                                <p class="mb-3">Please fill out your marriage details below.</p>
+                                <p class="note mb-3">Please fill out your marriage details below.</p>
                             
                                 <div class="form-floating mb-3">
                                     <input type="text" class="form-control" id="spouseName" name="spouseName" placeholder="Spouse Name" required>
@@ -152,22 +152,22 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                 </div>
 
                                 <div class="form-floating">
-                                    <input type="number" class="form-control" id="marriageYear" name="marriageYear" placeholder="Year of Marriage" min="1900" max="<?php echo date('Y'); ?>" required>
-                                    <label for="marriageYear">Year of Marriage</label>
+                                    <input type="number" class="form-control" id="marriageYear" name="marriageYear" placeholder="Year of Marriage (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                                    <label for="marriageYear">Year of Marriage (e.g., 2003)</label>
                                 </div>
 
                             <?php } elseif ($documentsRow['documentTypeID'] == 10) { ?>
 
-                                <p class="mb-3">Please enter the number of children you have.</p>
+                                <p class="note mb-3">Please enter the number of children you have.</p>
 
                                 <div class="form-floating">
-                                    <input type="number" class="form-control" id="childNo" name="childNo" placeholder="Number of Children" required>
-                                    <label for="childNo">Number of Children</label>
+                                    <input type="number" class="form-control" id="childNo" name="childNo" placeholder="Number of Children (e.g., 2)" min="0" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                                    <label for="childNo">Number of Children (e.g., 2)</label>
                                 </div>
 
                             <?php } else { ?>
                                 
-                                <p>No additional details are required for this request.</p>
+                                <p class="note">No additional details are required for this request.</p>
 
                                 <small class="text-muted">Click proceed for the confirmation.</small>
 

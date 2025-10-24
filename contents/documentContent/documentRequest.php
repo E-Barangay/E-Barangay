@@ -7,7 +7,7 @@ $documentRequestResult = executeQuery($documentRequestQuery);
 
 <div class="col p-1">
     
-    <div class="card py-2 mt-2 text-center" style="background-color: #19AFA5; border: none; border-radius: 12px;">
+    <div class="card py-3 mt-2 text-center" style="background-color: #19AFA5; border: none; border-radius: 12px;">
         <span class="m-0" style="font-size: clamp(16px, 4vw, 20px); font-weight: bold; color: white;">Your Submitted Request</span>
     </div>
 
@@ -32,7 +32,7 @@ $documentRequestResult = executeQuery($documentRequestQuery);
                     if(mysqli_num_rows($documentRequestResult) > 0) {
                         while ($documentRequestRow = mysqli_fetch_assoc($documentRequestResult)) { ?>
 
-                            <tr>
+                            <tr >
                                 <td class="align-middle" style="white-space: nowrap;"><?php echo $documentRequestRow['documentName'] ?></td>
                                 <td class="align-middle" style="white-space: nowrap;"><?php echo !empty($documentRequestRow['purpose']) ? $documentRequestRow['purpose'] : '<span class="text-muted">N/A</span>'; ?></td>
                                 <td class="align-middle" style="white-space: nowrap;"><?php echo date("F j, Y h:i a", strtotime($documentRequestRow['requestDate'])); ?></td>

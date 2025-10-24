@@ -1,28 +1,30 @@
-<div class="row border-top border-bottom">
-    <div class="col">
-        <div class="row">
-            <div class="col">
-                <div class="h5 mt-3 text-center fst-italic">
-                    "MAKABAGONG PUTOL, MAKIKINABANG ALL"
-                </div>
+<div class="d-flex justify-content-end border-top mt-auto">
+    <a href="../documents.php">
+        <button class="btn btn-secondary cancelButton my-4 mx-2" type="button">Cancel</button>
+    </a>
+    <button class="btn btn-primary confirmButton my-4" id="confirmButton" type="button" data-bs-toggle="modal" data-bs-target="#confirmationModal">
+        Confirm Request
+    </button>
+</div>
+
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            
+            <div class="modal-header" style="background-color: #19AFA5; color: white;">
+                <h1 class="modal-title fs-5 text-start" id="confirmationModalLabel">Confirm Request</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-4 text-start d-flex align-items-end">
-                NOTE: Not valid without dry seal.
+
+            <div class="modal-body">
+                <p class="mb-0">Are you sure you want to proceed with this request?</p>
             </div>
-            <div class="col-4">
-                <div class="d-flex justify-content-center">
-                    <img src="../assets/images/aksyonBilis.png" class="me-2" style="width: 100%; height: 150px;" alt="">
-                    <img src="../assets/images/tet.png" style="width: 100%; height: 150px;" alt="">
-                </div>
+
+            <div class="modal-footer d-flex justify-content-end">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">No</button>
+                <button type="submit" class="btn btn-primary yesButton px-4" name="yes">Yes</button>
             </div>
-            <div class="col-4 d-flex justify-content-end align-items-end">
-                <div class="text-center">
-                    <strong>HON. ULYSES "TETET" M. RELLAMA</strong><br>
-                    Barangay Chairman
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>

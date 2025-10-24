@@ -78,7 +78,17 @@ input.form-control:focus {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.form-select:focus {
+.note {
+    color: black;
+}
+
+.form-control, .form-select {
+  color: black;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border: 1px solid #19AFA5;
     outline: none;
     box-shadow: none;
 }
@@ -123,6 +133,30 @@ input.form-control:focus {
     color: white;
 }
 
+.confirmButton {
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+    color: white;
+}
+
+.confirmButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+    color: white;
+}
+
+.yesButton {
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+    color: white;
+}
+
+.yesButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+    color: white;
+}
+
 #scrollable {
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -130,4 +164,10 @@ input.form-control:focus {
 
 #scrollable::-webkit-scrollbar {
     display: none;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

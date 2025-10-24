@@ -24,14 +24,23 @@
     font-size: 1.2rem;
 }
 
+.nav-link {
+    color: black;
+}
+
 .dropdown-icon {
     color: #19AFA5;
 }
 
+.dropdown-item:hover .dropdown-icon {
+    color: white;
+}
+
 .dropdown-item {
-    color: var(--bs-body-color);
+    color: black;
 }
 
 .dropdown-item:hover {
-    color: black;
+    background-color: #19AFA5;
+    color: white;
 }

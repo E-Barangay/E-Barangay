@@ -1,33 +1,16 @@
-<div class="col-3 text-center">
-    <div>HON. ULYSES "TETET" M. RELLAMA</div>
-    <div class="pt-3">COUNCILORS</div>
-    <div>HON. JAYMAR A. MANARIN</div>
-    <div>HON. NOLITO S. AVENIDO</div>
-    <div>HON. LIEZEL M. ALCOZER</div>
-    <div>HON. BOBBIT M. GUEVARRA</div>
-    <div>HON. CRISTITN M. MANDAYO</div>
-    <div>HON. JOEL C. MARASIGAN</div>
-    <div>HON. APOLINARIO C. MANARIN</div>
-    <div class="pt-3">S.K. Chairwoman</div>
-    <div>HON. BABYANN E. MANARIN</div>
-    <div class="pt-3">Barangay Secretary</div>
-    <div>MARY JOY M. MARTIREZ</div>
-    <div class="pt-3">Barangay Treasurer</div>
-    <div>AMELIA A. MALACAMAN</div>
-    <div class="pt-3">Barangay Record Keeper</div>
-    <div>LEXTER M. DOLOR</div>
-</div>
-<div class="col-8">
+<div class="col-lg-9 col-12" style="color: black;">
     <div class="row">
         <div class="col">
-            <div>To whom it may concern,</div>
-            <p class="pt-2" style="text-indent: 2em; text-align: justify;">This is to certify that the person whose name, picture, right thumb print and
-                signature appears hereon, has requested a <?php echo $documentName ?> from this office with the following
-                information:</p>
+            <p>To whom it may concern,</p>
         </div>
     </div>
     <div class="row">
-        <div class="col-9">
+        <div class="col">
+            <p style="text-indent: 2em; text-align: justify;">This is to certify that the person whose name, picture, right thumb print and signature appears hereon, has requested a <?php echo $documentName ?> from this office with the following information:</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
             <p><strong>Name:</strong> <?php echo $fullName ?></p>
             <p><strong>Address:</strong> <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName ?></p>
             <p><strong>Permanent Address:</strong> <?php echo $permanentBlockLotNo . ", " . $permanentPhase . ", " . $permanentSubdivisionName . ", " . $permanentPurok . ", " . $permanentStreetName . ", " . $permanentBarangayName . ", " . $permanentCityName . ", " . $permanentProvinceName; ?></p>
@@ -45,9 +28,16 @@
             <p><strong>Issued On:</strong> <?php echo date("F j, Y", time()); ?></p>
             <p><strong>Issued At:</strong> Barangay San Antonio, Santo Tomas City, Batangas</p>
         </div>
-        <div class="col-3">
-            <img src="../uploads/profiles/<?php echo $profilePicture ?>" style="width: 100%; height: 150px; object-fit: cover; object-position: center; " alt="">
-            <div class="signature-label mt-5 text-center border-top">Signature</div>
+    </div>
+</div>
+<div class="col-lg-3 col-12 d-flex flex-row flex-md-column justify-content-start align-items-center" style="color: black;">
+    <div class="row w-100">
+        <div class="col-lg-12 col-6 mb-0 mb-lg-3 text-center">
+            <img src="../uploads/profiles/<?php echo $profilePicture ?>" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover; object-position: center;">
+        </div>
+        <div class="col-lg-12 col-6 d-flex flex-column justify-content-end align-items-center pt-5">
+            <img src="../uploads/profiles/<?php echo $profilePicture ?>" alt="Signature" style="width: 100%; max-width: 250px; height: auto; aspect-ratio: 5 / 1; object-fit: contain; object-position: center;">
+            <div class="signature-label mt-2 text-center border-top w-100">Signature</div>
         </div>
     </div>
 </div>

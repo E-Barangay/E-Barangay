@@ -1,6 +1,6 @@
 .footer-link {
     position: relative;
-    color: var(--bs-body-color);
+    color: black;
     text-decoration: none;
     transition: color 0.3s ease;
 }

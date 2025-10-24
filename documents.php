@@ -49,9 +49,9 @@ $phase = $userDataRow['phase'];
 $subdivisionName = $userDataRow['subdivisionName'];
 $purok = $userDataRow['purok'];
 $streetName = $userDataRow['streetName'];
-$barangayName = $userDataRow['barangayName'];
-$cityName = $userDataRow['cityName'];
-$provinceName = $userDataRow['provinceName'];
+$barangayName = formatAddress($userDataRow['barangayName']);
+$cityName = formatAddress($userDataRow['cityName']);
+$provinceName = formatAddress($userDataRow['provinceName']);
 
 $permanentBlockLotNo = $userDataRow['permanentBlockLotNo'];
 $permanentPhase = $userDataRow['permanentPhase']; 
@@ -75,7 +75,7 @@ $documentsResult = executeQuery($documentsQuery);
 $searchDisplay = !empty($searchTerm) ? htmlspecialchars($searchTerm) : 'document';
 
 if (isset($_POST['proceedButton'])) {
-    $documentTypeID = $_POST['documentTypeID'];
+    $documentTypeID = $_POST['documentTypeID'] ?? '';
 
     $_SESSION['purpose'] = $_POST['purpose'] ?? '';
     $_SESSION['businessName'] = $_POST['businessName'] ?? '';
@@ -126,6 +126,12 @@ if (isset($_POST['proceedButton'])) {
 
         <div class="container pt-3">
             <div class="row">
+
+                <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'requestConfirmed'): ?>
+                    <div class="alert alert-success text-center mb-4">Your request for <?php echo htmlspecialchars($_SESSION['documentName']); ?> has been submitted successfully!</div>
+                    <?php unset($_SESSION['success']); unset($_SESSION['documentName']); ?>
+                <?php endif; ?>
+
                 <div class="col-12 col-lg-3 p-0">
 
                     <form method="GET">
