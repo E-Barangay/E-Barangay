@@ -43,7 +43,7 @@ if (isset($_SESSION['userID'])) {
                     <a class="nav-link active2" href="documents.php">Documents</a>
                 </li>
                 <li class="nav-item mx-1">
-                    <a class="nav-link active3" href="reports.php">Reports</a>
+                    <a class="nav-link active3" href="reports.php">Complaints</a>
                 </li>
                 <li class="nav-item mx-1 dropdown">
                     <a class="nav-link active4 text-center dropdown-toggle" href="#" role="button"
@@ -51,10 +51,11 @@ if (isset($_SESSION['userID'])) {
                         Hi, <?php echo $firstName ?> <i class="fa-solid fa-user" style="color: #19AFA5;"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user dropdown-icon"></i>
-                                Profile</a></li>
-                        <li><button class="dropdown-item"><i class="fa-solid fa-sun dropdown-icon"></i> Light
-                                Mode</button></li>
+                        <li>
+                            <a class="dropdown-item" href="profile.php">
+                                <i class="fa-solid fa-user dropdown-icon"></i> Profile
+                            </a>
+                        </li>
                         <form action="" method="POST">
                             <li>
                                 <button class="dropdown-item" type="submit" name="logout">

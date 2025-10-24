@@ -1,12 +1,12 @@
-<div class="col">
+<div class="col" style="color: black;">
     <div class="row">
         <div class="col">
-            <span>To whom it may concern:</span>
+            <p>To whom it may concern:</p>
         </div>
     </div>
-    <div class="row pt-4">
-        <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", Legal Age, " . $gender . ", " . $citizenship . " and a " . $residencyType . " resident of " . $barangayName . ", " . $cityName . ", " . $provinceName ?>.</p>
+    <div class="row">
+        <div class="col" >
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", Legal Age, " . $gender . ", " . $citizenship . " and a " . $residencyType . " resident of " . $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName ?>.</p>
         </div>
     </div>
      <div class="row">
@@ -16,20 +16,12 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This certification is being issued upon the request of the above-named person for $purpose.</p>
+            <p style="text-indent: 48px; text-align: justify;">This certification is being issued upon the request of the above-named person for <?php echo $purpose ?>.</p>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">Issued this <?php echo date("jS") ?> day of <?php echo date("F, Y") ?> at the office of the Barangay San Antonio, Santo Tomas City, Batangas.</p>
+            <p style="text-indent: 48px; text-align: justify;">Issued this <?php echo date("jS") ?> day of <?php echo date("F, Y") ?> at the office of the Barangay Chairman, Barangay San Antonio, Santo Tomas City, Batangas.</p>
         </div>
-    </div>
-    <div class="row pt-5">
-        <div class="col d-flex justify-content-end align-items-end">
-                <div class="text-center">
-                    <strong>MRS. ANGELITA R. SANCHEZ</strong><br>
-                    Barangay Health Center Head
-                </div>
-            </div>
     </div>
 </div>

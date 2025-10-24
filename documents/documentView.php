@@ -73,6 +73,10 @@ $residingYear = $currentYear - $lengthOfStay;
 $residencyType = $userRow['residencyType'];
 $remarks = $userRow['remarks'];
 
+$startYear = $lengthOfStay;
+$currentYear = date("Y");
+$yearsOfStay = $currentYear - $startYear;
+
 function formatAddress($value) {
     return ucwords(strtolower($value));
 }
@@ -112,7 +116,7 @@ $marriageYear = $_SESSION['marriageYear'] ?? '';
 $ownership = $_SESSION['ownership'] ?? '';
 $childNo = $_SESSION['childNo'] ?? '';
 
-if (isset($_POST['confirmButton'])) {
+if (isset($_POST['yes'])) {
     
     if ($documentTypeID == 2) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW())";
@@ -140,6 +144,8 @@ if (isset($_POST['confirmButton'])) {
         $_SESSION['childNo']
     );
 
+    $_SESSION['documentName'] = $documentRow['documentName'];
+    $_SESSION['success'] = 'requestConfirmed';
     header("Location: ../documents.php?content=documentRequest");
     exit();
     
@@ -161,22 +167,7 @@ if (isset($_POST['confirmButton'])) {
     <!-- Style Sheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        * {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        .confirmButton {
-            background-color: #19AFA5;
-            border: none;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/documents/style.css">
 </head>
 
 <body data-bs-theme="light">
@@ -188,20 +179,13 @@ if (isset($_POST['confirmButton'])) {
                     
                     <?php include("sharedAssets/header.php") ?>
 
-                    <div class="row mt-3 justify-content-center">
+                    <div class="row my-4 d-flex flex-row justify-content-center">
 
                         <?php include("documentTypes/" . $document . ".php"); ?>
 
                     </div>
 
                     <?php include("sharedAssets/footer.php") ?>
-                    
-                    <div class="d-flex justify-content-end mt-3">
-                        <a href="../documents.php">
-                            <button class="btn btn-secondary cancelButton me-2" type="button">Cancel</button>
-                        </a>
-                        <button class="btn btn-primary confirmButton" id="confirmButton" type="submit" name="confirmButton">Confirm Request</button>
-                    </div>
 
                 </div>
             </div>
