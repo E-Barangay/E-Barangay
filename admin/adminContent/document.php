@@ -30,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
 $search = $_GET['search'] ?? '';
 $statusFilter = $_GET['status'] ?? '';
 $dateFilter = $_GET['date'] ?? '';
+$docTypeFilter = $_GET['doctype'] ?? '';
+$currentPage = isset($_GET['pg']) ? (int)$_GET['pg'] : 1;
+$recordsPerPage = 20;
+$offset = ($currentPage - 1) * $recordsPerPage;
 
 $documentsQuery = "SELECT 
     d.documentID, 
@@ -64,7 +68,16 @@ if ($dateFilter != '') {
   $documentsQuery .= " AND DATE(d.requestDate) = '$dateFilter'";
 }
 
-$documentsQuery .= " ORDER BY d.requestDate DESC";
+if ($docTypeFilter != '' && $docTypeFilter != 'All') {
+  $documentsQuery .= " AND d.documentTypeID = '$docTypeFilter'";
+}
+
+$countQuery = $documentsQuery;
+$countResult = executeQuery($countQuery);
+$totalRecords = $countResult->num_rows;
+$totalPages = ceil($totalRecords / $recordsPerPage);
+
+$documentsQuery .= " ORDER BY d.requestDate DESC LIMIT $recordsPerPage OFFSET $offset";
 
 $documentsResults = executeQuery($documentsQuery);
 
@@ -94,34 +107,62 @@ $docTypesResults = executeQuery($docTypesQuery);
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
 
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f8f9fa;
-    }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+  }
 
-    .card {
-      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-      border: none;
-    }
+  .card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: none;
+  }
 
-    .btn-primary {
-      background-color: #31afab;
-      border-color: #31afab;
-    }
+  .btn-primary {
+    background-color: #31afab;
+    border-color: #31afab;
+  }
 
-    .btn-primary:hover {
-      background-color: #2a9995;
-      border-color: #2a9995;
-    }
+  .btn-primary:hover {
+    background-color: #2a9995;
+    border-color: #2a9995;
+  }
 
-    .modal-header {
-      background-color: #31afab;
-      color: white;
-    }
+  .modal-header {
+    background-color: #31afab;
+    color: white;
+  }
 
-    .modal-header .btn-close {
-      filter: invert(1);
-    }
+  .modal-header .btn-close {
+    filter: invert(1);
+  }
+
+  .pagination .page-link {
+    color: #31afab;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #31afab;
+    border-color: #31afab;
+    color: white;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #e9f8f8;
+    color: #31afab;
+  }
+
+  .btn-info {
+    background-color: #31afab !important;
+    border-color: #31afab !important;
+  }
+
+  .btn-info:hover {
+    background-color: #2a9995 !important;
+    border-color: #2a9995 !important;
+  }
   </style>
 </head>
 
@@ -148,7 +189,7 @@ $docTypesResults = executeQuery($docTypesQuery);
             <div class="card shadow-sm mb-4">
               <div class="card-body">
                 <div class="row g-3">
-                  <div class="col-lg-4 col-md-6">
+                  <div class="col-lg-3 col-md-6">
                     <div class="input-group">
                       <span class="input-group-text bg-white border-end-0">
                         <i class="fas fa-search text-muted"></i>
@@ -158,7 +199,20 @@ $docTypesResults = executeQuery($docTypesQuery);
                     </div>
                   </div>
 
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-2 col-md-6">
+                    <select class="form-select" name="doctype">
+                      <option value="All" <?= $docTypeFilter === '' || $docTypeFilter === 'All' ? 'selected' : '' ?>>All Document Types</option>
+                      <?php 
+                      mysqli_data_seek($docTypesResults, 0);
+                      while ($docType = $docTypesResults->fetch_assoc()): ?>
+                        <option value="<?= $docType['documentTypeID'] ?>" <?= $docTypeFilter == $docType['documentTypeID'] ? 'selected' : '' ?>>
+                          <?= htmlspecialchars($docType['documentName']) ?>
+                        </option>
+                      <?php endwhile; ?>
+                    </select>
+                  </div>
+
+                  <div class="col-lg-2 col-md-6">
                     <select class="form-select" name="status">
                       <option value="All" <?= $statusFilter === '' || $statusFilter === 'All' ? 'selected' : '' ?>>All Status</option>
                       <?php foreach (['Pending', 'Approved', 'Denied'] as $status): ?>
@@ -221,9 +275,12 @@ $docTypesResults = executeQuery($docTypesQuery);
                               </a>
 
                               <?php if ($row['documentStatus'] === 'Approved'): ?>
-                                <a href="adminContent/printDocument.php?id=<?= $row['documentID'] ?>" class="btn btn-sm btn-success" target="_blank" title="Print Document">
-                                  <i class="fas fa-print"></i>
-                                </a>
+<a href="adminContent/printDocument.php?id=<?= $row['documentID'] ?>"
+     class="btn btn-sm btn-success"
+     target="_blank"
+     title="Print Document">
+     <i class="fas fa-print"></i>
+  </a>
                               <?php else: ?>
                                 <form method="POST" style="display:inline;">
                                   <input type="hidden" name="documentID" value="<?= $row['documentID'] ?>">
@@ -250,6 +307,59 @@ $docTypesResults = executeQuery($docTypesQuery);
                 </table>
               </div>
             </div>
+
+            <?php if ($totalPages > 1): ?>
+            <div class="card-footer bg-white">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                  Showing <?= min($offset + 1, $totalRecords) ?> to <?= min($offset + $recordsPerPage, $totalRecords) ?> of <?= $totalRecords ?> entries
+                </div>
+                <nav>
+                  <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                      <a class="page-link" href="?page=document&pg=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>">
+                        <i class="fas fa-chevron-left"></i> Back
+                      </a>
+                    </li>
+
+                    <?php
+                    $startPage = max(1, $currentPage - 2);
+                    $endPage = min($totalPages, $currentPage + 2);
+
+                    if ($startPage > 1): ?>
+                      <li class="page-item">
+                        <a class="page-link" href="?page=document&pg=1&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>">1</a>
+                      </li>
+                      <?php if ($startPage > 2): ?>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                      <?php endif; ?>
+                    <?php endif; ?>
+
+                    <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                      <li class="page-item <?= $i == $currentPage ? 'active' : '' ?>">
+                        <a class="page-link" href="?page=document&pg=<?= $i ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>"><?= $i ?></a>
+                      </li>
+                    <?php endfor; ?>
+
+                    <?php if ($endPage < $totalPages): ?>
+                      <?php if ($endPage < $totalPages - 1): ?>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                      <?php endif; ?>
+                      <li class="page-item">
+                        <a class="page-link" href="?page=document&pg=<?= $totalPages ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>"><?= $totalPages ?></a>
+                      </li>
+                    <?php endif; ?>
+
+                    <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                      <a class="page-link" href="?page=document&pg=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>">
+                        Next <i class="fas fa-chevron-right"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            <?php endif; ?>
           </div>
         </div>
       </div>

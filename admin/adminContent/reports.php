@@ -15,7 +15,6 @@ function getDemographicsData() {
     return $data;
 }
 
-// Get documents data with date filtering
 function getDocumentsData($fromDate = null, $toDate = null) {
     $whereClause = "";
     if ($fromDate && $toDate) {
@@ -37,7 +36,6 @@ function getDocumentsData($fromDate = null, $toDate = null) {
     return $data;
 }
 
-// Get complaints data with date filtering
 function getComplaintsData($fromDate = null, $toDate = null) {
     $whereClause = "";
     if ($fromDate && $toDate) {
@@ -58,7 +56,6 @@ function getComplaintsData($fromDate = null, $toDate = null) {
     return $data;
 }
 
-// Handle AJAX requests
 if (isset($_GET['ajax'])) {
     header('Content-Type: application/json');
 
@@ -82,7 +79,6 @@ if (isset($_GET['ajax'])) {
     }
 }
 
-// Get initial data for page load
 $demographicsData = getDemographicsData();
 $documentsData    = getDocumentsData();
 $complaintsData   = getComplaintsData();
@@ -100,7 +96,9 @@ $complaintsData   = getComplaintsData();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
     .bg-custom {
       background-color: #31afab !important;
@@ -132,7 +130,7 @@ $complaintsData   = getComplaintsData();
                             
                             <div class="col-md-6 mb-4">
                                 <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-custom text-dark">
+                                    <div class="card-header bg-custom text-white">
                                         <h6 class="mb-0">Gender Distribution</h6>
                                     </div>
                                     <div class="card-body" style="height:350px">
@@ -152,13 +150,12 @@ $complaintsData   = getComplaintsData();
             </div>
         </div>
 
-        <!-- Documents Services Section -->
         <div class="row mb-5">
             <div class="col-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-custom text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">Barangay Services Reports</h4>
-                        <span class="badge bg-custom text-primary">Document Requests</span>
+                        <span class="badge bg-light text-info">Document Requests</span>
                     </div>
                     <div class="card-body">
                         <div class="row mb-4 p-3 bg-light rounded">
@@ -177,13 +174,13 @@ $complaintsData   = getComplaintsData();
                             </div>
                             <div class="col-md-3 mb-2 d-flex align-items-end justify-content-end">
                                 <div class="btn-group" role="group">
-                                    <button class="btn btn-outline-danger btn-sm" onclick="exportToPDF('services')">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="showExportModal('services', 'pdf')">
                                         📄 PDF
                                     </button>
-                                    <button class="btn btn-outline-success btn-sm" onclick="exportToCSV('services')">
+                                    <button class="btn btn-outline-success btn-sm" onclick="showExportModal('services', 'csv')">
                                         📊 CSV
                                     </button>
-                                    <button class="btn btn-outline-primary btn-sm" onclick="exportToExcel('services')">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="showExportModal('services', 'excel')">
                                         📈 Excel
                                     </button>
                                 </div>
@@ -193,7 +190,7 @@ $complaintsData   = getComplaintsData();
                         <div class="row">
                             <div class="col-lg-6 mb-4">
                                 <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-info text-white">
+                                    <div class="card-header bg-custom text-white">
                                         <h6 class="mb-0">Document Requests by Type</h6>
                                     </div>
                                     <div class="card-body">
@@ -203,7 +200,7 @@ $complaintsData   = getComplaintsData();
                             </div>
                             <div class="col-lg-6 mb-4">
                                 <div class="card border-0 shadow-sm">
-                                    <div class="card-header bg-custom text-dark">
+                                    <div class="card-header bg-custom text-white">
                                         <h6 class="mb-0">Monthly Document Requests</h6>
                                     </div>
                                     <div class="card-body">
@@ -225,8 +222,8 @@ $complaintsData   = getComplaintsData();
                             <div class="col-md-3 mb-3">
                                 <div class="card bg-success text-white">
                                     <div class="card-body text-center">
-                                        <h5 id="completedRequests">0</h5>
-                                        <small>Completed</small>
+                                        <h5 id="approvedRequests">0</h5>
+                                        <small>Approved</small>
                                     </div>
                                 </div>
                             </div>
@@ -241,8 +238,8 @@ $complaintsData   = getComplaintsData();
                             <div class="col-md-3 mb-3">
                                 <div class="card bg-danger text-white">
                                     <div class="card-body text-center">
-                                        <h5 id="rejectedRequests">0</h5>
-                                        <small>Rejected</small>
+                                        <h5 id="deniedRequests">0</h5>
+                                        <small>Denied</small>
                                     </div>
                                 </div>
                             </div>
@@ -276,13 +273,13 @@ $complaintsData   = getComplaintsData();
                             </div>
                             <div class="col-md-3 mb-2 d-flex align-items-end justify-content-end">
                                 <div class="btn-group" role="group">
-                                    <button class="btn btn-outline-danger btn-sm" onclick="exportToPDF('incidents')">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="exportIncidentToPDF()">
                                         📄 PDF
                                     </button>
-                                    <button class="btn btn-outline-success btn-sm" onclick="exportToCSV('incidents')">
+                                    <button class="btn btn-outline-success btn-sm" onclick="exportIncidentToCSV()">
                                         📊 CSV
                                     </button>
-                                    <button class="btn btn-outline-primary btn-sm" onclick="exportToExcel('incidents')">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="exportIncidentToExcel()">
                                         📈 Excel
                                     </button>
                                 </div>
@@ -326,7 +323,7 @@ $complaintsData   = getComplaintsData();
                         </div>
 
                         <div class="row">
-                            <div class="col-md-2 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="card bg-danger text-white">
                                     <div class="card-body text-center">
                                         <h5 id="totalIncidents">0</h5>
@@ -334,15 +331,7 @@ $complaintsData   = getComplaintsData();
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-3">
-                                <div class="card bg-dark text-white">
-                                    <div class="card-body text-center">
-                                        <h5 id="disputes">0</h5>
-                                        <small>Disputes</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-2 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="card bg-success text-white">
                                     <div class="card-body text-center">
                                         <h5 id="resolvedCases">0</h5>
@@ -350,7 +339,7 @@ $complaintsData   = getComplaintsData();
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <div class="card bg-secondary text-white">
                                     <div class="card-body text-center">
                                         <h5 id="escalatedCases">0</h5>
@@ -365,9 +354,44 @@ $complaintsData   = getComplaintsData();
         </div>
     </div>
 
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-custom text-white">
+                    <h5 class="modal-title" id="exportModalLabel">Select Document Type</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="documentTypeSelect" class="form-label">Document Type:</label>
+                        <select class="form-select" id="documentTypeSelect">
+                            <option value="First Time Job Seeker">First Time Job Seeker</option>
+                            <option value="All">All Document Types</option>
+                            <option value="Barangay Clearance">Barangay Clearance</option>
+                            <option value="Business Clearance">Business Clearance</option>
+                            <option value="Construction Clearance">Construction Clearance</option>
+                            <option value="Good Health">Good Health</option>
+                            <option value="Good Moral">Good Moral</option>
+                            <option value="Joint Cohabitation">Joint Cohabitation</option>
+                            <option value="Residency">Residency</option>
+                            <option value="Solo Parent">Solo Parent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="confirmExport()">Export</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
     let ageChart, genderChart, residentsData = [];
     let servicesBarChart, servicesLineChart, incidentPieChart, complaintDoughnutChart, incidentTrendChart;
+    let currentExportType = '';
+    let currentServicesData = [];
+    let currentComplaintsData = [];
 
     const initialDemographicsData = <?php echo json_encode($demographicsData); ?>;
     const initialDocumentsData = <?php echo json_encode($documentsData); ?>;
@@ -497,6 +521,7 @@ $complaintsData   = getComplaintsData();
     }
 
     function updateServicesCharts(data) {
+        currentServicesData = data;
         const processed = processDocumentsData(data);
         
         servicesBarChart.data.labels = Object.keys(processed.documentRequests);
@@ -512,22 +537,22 @@ $complaintsData   = getComplaintsData();
 
     function updateServicesSummary(summary) {
         document.getElementById('totalRequests').textContent = summary.total || 0;
-        document.getElementById('completedRequests').textContent = summary.completed || 0;
+        document.getElementById('approvedRequests').textContent = summary.approved || 0;
         document.getElementById('pendingRequests').textContent = summary.pending || 0;
-        document.getElementById('rejectedRequests').textContent = summary.rejected || 0;
+        document.getElementById('deniedRequests').textContent = summary.denied || 0;
     }
 
     function processDocumentsData(rows) {
         const documentRequests = {};
         const monthly = {};
-        const summary = { total: 0, completed: 0, pending: 0, rejected: 0 };
+        const summary = { total: 0, approved: 0, pending: 0, denied: 0 };
 
         rows.forEach(r => {
             summary.total++;
             const status = (r.status || '').toLowerCase();
-            if (status === 'completed') summary.completed++;
+            if (status === 'approved') summary.approved++;
             else if (status === 'pending') summary.pending++;
-            else if (status === 'rejected') summary.rejected++;
+            else if (status === 'denied') summary.denied++;
 
             const type = r.type || 'Uncategorized';
             documentRequests[type] = (documentRequests[type] || 0) + 1;
@@ -584,6 +609,7 @@ $complaintsData   = getComplaintsData();
     }
 
     function updateIncidentCharts(data) {
+        currentComplaintsData = data;
         const processed = processComplaintsData(data);
         
         incidentPieChart.data.labels = Object.keys(processed.incidentTypes);
@@ -604,9 +630,6 @@ $complaintsData   = getComplaintsData();
 
     function updateIncidentSummary(summary) {
         document.getElementById('totalIncidents').textContent = summary.total || 0;
-        document.getElementById('theftCases').textContent = summary.theft || 0;
-        document.getElementById('domesticViolence').textContent = summary.domesticViolence || 0;
-        document.getElementById('disputes').textContent = summary.disputes || 0;
         document.getElementById('resolvedCases').textContent = summary.resolved || 0;
         document.getElementById('escalatedCases').textContent = summary.escalated || 0;
     }
@@ -645,16 +668,12 @@ $complaintsData   = getComplaintsData();
             },
             summary: {
                 total: rows.length,
-                theft: (incidentTypes['Theft'] || incidentTypes['theft'] || 0),
-                domesticViolence: (incidentTypes['Domestic Violence'] || incidentTypes['domestic violence'] || 0),
-                disputes: (incidentTypes['Dispute'] || incidentTypes['Property Dispute'] || incidentTypes['dispute'] || 0),
                 resolved: complaintStatus['resolved'] || 0,
                 escalated: complaintStatus['escalated'] || 0
             }
         };
     }
 
-    // Filter functions
     async function filterServicesData() {
         const fromDate = document.getElementById('servicesFromDate').value;
         const toDate = document.getElementById('servicesToDate').value;
@@ -693,7 +712,234 @@ $complaintsData   = getComplaintsData();
         }
     }
 
-    // Export functions
+    // Export Modal Functions
+    function showExportModal(reportType, exportType) {
+        currentExportType = exportType;
+        const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+        modal.show();
+    }
+
+    function confirmExport() {
+        const documentType = document.getElementById('documentTypeSelect').value;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+        modal.hide();
+
+        if (currentExportType === 'pdf') {
+            exportServicesToPDF(documentType);
+        } else if (currentExportType === 'csv') {
+            exportServicesToCSV(documentType);
+        } else if (currentExportType === 'excel') {
+            exportServicesToExcel(documentType);
+        }
+    }
+
+//    Services Export Functions
+    function exportServicesToPDF(documentType) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        let filteredData = currentServicesData;
+        if (documentType !== 'All') {
+            filteredData = currentServicesData.filter(row => row.type === documentType);
+        }
+
+        if (filteredData.length === 0) {
+            alert('No data available for the selected document type.');
+            return;
+        }
+
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text("Barangay Services Report", 14, 20);
+        
+        const fromDate = document.getElementById('servicesFromDate').value;
+        const toDate = document.getElementById('servicesToDate').value;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Date Range: ${fromDate} to ${toDate}`, 14, 28);
+        doc.text(`Document Type: ${documentType}`, 14, 34);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 40);
+
+        const headers = [['Document ID', 'Type', 'Status', 'Request Date']];
+        const tableData = filteredData.map(row => [
+            row.documentID,
+            row.type,
+            row.status.charAt(0).toUpperCase() + row.status.slice(1),
+            row.requestDate
+        ]);
+
+        doc.autoTable({
+            head: headers,
+            body: tableData,
+            startY: 45,
+            theme: 'grid',
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [49, 175, 171] }
+        });
+
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text('Summary:', 14, finalY);
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        
+        const approved = filteredData.filter(r => r.status.toLowerCase() === 'approved').length;
+        const pending = filteredData.filter(r => r.status.toLowerCase() === 'pending').length;
+        const denied = filteredData.filter(r => r.status.toLowerCase() === 'denied').length;
+
+        doc.text(`Total Requests: ${filteredData.length}`, 14, finalY + 8);
+        doc.text(`Approved: ${approved}`, 14, finalY + 14);
+        doc.text(`Pending: ${pending}`, 14, finalY + 20);
+        doc.text(`Denied: ${denied}`, 14, finalY + 26);
+
+        doc.save(`Barangay_Services_${documentType.replace(/\s+/g, '_')}_Report.pdf`);
+    }
+
+    function exportServicesToCSV(documentType) {
+        let filteredData = currentServicesData;
+        if (documentType !== 'All') {
+            filteredData = currentServicesData.filter(row => row.type === documentType);
+        }
+
+        if (filteredData.length === 0) {
+            alert('No data available for the selected document type.');
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Document ID,Type,Status,Request Date\n";
+
+        filteredData.forEach(row => {
+            csvContent += `${row.documentID},"${row.type}","${row.status}",${row.requestDate}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Barangay_Services_${documentType.replace(/\s+/g, '_')}_Report.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function exportServicesToExcel(documentType) {
+        let filteredData = currentServicesData;
+        if (documentType !== 'All') {
+            filteredData = currentServicesData.filter(row => row.type === documentType);
+        }
+
+        if (filteredData.length === 0) {
+            alert('No data available for the selected document type.');
+            return;
+        }
+
+        const ws_data = [['Document ID', 'Type', 'Status', 'Request Date']];
+        filteredData.forEach(row => {
+            ws_data.push([row.documentID, row.type, row.status, row.requestDate]);
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, "Services");
+        XLSX.writeFile(wb, `Barangay_Services_${documentType.replace(/\s+/g, '_')}_Report.xlsx`);
+    }
+
+    // Incident Export Functions
+    function exportIncidentToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        if (currentComplaintsData.length === 0) {
+            alert('No data available to export.');
+            return;
+        }
+
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text("Incident & Complaint Report", 14, 20);
+        
+        const fromDate = document.getElementById('incidentFromDate').value;
+        const toDate = document.getElementById('incidentToDate').value;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Date Range: ${fromDate} to ${toDate}`, 14, 28);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 34);
+
+        const headers = [['Complaint ID', 'Type', 'Status', 'Request Date']];
+        const tableData = currentComplaintsData.map(row => [
+            row.complaintID,
+            row.type,
+            row.status.charAt(0).toUpperCase() + row.status.slice(1),
+            row.requestDate
+        ]);
+
+        doc.autoTable({
+            head: headers,
+            body: tableData,
+            startY: 40,
+            theme: 'grid',
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [49, 175, 171] }
+        });
+
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text('Summary:', 14, finalY);
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(10);
+        
+        const resolved = currentComplaintsData.filter(r => r.status.toLowerCase() === 'resolved').length;
+        const escalated = currentComplaintsData.filter(r => r.status.toLowerCase() === 'escalated').length;
+
+        doc.text(`Total Incidents: ${currentComplaintsData.length}`, 14, finalY + 8);
+        doc.text(`Resolved: ${resolved}`, 14, finalY + 14);
+        doc.text(`Escalated: ${escalated}`, 14, finalY + 20);
+
+        doc.save(`Barangay_Incidents_Report.pdf`);
+    }
+
+    function exportIncidentToCSV() {
+        if (currentComplaintsData.length === 0) {
+            alert('No data available to export.');
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Complaint ID,Type,Status,Request Date\n";
+
+        currentComplaintsData.forEach(row => {
+            csvContent += `${row.complaintID},"${row.type}","${row.status}",${row.requestDate}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Barangay_Incidents_Report.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function exportIncidentToExcel() {
+        if (currentComplaintsData.length === 0) {
+            alert('No data available to export.');
+            return;
+        }
+
+        const ws_data = [['Complaint ID', 'Type', 'Status', 'Request Date']];
+        currentComplaintsData.forEach(row => {
+            ws_data.push([row.complaintID, row.type, row.status, row.requestDate]);
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, "Complaints");
+        XLSX.writeFile(wb, `Barangay_Incidents_Report.xlsx`);
+    }
+
+    // Demographics Export
     function exportToExcel(reportType) {
         if (!reportType || reportType === 'demographics') {
             const ws_data = [['ID', 'First Name', 'Last Name', 'Age', 'Gender', 'Age Group']];
@@ -706,98 +952,6 @@ $complaintsData   = getComplaintsData();
             XLSX.writeFile(wb, "Barangay_Demographics.xlsx");
             return;
         }
-
-        if (reportType === 'services') {
-            const fromDate = document.getElementById('servicesFromDate').value;
-            const toDate = document.getElementById('servicesToDate').value;
-            fetch(`?ajax=documents&from=${fromDate}&to=${toDate}`)
-                .then(r => r.json())
-                .then(rows => {
-                    const ws_data = [['Document ID', 'Type', 'Status', 'Request Date']];
-                    rows.forEach(row => {
-                        ws_data.push([row.documentID, row.type, row.status, row.requestDate]);
-                    });
-                    const wb = XLSX.utils.book_new();
-                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                    XLSX.utils.book_append_sheet(wb, ws, "Services");
-                    XLSX.writeFile(wb, "Barangay_Services.xlsx");
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Export failed');
-                });
-            return;
-        }
-
-        if (reportType === 'incidents') {
-            const fromDate = document.getElementById('incidentFromDate').value;
-            const toDate = document.getElementById('incidentToDate').value;
-            fetch(`?ajax=complaints&from=${fromDate}&to=${toDate}`)
-                .then(r => r.json())
-                .then(rows => {
-                    const ws_data = [['Complaint ID', 'Type', 'Status', 'Request Date']];
-                    rows.forEach(row => {
-                        ws_data.push([row.complaintID, row.type, row.status, row.requestDate]);
-                    });
-                    const wb = XLSX.utils.book_new();
-                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
-                    XLSX.utils.book_append_sheet(wb, ws, "Complaints");
-                    XLSX.writeFile(wb, "Barangay_Complaints.xlsx");
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Export failed');
-                });
-            return;
-        }
-    }
-
-    function exportToPDF(reportType) {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        doc.setFontSize(20);
-        if (reportType === 'services') {
-            doc.text("Barangay Services Report", 20, 20);
-        } else if (reportType === 'incidents') {
-            doc.text("Incident & Complaint Report", 20, 20);
-        } else {
-            doc.text("Demographics Report", 20, 20);
-        }
-
-        doc.setFontSize(12);
-        doc.text("Generated on: " + new Date().toLocaleDateString(), 20, 40);
-        
-        doc.save(`Barangay_${reportType}_Report.pdf`);
-    }
-
-    function exportToCSV(reportType) {
-        let csvContent = "data:text/csv;charset=utf-8,";
-        let rows = [];
-
-        if (reportType === 'services') {
-            rows.push(['Document ID', 'Type', 'Status', 'Request Date']);
-        } else if (reportType === 'incidents') {
-            rows.push(['Complaint ID', 'Type', 'Status', 'Request Date']);
-        } else {
-            rows.push(['ID', 'First Name', 'Last Name', 'Age', 'Gender']);
-            residentsData.forEach(r => {
-                rows.push([r.id, r.firstName, r.lastName, r.age, r.gender]);
-            });
-        }
-
-        rows.forEach(function(rowArray) {
-            let row = rowArray.join(",");
-            csvContent += row + "\r\n";
-        });
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `barangay_${reportType}_report.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     }
 
     function setDefaultDates() {

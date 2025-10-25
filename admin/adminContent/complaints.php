@@ -75,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   exit;
 }
 
-// ===================== DELETE HANDLER =====================
 if (isset($_GET['delete'])) {
   $complaintID = (int) $_GET['delete'];
 
@@ -88,12 +87,11 @@ if (isset($_GET['delete'])) {
   exit;
 }
 
-// ===================== FETCH COMPLAINTS WITH PAGINATION =====================
 $search = trim($_GET['search'] ?? '');
 $status = $_GET['status'] ?? '';
 $date = $_GET['date'] ?? '';
 
-$perPage = 10; // ✅ number of rows per page
+$perPage = 10;
 $currentPage = isset($_GET['p']) ? (int) $_GET['p'] : 1;
 if ($currentPage < 1)
   $currentPage = 1;
@@ -176,7 +174,6 @@ if (!empty($params)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-// ===================== HELPERS =====================
 function getStatusBadgeClass($status)
 {
   return match (strtolower($status)) {
@@ -291,7 +288,7 @@ function getBorderClass($status)
 
             <!-- Add Button (outside the form) -->
             <div class="col-md-2">
-              <button class="btn btn-custom w-100" data-bs-toggle="modal" data-bs-target="#addComplaintModal">
+              <button class="btn btn-custom w-100" data-bs-toggle="modal" data-bs-target="#addComplaint">
                 <i class="fas fa-user-plus me-1"></i> Add
               </button>
             </div>
@@ -405,7 +402,7 @@ function getBorderClass($status)
           </div>
 
           <!-- Add Complaint Modal -->
-          <div class="modal fade" id="addComplaintModal" tabindex="-1" aria-labelledby="addComplaintModalLabel"
+          <div class="modal fade" id="addComplaint" tabindex="-1" aria-labelledby="addComplaintLabel"
             aria-hidden="true">
             <!-- modal content unchanged -->
           </div>

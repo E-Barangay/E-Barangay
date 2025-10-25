@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $complaintTitle = $_POST['otherComplaint'];
     }
 
-    $complaintStatus = 'Criminal'; // ✅ Always set as Criminal
+    $complaintStatus = 'Criminal';
     $complaintDescription = $_POST['complaintDescription'] ?? '';
     $phoneNumber = $_POST['phoneNumber'] ?? '';
     $complainantName = $_POST['complainantName'] ?? '';
@@ -18,10 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $complaintAccused = $_POST['complaintAccused'] ?? '';
     $victimRelationship = $_POST['victimRelationship'] ?? '';
     $actionTaken = $_POST['actionTaken'] ?? '';
-    $complaintAddress = $_POST['complaintAddress'] ?? ''; // ✅ make sure value comes from form
+    $complaintAddress = $_POST['complaintAddress'] ?? ''; 
     $requestDate = date('Y-m-d H:i:s');
 
-    // Default values for unused columns
     $complaintCategoryID = null;
     $complaintTypeID = null;
     $evidence = null;
@@ -42,14 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ✅ Insert new complaint
     $stmt = $conn->prepare("INSERT INTO complaints 
     (userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, requestDate, 
      complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complaintVictim, 
      complainantName, victimAge, victimRelationship, actionTaken, evidence) 
     VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    // 🔥 Fixed bind_param format (complaintAddress included properly)
     $stmt->bind_param(
         "iisssssssssisss",
         $complaintCategoryID,
@@ -60,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $complaintStatus,
         $phoneNumber,
         $complaintAccused,
-        $complaintAddress,     // ✅ FIXED: now bound as string
+        $complaintAddress,     
         $complaintVictim,
         $complainantName,
         $victimAge,
@@ -123,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </select>
                 </div>
 
-                <!-- Hidden input for custom complaint -->
                 <div class="mb-3 d-none" id="otherComplaintDiv">
                     <label class="form-label">Please specify</label>
                     <input type="text" name="otherComplaint" class="form-control">

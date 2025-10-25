@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_document'])) {
   $lengthOfStay = $_POST['lengthOfStay'];
   $phoneNumber = $_POST['phoneNumber'];
   $email = $_POST['email'];
-  $houseNo = $_POST['houseNo'];
+  $blockLotNo = $_POST['houseNo'];
   $streetName = $_POST['streetName'];
   $barangayName = $_POST['barangayName'];
   $cityName = $_POST['cityName'];
@@ -35,7 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_document'])) {
   $subdivisionName = $_POST['subdivisionName'];
   $purok = $_POST['purok'];
 
-  $updateDocQuery = "UPDATE documents SET purpose = '$purpose', documentTypeID = '$documentTypeID' WHERE documentID = '$documentID'";
+  $updateDocQuery = "UPDATE documents 
+                     SET purpose = '$purpose', documentTypeID = '$documentTypeID' 
+                     WHERE documentID = '$documentID'";
   $updateDocResult = executeQuery($updateDocQuery);
 
   $updateUserInfoQuery = "UPDATE userinfo ui 
@@ -60,10 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_document'])) {
                         JOIN userinfo ui ON a.userInfoID = ui.userInfoID
                         JOIN users u ON ui.userID = u.userID
                         JOIN documents d ON u.userID = d.userID
-                        SET a.houseNo = '$houseNo', a.streetName = '$streetName', 
-                            a.barangayName = '$barangayName', a.cityName = '$cityName', 
-                            a.provinceName = '$provinceName', a.phase = '$phase', 
-                            a.subdivisionName = '$subdivisionName', a.purok = '$purok'
+                        SET a.blockLotNo = '$blockLotNo', 
+                            a.streetName = '$streetName', 
+                            a.barangayName = '$barangayName', 
+                            a.cityName = '$cityName', 
+                            a.provinceName = '$provinceName', 
+                            a.phase = '$phase', 
+                            a.subdivisionName = '$subdivisionName', 
+                            a.purok = '$purok'
                         WHERE d.documentID = '$documentID'";
   $updateAddressResult = executeQuery($updateAddressQuery);
 
@@ -75,22 +81,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_document'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_status'])) {
   $newStatus = $_POST['new_status'];
 
-  $updateQuery = "UPDATE documents SET documentStatus = '$newStatus' WHERE documentID = '$documentID'";
   if ($newStatus === 'Approved') {
-    $updateQuery = "
-            UPDATE documents 
-            SET documentStatus = '$newStatus', 
-                approvalDate = NOW()
-            WHERE documentID = '$documentID'
-        ";
+    $updateQuery = "UPDATE documents 
+                    SET documentStatus = '$newStatus', approvalDate = NOW()
+                    WHERE documentID = '$documentID'";
   } else {
-    $updateQuery = "
-            UPDATE documents 
-            SET documentStatus = '$newStatus',
-                approvalDate = NULL
-            WHERE documentID = '$documentID'
-        ";
+    $updateQuery = "UPDATE documents 
+                    SET documentStatus = '$newStatus', approvalDate = NULL
+                    WHERE documentID = '$documentID'";
   }
+
   $updateResult = executeQuery($updateQuery);
 
   $_SESSION['success_message'] = "Status updated successfully!";
@@ -128,7 +128,7 @@ $documentQuery = "SELECT
     a.provinceName,
     a.barangayName,
     a.streetName,
-    a.houseNo,
+    a.blockLotNo AS houseNo,
     a.phase,
     a.subdivisionName,
     a.purok
@@ -158,6 +158,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
   $documentTypes[] = $row;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
