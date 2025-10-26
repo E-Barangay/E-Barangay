@@ -13,8 +13,8 @@
             </div>
             <div class="col-4">
                 <div class="d-flex justify-content-center">
-                    <img src="../assets/images/aksyonBilis.png" class="me-2" style="width: 100%; height: 150px;" alt="">
-                    <img src="../assets/images/tet.png" style="width: 100%; height: 150px;" alt="">
+                    <img src="../../assets/images/aksyonBilis.png" class="me-2" style="width: 100%; height: 150px;" alt="">
+                    <img src="../../assets/images/tet.png" style="width: 100%; height: 150px;" alt="">
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-end">

@@ -275,7 +275,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                               </a>
 
                               <?php if ($row['documentStatus'] === 'Approved'): ?>
-<a href="adminContent/printDocument.php?id=<?= $row['documentID'] ?>"
+  <a href="adminContent/printDocument.php?documentID=<?= $row['documentID'] ?>"
      class="btn btn-sm btn-success"
      target="_blank"
      title="Print Document">
