@@ -1,207 +1,286 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../sharedAssets/connect.php';
+include_once __DIR__ . '/../../sharedAssets/connect.php';
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-
+if (!isset($_SESSION['userID']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../../login.php");
+    exit();
 }
 
-$docId = isset($_GET['id']) ? intval($_GET['id']) : 0;
-if ($docId <= 0) {
-    die("Invalid document ID.");
+if (!isset($_GET['documentID'])) {
+    header("Location: ../adminContent/document.php");
+    exit();
 }
 
+$documentID = mysqli_real_escape_string($conn, $_GET['documentID']);
 
-$sql = "
-    SELECT
-        d.documentID,
-        d.userID,
-        d.documentTypeID,
-        d.purpose,
-        d.documentStatus,
-        d.requestDate,
-        d.approvalDate,
-        dt.documentName AS documentName,
+$userQuery = "
+    SELECT 
+        users.userID,
+        users.email,
+        users.phoneNumber,
+        userInfo.firstName,
+        userInfo.middleName,
+        userInfo.lastName,
+        userInfo.suffix,
+        userInfo.birthDate,
+        userInfo.birthPlace,
+        userInfo.gender,
+        userInfo.civilStatus,
+        userInfo.citizenship,
+        userInfo.lengthOfStay,
+        userInfo.residencyType,
+        userInfo.remarks,
+        userInfo.profilePicture,
+        
+        addresses.blockLotNo,
+        addresses.phase,
+        addresses.subdivisionName,
+        addresses.purok,
+        addresses.streetName,
+        addresses.barangayName,
+        addresses.cityName,
+        addresses.provinceName,
 
-        -- users
-        u.email AS userEmail,
-        u.role AS userRole,
-        u.phoneNumber,
+        permanentAddresses.permanentBlockLotNo,
+        permanentAddresses.permanentPhase,
+        permanentAddresses.permanentSubdivisionName,
+        permanentAddresses.permanentPurok,
+        permanentAddresses.permanentStreetName,
+        permanentAddresses.permanentBarangayName,
+        permanentAddresses.permanentCityName,
+        permanentAddresses.permanentProvinceName,
 
-        -- userinfo
-        ui.userInfoID,
-        ui.firstName,
-        ui.middleName,
-        ui.lastName,
-        ui.suffix,
-        ui.gender,
-        ui.birthDate,
-        ui.birthPlace,
-        ui.civilStatus,
-        ui.citizenship,
-        ui.occupation,
-        ui.lengthOfStay,
-        ui.residencyType,
-        ui.remarks,
+        documents.documentID,
+        documents.documentTypeID,
+        documents.purpose,
+        documents.businessName,
+        documents.businessAddress,
+        documents.businessNature,
+        documents.controlNo,
+        documents.ownership,
+        documents.spouseName,
+        documents.marriageYear,
+        documents.childNo,
+        documents.requestDate,
+        documents.documentStatus,
+        documentTypes.documentName
 
-        -- addresses (current)
-        a.cityName AS cityName,
-        a.provinceName AS provinceName,
-        a.barangayName AS barangayName,
-        a.streetName AS streetName,
-        a.blockLotNo AS blockLotNo,
-        a.phase AS phase,
-        a.subdivisionName AS subdivisionName,
-        a.purok AS purok,
-
-        -- permanent addresses
-        pa.permanentCityName,
-        pa.permanentProvinceName,
-        pa.permanentBarangayName,
-        pa.permanentStreetName,
-        pa.permanentBlockLotNo,
-        pa.permanentPhase,
-        pa.permanentSubdivisionName,
-        pa.permanentPurok
-
-    FROM documents d
-    LEFT JOIN documenttypes dt ON d.documentTypeID = dt.documentTypeID
-    LEFT JOIN users u ON d.userID = u.userID
-    LEFT JOIN userinfo ui ON ui.userID = u.userID
-    LEFT JOIN addresses a ON a.userInfoID = ui.userInfoID
-    LEFT JOIN permanentaddresses pa ON pa.userInfoID = ui.userInfoID
-    WHERE d.documentID = ?
-    LIMIT 1
+    FROM documents
+    LEFT JOIN users ON documents.userID = users.userID
+    LEFT JOIN userInfo ON users.userID = userInfo.userID
+    LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID
+    LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+    LEFT JOIN documentTypes ON documents.documentTypeID = documentTypes.documentTypeID
+    WHERE documents.documentID = '$documentID' AND documents.documentStatus = 'approved'
 ";
 
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
-    die("Prepare failed: " . $conn->error);
-}
-$stmt->bind_param("i", $docId);
-$stmt->execute();
-$result = $stmt->get_result();
+$userResult = mysqli_query($conn, $userQuery);
 
-if ($result->num_rows === 0) {
-    die("Document not found.");
+if (!$userResult || mysqli_num_rows($userResult) === 0) {
+    echo "<script>alert('Document not found or not yet approved!'); window.location.href='../adminContent/document.php';</script>";
+    exit();
 }
 
-$row = $result->fetch_assoc();
+$userRow = mysqli_fetch_assoc($userResult);
 
-$documentName = isset($row['documentName']) && $row['documentName'] !== '' ? $row['documentName'] : 'Unknown Document';
+$firstName = $userRow['firstName'];
+$middleName = $userRow['middleName'];
+$lastName = $userRow['lastName'];
+$suffix = $userRow['suffix'];
+$fullName = trim("$firstName " . ($middleName ? $middleName[0] . ". " : "") . "$lastName $suffix");
 
-$firstName = $row['firstName'] ?? '';
-$middleName = $row['middleName'] ?? '';
-$lastName = $row['lastName'] ?? '';
-$suffix = $row['suffix'] ?? '';
-$fullName = trim(implode(' ', array_filter([$firstName, $middleName, $lastName, $suffix])));
+$birthDate = $userRow['birthDate'];
+$age = $birthDate ? date_diff(date_create($birthDate), date_create('now'))->y : '';
+$birthPlace = $userRow['birthPlace'];
+$gender = $userRow['gender'];
+$profilePicture = $userRow['profilePicture'];
+$citizenship = $userRow['citizenship'];
+$civilStatus = $userRow['civilStatus'];
+$lengthOfStay = $userRow['lengthOfStay'];
+$currentYear = date('Y');
+$residingYear = $currentYear - (int)$lengthOfStay;
+$residencyType = $userRow['residencyType'];
+$remarks = $userRow['remarks'];
 
-$purpose = $row['purpose'] ?? '';
-$documentStatus = $row['documentStatus'] ?? '';
-$requestDate = $row['requestDate'] ?? '';
-$approvalDate = $row['approvalDate'] ?? '';
+$startYear = (int)$lengthOfStay;
+$currentYear = date("Y");
+$yearsOfStay = $currentYear - $startYear;
 
-$cityName = $row['cityName'] ?? '';
-$provinceName = $row['provinceName'] ?? '';
-$barangayName = $row['barangayName'] ?? '';
-$streetName = $row['streetName'] ?? '';
-$blockLotNo = $row['blockLotNo'] ?? '';
-$phase = $row['phase'] ?? '';
-$subdivisionName = $row['subdivisionName'] ?? '';
-$purok = $row['purok'] ?? '';
-
-$permanentCityName = $row['permanentCityName'] ?? '';
-$permanentProvinceName = $row['permanentProvinceName'] ?? '';
-$permanentBarangayName = $row['permanentBarangayName'] ?? '';
-$permanentStreetName = $row['permanentStreetName'] ?? '';
-$permanentBlockLotNo = $row['permanentBlockLotNo'] ?? '';
-$permanentPhase = $row['permanentPhase'] ?? '';
-$permanentSubdivisionName = $row['permanentSubdivisionName'] ?? '';
-$permanentPurok = $row['permanentPurok'] ?? '';
-
-$gender = $row['gender'] ?? '';
-$birthDate = $row['birthDate'] ?? '';
-$birthPlace = $row['birthPlace'] ?? '';
-$civilStatus = $row['civilStatus'] ?? '';
-$citizenship = $row['citizenship'] ?? '';
-$occupation = $row['occupation'] ?? '';
-$lengthOfStay = $row['lengthOfStay'] ?? '';
-$residencyType = $row['residencyType'] ?? '';
-$remarks = $row['remarks'] ?? '';
-$userEmail = $row['userEmail'] ?? '';
-$userRole = $row['userRole'] ?? '';
-
-function docNameToFile($docName) {
-    $name = preg_replace('/[^a-zA-Z0-9\s]/', '', $docName);
-    $name = strtolower(trim($name));
-    $name = preg_replace('/\s+/', '_', $name);
-    $map = [
-        'barangay_clearance' => 'barangayClearance.php', 
-        'good_moral' => 'goodMoral.php',
-    ];
-    if (isset($map[$name])) return $map[$name];
-    return $name . '.php';
+function formatAddress($value) {
+    return ucwords(strtolower($value ?? ''));
 }
 
-$filename = docNameToFile($documentName);
-$docPath = realpath(__DIR__ . "/../../documents/documentTypes/" . $filename);
+$blockLotNo = formatAddress($userRow['blockLotNo']);
+$phase = formatAddress($userRow['phase']); 
+$subdivisionName = formatAddress($userRow['subdivisionName']);
+$purok = formatAddress($userRow['purok']);
+$streetName = formatAddress($userRow['streetName']);
+$barangayName = formatAddress($userRow['barangayName']);
+$cityName = formatAddress($userRow['cityName']);
+$provinceName = formatAddress($userRow['provinceName']);
 
-if (!$docPath) {
-    $alt = str_replace('_', '', str_replace(' ', '', ucwords(str_replace('_',' ',$filename))));
-    $camel = preg_replace_callback('/_([a-z])/', function($m){ return strtoupper($m[1]); }, $filename);
-    $tryPaths = [
-        __DIR__ . "/../../documents/documentTypes/" . $camel,
-        __DIR__ . "/../../documents/documentTypes/" . ucfirst($camel),
-        __DIR__ . "/../../documents/documentTypes/" . $filename, // original
-    ];
-    foreach ($tryPaths as $p) {
-        if (file_exists($p)) {
-            $docPath = realpath($p);
-            break;
-        }
-    }
+$addressParts = array_filter([
+    $blockLotNo, $phase, $subdivisionName, $streetName,
+    $purok ? "Purok $purok" : '',
+    $barangayName ? "Brgy. $barangayName" : '',
+    $cityName, $provinceName
+]);
+$fullAddress = implode(', ', $addressParts);
+
+$permanentBlockLotNo = formatAddress($userRow['permanentBlockLotNo']);
+$permanentPhase = formatAddress($userRow['permanentPhase']); 
+$permanentSubdivisionName = formatAddress($userRow['permanentSubdivisionName']);
+$permanentPurok = formatAddress($userRow['permanentPurok']);
+$permanentStreetName = formatAddress($userRow['permanentStreetName']);
+$permanentBarangayName = formatAddress($userRow['permanentBarangayName']);
+$permanentCityName = formatAddress($userRow['permanentCityName']);
+$permanentProvinceName = formatAddress($userRow['permanentProvinceName']);
+
+$permanentAddressParts = array_filter([
+    $permanentBlockLotNo, $permanentPhase, $permanentSubdivisionName, $permanentStreetName,
+    $permanentPurok ? "Purok $permanentPurok" : '',
+    $permanentBarangayName ? "Brgy. $permanentBarangayName" : '',
+    $permanentCityName, $permanentProvinceName
+]);
+$permanentFullAddress = implode(', ', $permanentAddressParts);
+
+$documentName = $userRow['documentName'];
+$purpose = $userRow['purpose'];
+$businessName = $userRow['businessName'];
+$businessAddress = $userRow['businessAddress'];
+$businessNature = $userRow['businessNature'];
+$controlNo = $userRow['controlNo'];
+$ownership = $userRow['ownership'];
+$spouseName = $userRow['spouseName'];
+$marriageYear = $userRow['marriageYear'];
+$childNo = $userRow['childNo'];
+
+// paths
+$sharedPath = __DIR__ . '/documents/sharedAssets/';
+$layoutPath = __DIR__ . '/documents/documentTypes/';
+
+$documentTypeID = $userRow['documentTypeID'];
+switch ($documentTypeID) {
+    case 1: $layoutFile = 'barangayClearance.php'; break;
+    case 2: $layoutFile = 'businessClearance.php'; break;
+    case 3: $layoutFile = 'constructionClearance.php'; break;
+    case 4: $layoutFile = 'firstTimeJobSeeker.php'; break;
+    case 5: $layoutFile = 'goodHealth.php'; break;
+    case 6: $layoutFile = 'goodMoral.php'; break;
+    case 7: $layoutFile = 'jointCohabitation.php'; break;
+    case 9: $layoutFile = 'residency.php'; break;
+    case 10: $layoutFile = 'soloParent.php'; break;
+    default: $layoutFile = null;
 }
+?>
 
-if (!$docPath || !file_exists($docPath)) {
-    $docPath = realpath(__DIR__ . "/../../documents/documentTypes/defaultLayout.php");
-}
-
-
-?><!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Print - <?= htmlspecialchars($documentName) ?></title>
-    <style>
-        body { font-family: "Times New Roman", serif; margin: 30px; color: #000; background: #fff; }
-        .admin-watermark { position: fixed; top: 35%; left: 15%; transform: rotate(-30deg); font-size: 6rem; opacity: 0.08; pointer-events: none; user-select: none; }
-        .no-print { text-align: right; margin-bottom: 18px; }
-        .print-btn { padding: 8px 12px; background:#4CAF50; color:#fff; border:0; border-radius:4px; cursor:pointer;}
-        @media print { .no-print { display:none } .admin-watermark{opacity:0.06;} }
-    </style>
-</head>
-<body>
-    <div class="admin-watermark">ADMIN COPY</div>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Print <?= htmlspecialchars($documentName); ?></title>
+    <link rel="icon" href="../../assets/images/logoSanAntonio.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    @page {
+        size: A4;
+        margin: 1in;
+    }
 
-    <div class="no-print">
-        <button class="print-btn" onclick="window.print()">🖨 Print</button>
-    </div>
+    @media print {
+        body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            margin: 0;
+            background: white;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        @page {
+            margin: 0;
+        }
+
+        .print-container {
+            margin: 0;
+            padding: 1in;
+            width: 210mm;
+            height: 297mm;
+            box-sizing: border-box;
+            page-break-after: always;
+        }
+
+        html, body {
+            width: 210mm;
+            height: 297mm;
+        }
+    }
+
+    body {
+        font-family: "Times New Roman", serif;
+        background-color: #fff;
+    }
+
+    .print-container {
+        width: 210mm;
+        min-height: 297mm;
+        margin: auto;
+        padding: 1in;
+        background: white;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .buttons {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .btn {
+        padding: 10px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .btn-success
+    .btn-danger
+    .btn:hover { opacity: 0.8; }
+
+    .print-container p {
+    text-align: justify;
+    line-height: 1.5;
+    font-size: 12pt;
+}
+
+</style>
+
+</head>
+<body onload="window.print()">
+
+<div class="buttons no-print">
+    <button class="btn btn-success" onclick="window.print()">🖨️ Print Document</button>
+    <button class="btn btn-danger" onclick="window.close()">← Back</button>
+</div>
+
+<div class="print-container">
+    <?php include $sharedPath . 'header.php'; ?>
 
     <?php
-    if ($docPath && file_exists($docPath)) {
-        include $docPath;
+    if ($layoutFile && file_exists($layoutPath . $layoutFile)) {
+        include $layoutPath . $layoutFile;
     } else {
-        echo "<h2>" . htmlspecialchars($documentName) . " (Preview)</h2>";
-        echo "<p><strong>Name:</strong> " . htmlspecialchars($fullName) . "</p>";
-        echo "<p><strong>Purpose:</strong> " . htmlspecialchars($purpose) . "</p>";
+        echo "<p style='text-align:center; margin-top:100px;'>Layout not found for this document type.</p>";
     }
     ?>
 
-    <script>
-        setTimeout(()=> window.print(), 800);
-    </script>
+    <?php include $sharedPath . 'footer.php'; ?>
+</div>
+
 </body>
 </html>
-<?php
-$stmt->close();
-$conn->close();
