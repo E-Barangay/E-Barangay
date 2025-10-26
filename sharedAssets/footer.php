@@ -3,10 +3,11 @@
         <div class="row p-5" style="border-top: 1px solid #19AFA5; border-bottom: 1px solid #19AFA5;">
             <div class="col-12 mb-5 mt-4 text-adapt">
                 <div class="h3" style="font-weight: bold; color: black;">
-                    <span style="color:#19AFA5;">Makabagong</span> putol, <span style="color:#19AFA5;">Makikinabang</span> all!</span>
+                    <span style="color:#19AFA5;">Makabagong</span> putol, <span
+                        style="color:#19AFA5;">Makikinabang</span> all!</span>
                 </div>
             </div>
-            <div class="col-12 col-lg-5 text-center text-lg-start py-4 px-3" >
+            <div class="col-12 col-lg-5 text-center text-lg-start py-4 px-3">
                 <div class="h5 mb-3 text-adapt" style="color: black;">
                     Barangay<span style="color:#19AFA5;"> San Antonio</span>
                 </div>
@@ -20,10 +21,14 @@
             <div class="col-12 col-lg-2 text-center text-lg-start py-4">
                 <div class="h5 mb-3" style="color:#19AFA5;">About Us</div>
                 <ul class="nav flex-column">
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0">Mission</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0">Vision</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0">Chairman</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0">Staffs</a></li>
+                    <li class="footer-item mb-3"><a href="javascript:void(0)" onclick="showSection('mission-section')"
+                            class="footer-link p-0">Mission</a></li>
+                    <li class="footer-item mb-3"><a href="javascript:void(0)" onclick="showSection('vision-section')"
+                            class="footer-link p-0">Vision</a></li>
+                    <li class="footer-item mb-3"><a href="javascript:void(0)"
+                            onclick="showSection('executives-section')" class="footer-link p-0">Executives</a></li>
+                    <li class="footer-item mb-3"><a href="javascript:void(0)" onclick="showSection('staff-section')"
+                            class="footer-link p-0">Staffs</a></li>
                 </ul>
             </div>
             <hr class="d-block d-lg-none">
@@ -39,16 +44,59 @@
             <div class="col-12 col-lg-3 text-center text-lg-start py-4">
                 <div class="h5 mb-3" style="color:#19AFA5;">Contacts</div>
                 <ul class="nav flex-column">
-                    <li class="footer-item mb-3"><a href="https://www.facebook.com/profile.php?id=61553441500742" class="footer-link p-0"><i class="fa-brands fa-facebook" style="font-size: 20px; vertical-align: middle;"></i> Barangay San Antonio</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-envelope" style="font-size: 20px; vertical-align: middle;"></i> sanantonio@gmail.com</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-phone" style="font-size: 20px; vertical-align: middle;"></i> 0912 345 6789</a></li>
+                    <li class="footer-item mb-3"><a href="https://www.facebook.com/profile.php?id=61553441500742"
+                            class="footer-link p-0"><i class="fa-brands fa-facebook"
+                                style="font-size: 20px; vertical-align: middle;"></i> Barangay San Antonio</a></li>
+                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-envelope"
+                                style="font-size: 20px; vertical-align: middle;"></i> sanantonio@gmail.com</a></li>
+                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-phone"
+                                style="font-size: 20px; vertical-align: middle;"></i> 0912 345 6789</a></li>
                 </ul>
             </div>
+            <section id="mission-section" class="container py-5" style="display: none;">
+                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Mission</h2>
+                <p style="color: black;">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus totam
+                    cupiditate cumque laborum adipisci, unde eos odio consectetur natus perferendis!
+                </p>
+            </section>
+
+            <section id="vision-section" class="container py-5" style="display: none;">
+                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Vision</h2>
+                <p style="color: black;">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis dolor accusamus
+                    obcaecati consequuntur nesciunt, pariatur dicta vitae laboriosam dolores illum.
+                </p>
+            </section>
+
+            <section id="executives-section" class="container py-5 text-center" style="display: none;">
+                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Executives</h2>
+                <img src="assets/images/executives.jpg" alt="Barangay Executives" class="img-fluid rounded">
+            </section>
+
+
+            <section id="staff-section" class="container py-5" style="display: none;">
+                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Staffs</h2>
+                <p style="color: black;">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iusto ducimus
+                    libero dolorem amet minus velit aut molestiae ex corrupti.
+                </p>
+            </section>
         </div>
         <div class="row">
             <div class="col text-center py-4 text-adapt" style="color: black;">
                 © 2025 Barangay San Antonio. All Rights Reserved.
             </div>
         </div>
+
     </footer>
+    <script>
+        function showSection(sectionId) {
+            var sections = ['mission-section', 'vision-section', 'executives-section', 'staff-section'];
+            sections.forEach(function (id) {
+                document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+            });
+        }
+    </script>
+
 </div>
