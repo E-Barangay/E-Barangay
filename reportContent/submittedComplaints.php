@@ -28,7 +28,7 @@ if (isset($_SESSION['userID'])) {
 <div class="content">
   <div class="p-md-5 p-4">
     <div class="d-flex justify-content-center mb-3">
-      <div class="card p-3 text-center" style="background-color: #0C8888; border: none;">
+      <div class="card p-3 text-center" style="background-color: #19AFA5; border: none;">
         <h2 class="fw-bold fs-5 text-light mb-0">Your Submitted Complaints</h2>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <div class="content">
     <div class="p-md-5 p-4">
         <div class="d-flex flex-column align-items-center">
-            <div class="card d-inline-block p-3 text-center" style="background-color: #0C8888">
+            <div class="card d-inline-block p-3 text-center" style="background-color: #19AFA5">
                 <h2 class="fw-bolder m-0 text-light">REPORT COMMUNITY CONCERNS</h2>
             </div>
 
