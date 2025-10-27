@@ -71,28 +71,7 @@ if (isset($_GET['page'])) {
     <div class="container pt-3">
         <div class="row">
             <div class="col-12 col-lg-3 p-0">
-
-                <!-- Pop Up when screen is in small size -->
-
-                <!-- <div class="row mb-2 g-0 d-sm-none d-flex justify-content-between">
-
-                    <div class="col-4 d-flex justify-content-center">
-                        <a href="?page=complaintSection" class="btn filterButton p-2 w-75 text-center">
-                            <i class="bi bi-house-door-fill"></i>
-                        </a>
-                    </div>
-                    <div class="col-4 d-flex justify-content-center">
-                        <a href="?page=makeComplaint" class="btn filterButton p-2 w-75 text-center">
-                            <i class="bi bi-file-earmark-text-fill"></i>
-                        </a>
-                    </div>
-                    <div class="col-4 d-flex justify-content-center">
-                        <a href="?page=submittedComplaints" class="btn filterButton p-2 w-75 text-center">
-                            <i class="bi bi-send-fill"></i>
-                        </a>
-                    </div>
-                </div> -->
-
+                
                 <div class="filterCard card m-1 p-3">
                     <div class="row">
                         <div class="col d-flex flex-column align-items-center">
