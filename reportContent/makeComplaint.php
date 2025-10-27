@@ -54,7 +54,7 @@ if (isset($_POST['submit'])) {
                 VALUES 
                 ('$userID', '$complaintTitle', '$complaintDescription', NOW(), '$requestStatus', '$phoneNumber', '$complaintAccused', '$complaintAddress', '$userName', '$complaintVictim', '$userAge', '$isDeleted', '$relationshipVictim', '$isAction', '$latitude', '$longitude')";
         if (mysqli_query($conn, $sql)) {
-            
+
             $complaintID = mysqli_insert_id($conn);
 
             if (!empty($_FILES['evidence']['name'][0])) {
@@ -82,7 +82,7 @@ if (isset($_POST['submit'])) {
 
             }
 
-            echo "<script>window.location.href='reports.php?page=makeComplaint&success';</script>";
+            echo "<script>window.location.href='complaints.php?page=makeComplaint&success';</script>";
 
             exit();
         } else {
@@ -169,7 +169,7 @@ if (isset($_POST['submit'])) {
     </div>
 
     <div class="p-2">
-        <form action="" method="post" enctype="multipart/form-data">
+        <form action="" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
             <!-- Row 1 -->
             <div class="container">
                 <div class="row">
@@ -229,7 +229,7 @@ if (isset($_POST['submit'])) {
                                 <label for="relationship" class="form-label me-2"
                                     style="color: #19AFA5; min-width: 80px;">Relation:</label>
                                 <input type="text" class="form-control" id="relationship" placeholder="Optional"
-                                    name="relationship" required>
+                                    name="relationship">
                             </div>
                         </div>
 
@@ -290,21 +290,26 @@ if (isset($_POST['submit'])) {
 
                 <!-- Submit buttons -->
                 <div class="d-flex justify-content-center justify-content-md-end mt-2 gap-2">
-                    <a href="reports.php?page=complaintSection.php" class="btn filterButton">Cancel</a>
+                    <a href="complaints.php?page=complaintSection.php" class="btn filterButton">Cancel</a>
 
-                    <button type="button" class="btn filterButton" data-bs-toggle="modal"
-                        data-bs-target="#exampleModal">
+                    <button type="button" class="btn filterButton" id="submitBtn">
                         Submit
                     </button>
+
                 </div>
 
                 <!-- Modal -->
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                     aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-body">
-                                Confirm Submission?
+                            <div class="modal-header" style="background-color: #19AFA5;">
+                                <h5 class="modal-title text-light">Confirm Submission</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-dark">
+                                Are you sure you want to submit?
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn filterButton" data-bs-dismiss="modal">Cancel</button>
@@ -313,6 +318,27 @@ if (isset($_POST['submit'])) {
                         </div>
                     </div>
                 </div>
+
+                <!-- Warning Modal -->
+                <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #dc3545;">
+                                <h5 class="modal-title text-light">Warning</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Please fill out all required fields before submitting.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn filterButton" data-bs-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
         </form>
 
@@ -330,6 +356,5 @@ if (isset($_POST['submit'])) {
                 </div>
             </div>
         </div>
-
     </div>
 </div>
