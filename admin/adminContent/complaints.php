@@ -88,7 +88,8 @@ if (isset($_GET['delete'])) {
 }
 
 $search = trim($_GET['search'] ?? '');
-$status = $_GET['status'] ?? '';
+$status = $_GET['complaintStatus'] ?? '';
+$type = $_GET['complaintType'] ?? '';
 $date = $_GET['date'] ?? '';
 
 $perPage = 10;
@@ -120,7 +121,6 @@ WHERE r.isDeleted = 'no'";
 $params = [];
 $types = '';
 
-// ✅ Add filters
 if ($search !== '') {
   $sql .= " AND (
         COALESCE(CONCAT(ui.firstName, ' ', ui.lastName), r.complainantName) LIKE ?
@@ -144,6 +144,13 @@ if ($status !== '' && $status !== 'All') {
   $types .= 's';
 }
 
+if ($type !== '' && $type !== 'All') {
+  $sql .= " AND r.complaintTitle = ?";
+  $countSql .= " AND r.complaintTitle = ?";
+  $params[] = $type;
+  $types .= 's';
+}
+
 if ($date !== '') {
   $sql .= " AND DATE(r.requestDate) = ?";
   $countSql .= " AND DATE(r.requestDate) = ?";
@@ -151,7 +158,6 @@ if ($date !== '') {
   $types .= 's';
 }
 
-// ✅ Count total records for pagination
 $countStmt = $conn->prepare($countSql);
 if (!empty($params)) {
   $countStmt->bind_param($types, ...$params);
@@ -161,7 +167,6 @@ $totalRecords = $countStmt->get_result()->fetch_assoc()['total'] ?? 0;
 $totalPages = max(1, ceil($totalRecords / $perPage));
 $countStmt->close();
 
-// ✅ Add order + limit
 $sql .= " ORDER BY r.requestDate DESC LIMIT ? OFFSET ?";
 $params[] = $perPage;
 $params[] = $offset;
@@ -234,6 +239,12 @@ function getBorderClass($status)
       background-color: #279995;
       color: #fff;
     }
+
+    #addComplaintModal .modal-body {
+      max-height: calc(100vh - 200px);
+      /* Adjust as needed */
+      overflow-y: auto;
+    }
   </style>
 </head>
 
@@ -241,21 +252,27 @@ function getBorderClass($status)
   <div class="container-fluid p-3 p-md-4">
     <div class="card shadow-lg border-0 rounded-3">
       <div class="card-body p-0">
-        <div class="text-white p-4 rounded-top" style="background-color: rgb(49, 175, 171);">
-          <div class="d-flex align-items-center">
-            <i class="fas fa-users me-3 fs-4"></i>
-            <h1 class="h4 mb-0 fw-semibold">Katarungang Pambarangay</h1>
+        <div class="text-white p-4 rounded-top" style="background-color: #31afab;">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-file-alt me-3 fs-4"></i>
+              <h1 class="h4 mb-0 fw-semibold">Katarungnang Pambarangay</h1>
+            </div>
+            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addComplaintModal">
+              <i class="fas fa-plus me-2"></i>Add Complaint
+            </button>
+
           </div>
         </div>
 
         <div class="p-3 p-md-3">
           <div class="row g-3 mb-4">
             <!-- Filter Form -->
-            <div class="col-md-10">
+            <div class="col-md-12">
               <form method="GET" action="index.php" class="row g-3">
                 <input type="hidden" name="page" value="complaints">
 
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <div class="input-group">
                     <span class="input-group-text bg-white border-end-0">
                       <i class="fas fa-search text-muted"></i>
@@ -265,8 +282,8 @@ function getBorderClass($status)
                   </div>
                 </div>
 
-                <div class="col-md-3">
-                  <select name="status" class="form-select">
+                <div class="col-md-2">
+                  <select name="complaintStatus" class="form-select">
                     <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
                     <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
                       <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
@@ -275,6 +292,15 @@ function getBorderClass($status)
                 </div>
 
                 <div class="col-md-2">
+                  <select name="complaintType" class="form-select">
+                    <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Type</option>
+                    <?php foreach (['Noise Complaints', 'Boundary and Land Disputes', 'Neighborhood Quarrels', 'Animal-Related Complaints', 'Youth-Related Issues', 'Barangay Clearance and Permit Concerns', 'Garbage and Sanitation Complaints', 'Alcohol-Related Disturbances', 'Traffic and Parking Issues', 'Physical Assault and Threats', 'Water Supply Disputes', 'Business-Related Conflicts', 'Curfew Violations', 'Smoking and Littering Violations', 'Illegal Structures and Encroachments', 'Physical Abuse', 'Sexual Abuse', 'Psychological Abuse/Emotional Abuse', 'Economic Abuse', 'Neglect', 'Other'] as $st): ?>
+                      <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+
+                <div class="col-md-3">
                   <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="form-control">
                 </div>
 
@@ -284,13 +310,6 @@ function getBorderClass($status)
                   </button>
                 </div>
               </form>
-            </div>
-
-            <!-- Add Button (outside the form) -->
-            <div class="col-md-2">
-              <button class="btn btn-custom w-100" data-bs-toggle="modal" data-bs-target="#addComplaint">
-                <i class="fas fa-user-plus me-1"></i> Add
-              </button>
             </div>
           </div>
 
@@ -332,8 +351,6 @@ function getBorderClass($status)
                               data-bs-target="#deleteModal<?= $row['concernID'] ?>">
                               <i class="fas fa-trash"></i>
                             </button>
-
-                            <!-- Modal code unchanged -->
                           </td>
                         </tr>
                       <?php endwhile; ?>
@@ -398,19 +415,144 @@ function getBorderClass($status)
                   </nav>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Add Complaint Modal -->
-          <div class="modal fade" id="addComplaint" tabindex="-1" aria-labelledby="addComplaintLabel"
-            aria-hidden="true">
-            <!-- modal content unchanged -->
+              <!-- Add Complaint Modal -->
+              <div class="modal fade" id="addComplaintModal" tabindex="-1" aria-labelledby="addComplaintLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content">
+
+                    <div class="modal-header" style="background-color:#31afab;">
+                      <h5 class="modal-title text-white fw-semibold" id="addComplaintLabel">
+                        <i class="fas fa-plus me-2"></i>Add Complaint
+                      </h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                      <div class="modal-body">
+                        <div class="row g-3">
+
+                          <!-- Type of Complaint -->
+                          <div class="col-12">
+                            <label class="form-label fw-semibold">Type of Complaint</label>
+                            <select name="complaintTitle" class="form-select" id="complaintTitle" required>
+                              <option value="Noise Complaints">Noise Complaints</option>
+                              <option value="Boundary and Land Disputes">Boundary and Land Disputes</option>
+                              <option value="Neighborhood Quarrels">Neighborhood Quarrels</option>
+                              <option value="Animal-Related Complaints">Animal-Related Complaints</option>
+                              <option value="Youth-Related Issues">Youth-Related Issues</option>
+                              <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit Concerns</option>
+                              <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints</option>
+                              <option value="Alcohol-Related Disturbances">Alcohol-Related Disturbances</option>
+                              <option value="Traffic and Parking Issues">Traffic and Parking Issues</option>
+                              <option value="Physical Assault and Threats">Physical Assault and Threats</option>
+                              <option value="Water Supply Disputes">Water Supply Disputes</option>
+                              <option value="Business-Related Conflicts">Business-Related Conflicts</option>
+                              <option value="Curfew Violations">Curfew Violations</option>
+                              <option value="Smoking and Littering Violations">Smoking and Littering Violations</option>
+                              <option value="Illegal Structures and Encroachments">Illegal Structures and Encroachments</option>
+                              <option value="Physical Abuse">Physical Abuse</option>
+                              <option value="Sexual Abuse">Sexual Abuse</option>
+                              <option value="Psychological Abuse/Emotional Abuse">Psychological Abuse/Emotional Abuse</option>
+                              <option value="Economic Abuse">Economic Abuse</option>
+                              <option value="Neglect">Neglect</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+
+                          <div class="col-12 d-none" id="otherComplaintDiv">
+                            <label class="form-label fw-semibold">Please specify</label>
+                            <input type="text" name="otherComplaint" class="form-control">
+                          </div>
+
+                          <!-- Complainant Info -->
+                          <div class="col-md-6">
+                            <label class="form-label fw-semibold">Complainant's Name</label>
+                            <input type="text" name="complainantName" class="form-control" required>
+                          </div>
+
+                          <div class="col-md-6">
+                            <label class="form-label fw-semibold">Contact Number</label>
+                            <input type="text" name="phoneNumber" class="form-control" required pattern="^09\d{9}$"
+                              title="Please enter a valid PH mobile number (e.g. 09123456789)">
+                          </div>
+
+                          <!-- Address -->
+                          <div class="col-12">
+                            <label class="form-label fw-semibold">Address</label>
+                            <input type="text" name="complaintAddress" class="form-control" required>
+                          </div>
+
+                          <!-- Victim Info -->
+                          <div class="col-md-6">
+                            <label class="form-label fw-semibold">Victim</label>
+                            <input type="text" name="complaintVictim" class="form-control" required>
+                          </div>
+
+                          <div class="col-md-6">
+                            <label class="form-label fw-semibold">Victim's Age</label>
+                            <input type="number" name="victimAge" class="form-control" required min="0">
+                          </div>
+
+                          <!-- Perpetrator Info -->
+                          <div class="col-md-6">
+                            <label class="form-label fw-semibold">Perpetrator</label>
+                            <input type="text" name="complaintAccused" class="form-control" required>
+                          </div>
+
+                          <div class="col-md-6">
+                            <label class="form-label fw-semibold">Relationship</label>
+                            <input type="text" name="victimRelationship" class="form-control" required>
+                          </div>
+
+                          <!-- Description -->
+                          <div class="col-12">
+                            <label class="form-label fw-semibold">Complainant's Description</label>
+                            <textarea name="complaintDescription" class="form-control" rows="3" required></textarea>
+                          </div>
+
+                          <!-- Actions Taken -->
+                          <div class="col-12">
+                            <label class="form-label fw-semibold">Actions Taken</label>
+                            <textarea name="actionTaken" class="form-control" rows="3"></textarea>
+                          </div>
+
+                          <!-- Evidence Upload -->
+                          <div class="col-12">
+                            <label class="form-label fw-semibold">Evidence (Photo)</label>
+                            <input type="file" name="evidence" class="form-control" accept="image/*">
+                          </div>
+
+                        </div>
+                      </div>
+
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Submit Complaint</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <script>
+    document.getElementById("complaintTitle").addEventListener("change", function() {
+      const otherDiv = document.getElementById("otherComplaintDiv");
+      if (this.value === "Other") {
+        otherDiv.classList.remove("d-none");
+      } else {
+        otherDiv.classList.add("d-none");
+      }
+    });
+  </script>
+
+  <!-- Bootstrap bundle already included below -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 

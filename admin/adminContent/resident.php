@@ -18,8 +18,8 @@ $modalNotifType = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
 
     // ===================== INSERT INTO users =====================
-    $insertUser = "INSERT INTO users (phoneNumber, email, password, role, isNew, verificationCode) 
-                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', '{$_POST['password']}', 'user', 1, '')";
+    $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, verificationCode) 
+                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', 1, '')";
 
     if (mysqli_query($conn, $insertUser)) {
         $userID = mysqli_insert_id($conn);
@@ -142,21 +142,27 @@ $result = mysqli_query($conn, $sql);
         <div class="card shadow-lg border-0 rounded-3">
             <div class="card-body p-0">
 
-                <div class="text-white p-4 rounded-top" style="background-color: rgb(49, 175, 171);">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-users me-3 fs-4"></i>
-                        <h1 class="h4 mb-0 fw-semibold">Barangay Residents Listing</h1>
+                <div class="text-white p-4 rounded-top" style="background-color: #31afab;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-alt me-3 fs-4"></i>
+                            <h1 class="h4 mb-0 fw-semibold">Barangay Resident Listing</h1>
+                        </div>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addResidentModal">
+                            <i class="fas fa-plus me-2"></i>Add Resident
+                        </button>
+
                     </div>
                 </div>
 
                 <div class="p-3 p-md-3">
                     <div class="row g-3 mb-4">
                         <!-- Filter Form -->
-                        <div class="col-md-10">
+                        <div class="col-md-12">
                             <form method="GET" action="index.php" class="row g-3">
                                 <input type="hidden" name="page" value="resident">
 
-                                <div class="col-md-5">
+                                <div class="col-md-4">
                                     <div class="input-group">
                                         <span class="input-group-text bg-white border-end-0">
                                             <i class="fas fa-search text-muted"></i>
@@ -179,7 +185,7 @@ $result = mysqli_query($conn, $sql);
                                     </select>
                                 </div>
 
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <select name="order" class="form-select">
                                         <option value="ASC" <?= $order == 'ASC' ? 'selected' : '' ?>>Ascending</option>
                                         <option value="DESC" <?= $order == 'DESC' ? 'selected' : '' ?>>Descending</option>
@@ -192,13 +198,6 @@ $result = mysqli_query($conn, $sql);
                                     </button>
                                 </div>
                             </form>
-                        </div>
-
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button class="btn btn-custom w-100" data-bs-toggle="modal"
-                                data-bs-target="#addResidentModal">
-                                <i class="fas fa-user-plus me-1"></i> Add
-                            </button>
                         </div>
                     </div>
 
@@ -616,7 +615,7 @@ $result = mysqli_query($conn, $sql);
         </script>
     <?php endif; ?> -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(alert => alert.remove());
@@ -639,17 +638,17 @@ $result = mysqli_query($conn, $sql);
             return age;
         }
 
-        birthDateInput.addEventListener('change', function () {
+        birthDateInput.addEventListener('change', function() {
             ageInput.value = calculateAge(this.value);
         });
 
         // Optional: Update age as user types manually in birthdate
-        birthDateInput.addEventListener('input', function () {
+        birthDateInput.addEventListener('input', function() {
             ageInput.value = calculateAge(this.value);
         });
     </script>
     <script>
-        document.getElementById('sameAsCurrent').addEventListener('change', function () {
+        document.getElementById('sameAsCurrent').addEventListener('change', function() {
             const isChecked = this.checked;
 
             const fields = ['blockLotNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName'];
