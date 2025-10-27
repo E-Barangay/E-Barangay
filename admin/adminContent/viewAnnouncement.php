@@ -1,14 +1,12 @@
 <?php
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
-// Get and validate announcement ID
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if (!$id) {
     header("Location: ../index.php?page=announcement");
     exit;
 }
 
-// Fetch announcement details
 $stmt = mysqli_prepare($conn, "SELECT * FROM announcements WHERE announcementID = ?");
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
@@ -23,7 +21,6 @@ if (!$announcement) {
 $message = '';
 $messageType = '';
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
     $title = trim($_POST['title']);
@@ -36,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $imagePath = $announcement['image'];
 
-        // Handle image upload
         if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] === 0) {
             $uploadDir = '../../assets/images/announcements/';
             if (!is_dir($uploadDir)) {
@@ -52,10 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $fullPath = $uploadDir . $filename;
 
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $fullPath)) {
-                    if (!empty($announcement['image']) && file_exists('../../' . $announcement['image'])) {
-                        unlink('../../' . $announcement['image']);
+                    $oldPath = '../../assets/images/announcements/' . $announcement['image'];
+                    if (!empty($announcement['image']) && file_exists($oldPath)) {
+                        unlink($oldPath);
                     }
-                    $imagePath = 'assets/images/announcements/' . $filename;
+
+                    $imagePath = $filename;
                 } else {
                     $message = 'Failed to upload image.';
                     $messageType = 'danger';
@@ -66,10 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // If no upload errors
         if (empty($message)) {
-            $updateStmt = mysqli_prepare($conn, "UPDATE announcements SET title=?, dateTime=?, description=?, image=?, isImportant=? WHERE announcementID=?");
-            mysqli_stmt_bind_param($updateStmt, "ssssii", $title, $date, $description, $imagePath, $isImportant, $id);
+            $updateStmt = mysqli_prepare(
+                $conn,
+                "UPDATE announcements SET title=?, dateTime=?, description=?, image=? WHERE announcementID=?"
+            );
+            mysqli_stmt_bind_param($updateStmt, "ssssi", $title, $date, $description, $imagePath, $id);
 
             if (mysqli_stmt_execute($updateStmt)) {
                 header("Location: ../index.php?page=announcement&updated=1");
@@ -80,14 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-}
-
-// Helper for full image path
-function getImagePath($imagePath)
-{
-    if (empty($imagePath))
-        return null;
-    return (strpos($imagePath, 'assets/') === 0) ? '../../' . $imagePath : $imagePath;
 }
 ?>
 <!DOCTYPE html>
@@ -181,21 +173,19 @@ function getImagePath($imagePath)
 
                                 <?php
                                 $imageFilename = $announcement['image'] ?? '';
-                                $imageFilename = basename($imageFilename);
                                 $webPath = '../../assets/images/announcements/' . $imageFilename;
                                 $fullPath = __DIR__ . '/../../assets/images/announcements/' . $imageFilename;
+                                ?>
 
-                                if (!empty($imageFilename) && file_exists($fullPath)): ?>
-                                    <div class="mb-3 text-center">
-                                        <p class="text-muted mb-2">Current Image:</p>
-                                        <img src="<?= htmlspecialchars($webPath) ?>" alt="Current announcement image"
-                                            class="current-image shadow-sm">
-                                    </div>
-                                <?php else: ?>
-                                    <p class="text-muted">No image found or path is incorrect.</p>
-                                <?php endif; ?>
+                                <div class="mb-3 text-center" id="currentImageContainer"
+                                    style="<?= file_exists($fullPath) ? '' : 'display:none;' ?>">
+                                    <p class="text-muted mb-2">Preview:</p>
+                                    <img id="imagePreview"
+                                        src="<?= file_exists($fullPath) ? htmlspecialchars($webPath) : '' ?>"
+                                        class="current-image shadow-sm" alt="Announcement image">
+                                </div>
 
-                                <input type="file" name="image" class="form-control"
+                                <input type="file" name="image" id="imageInput" class="form-control"
                                     accept="image/jpeg,image/png,image/gif,image/webp">
                                 <div class="form-text">Leave empty to keep current image. Max size 5MB.</div>
                             </div>
@@ -216,9 +206,25 @@ function getImagePath($imagePath)
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const previewContainer = document.getElementById('currentImageContainer');
+            const previewImage = document.getElementById('imagePreview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 
 </html>
