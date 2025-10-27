@@ -20,15 +20,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
 
   // Update user table
   mysqli_query($conn, "UPDATE users 
-                          SET email='$email', phoneNumber='$phoneNumber' 
+                        SET email='$email', phoneNumber='$phoneNumber' 
                         WHERE userID=$userID");
 
   // Update userInfo table
   mysqli_query($conn, "UPDATE userInfo 
-                          SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix',
-                              gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace',
-                              civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation'
-                        WHERE userInfoID=(SELECT userInfoID FROM users WHERE userID=$userID)");
+                        SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix',
+                            gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace',
+                            civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation'
+                        WHERE userID=$userID");
 
   header("Location: viewResident.php?userID=$userID&updated=1");
   exit;
@@ -37,19 +37,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
 // --- Load User ---
 if (isset($_GET['userID'])) {
   $userID = intval($_GET['userID']);
-  $sql = "SELECT u.userID,u.username,u.phoneNumber,u.email,u.role,u.isNew,
-                 i.userInfoID,i.firstName,i.middleName,i.lastName,i.suffix,
-                 i.gender,i.age,i.birthDate,i.birthPlace,i.profilePicture,
-                 i.residencyType,i.lengthOfStay,i.civilStatus,i.citizenship,i.occupation,
-                 a.houseNo,a.streetName,a.phase,a.subdivisionName,a.barangayName,a.cityName,a.provinceName,
-                 pa.houseNo AS houseNoPermanent,pa.streetName AS streetNamePermanent,pa.phase AS phasePermanent,
-                 pa.subdivisionName AS subdivisionNamePermanent,pa.barangayName AS barangayNamePermanent,
-                 pa.cityName AS cityNamePermanent,pa.provinceName AS provinceNamePermanent
-          FROM users u
-          INNER JOIN userInfo i ON u.userInfoID = i.userInfoID
-          LEFT JOIN addresses a ON i.userInfoID = a.userInfoID
-          LEFT JOIN permanentAddresses pa ON i.userInfoID = pa.userInfoID
-          WHERE u.userID = $userID";
+  $sql = "SELECT 
+  u.userID, u.phoneNumber, u.email, u.role, u.isNew,
+  i.userInfoID, i.firstName, i.middleName, i.lastName, i.suffix,
+  i.gender, i.age, i.birthDate, i.birthPlace, i.profilePicture,
+  i.residencyType, i.lengthOfStay, i.civilStatus, i.citizenship, i.occupation,
+
+  -- PRESENT ADDRESS
+  a.blockLotNo AS presentBlockLotNo,
+  a.streetName AS presentStreetName,
+  a.phase AS presentPhase,
+  a.subdivisionName AS presentSubdivision,
+  a.barangayName AS presentBarangay,
+  a.cityName AS presentCity,
+  a.provinceName AS presentProvince,
+  a.purok AS presentPurok,
+
+  -- PERMANENT ADDRESS
+  pa.permanentBlockLotNo AS permanentBlockLotNo,
+  pa.permanentStreetName AS permanentStreetName,
+  pa.permanentPhase AS permanentPhase,
+  pa.permanentSubdivisionName AS permanentSubdivision,
+  pa.permanentBarangayName AS permanentBarangay,
+  pa.permanentCityName AS permanentCity,
+  pa.permanentProvinceName AS permanentProvince,
+  pa.permanentPurok AS permanentPurok
+
+FROM users u
+INNER JOIN userInfo i ON i.userID = u.userID
+LEFT JOIN addresses a ON a.userInfoID = i.userInfoID
+LEFT JOIN permanentaddresses pa ON pa.userInfoID = i.userInfoID
+WHERE u.userID = $userID";
+
 
   $result = mysqli_query($conn, $sql);
   if ($result && mysqli_num_rows($result) > 0) {

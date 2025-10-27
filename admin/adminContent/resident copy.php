@@ -11,97 +11,225 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     exit();
 }
 
-// ===================== HANDLE ADD RESIDENT FORM =====================
-$modalNotif = '';
-$modalNotifType = '';
+// ===================== NOTIFICATIONS =====================
+$modalNotif = "";
+$modalNotifType = "";
+$showModal = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
+$pageNotif = "";
+$pageNotifType = "";
 
-    // ===================== INSERT INTO users =====================
-    $insertUser = "INSERT INTO users (phoneNumber, email, password, role, isNew, verificationCode) 
-                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', '{$_POST['password']}', 'user', 1, '')";
+// ===================== INSERT HANDLER =====================
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $firstName = $_POST['firstName'];
+    $middleName = $_POST['middleName'];
+    $lastName = $_POST['lastName'];
+    $gender = $_POST['gender'];
+    $age = $_POST['age'];
+    $birthPlace = $_POST['birthPlace'];
+    $birthDate = $_POST['birthDate'];
+    $residencyType = $_POST['residencyType'];
+    $lengthOfStay = $_POST['lengthOfStay'];
+    $civilStatus = $_POST['civilStatus'];
+    $citizenship = $_POST['citizenship'];
+    $occupation = $_POST['occupation'];
 
-    if (mysqli_query($conn, $insertUser)) {
-        $userID = mysqli_insert_id($conn);
+    // CURRENT ADDRESS
+    $cityName = $_POST['cityName'];
+    $provinceName = $_POST['provinceName'];
+    $barangayName = $_POST['barangayName'];
+    $streetName = $_POST['streetName'];
+    $blockLotNo = $_POST['blockLotNo'];
+    $phase = $_POST['phase'];
+    $subdivisionName = $_POST['subdivisionName'];
+    $purok = $_POST['purok'];
 
-        // ===================== INSERT INTO userInfo =====================
-        $insertResident = "INSERT INTO userInfo
-            (userID, firstName, middleName, lastName, gender, birthDate, age, birthPlace, bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType)
-            VALUES
-            ($userID, '{$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}')";
+    // PERMANENT ADDRESS
+    $permanentCityName = $_POST['permanentCityName'];
+    $permanentProvinceName = $_POST['permanentProvinceName'];
+    $permanentBarangayName = $_POST['permanentBarangayName'];
+    $permanentStreetName = $_POST['permanentStreetName'];
+    $permanentBlockLotNo = $_POST['permanentBlockLotNo'];
+    $permanentPhase = $_POST['permanentPhase'];
+    $permanentSubdivisionName = $_POST['permanentSubdivisionName'];
+    $permanentPurok = $_POST['permanentPurok'];
 
-        if (mysqli_query($conn, $insertResident)) {
+    // USER
+    $email = $_POST['email'];
+    $phoneNumber = $_POST['phoneNumber'];
+    $userType = "user";
+
+    // Check for duplicate email
+    $checkEmail = "SELECT userID FROM users WHERE email = '$email' LIMIT 1";
+    $checkResult = mysqli_query($conn, $checkEmail);
+
+    if (mysqli_num_rows($checkResult) > 0) {
+        $modalNotif = "The email <strong>" . htmlspecialchars($email) . "</strong> is already in use.";
+        $modalNotifType = "danger";
+        $showModal = true;
+    } else {
+        // Insert into userInfo
+        $sqlUserInfo = "INSERT INTO userInfo (firstName, middleName, lastName, gender, age, birthDate, birthPlace, residencyType, lengthOfStay, civilStatus, citizenship, occupation)
+                        VALUES ('$firstName', '$middleName', '$lastName', '$gender', '$age', '$birthDate', '$birthPlace', '$residencyType', '$lengthOfStay', '$civilStatus', '$citizenship', '$occupation')";
+
+        if (mysqli_query($conn, $sqlUserInfo)) {
+
             $userInfoID = mysqli_insert_id($conn);
 
-            // ===================== INSERT CURRENT ADDRESS =====================
-            $insertAddress = "INSERT INTO addresses 
-                (userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName)
-                VALUES
-                ($userInfoID, '{$_POST['blockLotNo']}', '{$_POST['streetName']}', '{$_POST['phase']}', '{$_POST['subdivisionName']}', '{$_POST['barangayName']}', '{$_POST['cityName']}', '{$_POST['provinceName']}')";
-            mysqli_query($conn, $insertAddress);
+            // Insert into addresses (CURRENT)
+            $sqlAddress = "INSERT INTO addresses (userInfoID, cityName, provinceName, barangayName, streetName, blockLotNo, phase, subdivisionName, purok)
+                           VALUES ('$userInfoID', '$cityName', '$provinceName', '$barangayName', '$streetName', '$blockLotNo', '$phase', '$subdivisionName', '$purok')";
+            mysqli_query($conn, $sqlAddress);
 
-            // ===================== INSERT PERMANENT ADDRESS =====================
-            $insertPermanent = "INSERT INTO permanentAddresses
-                (userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, permanentSubdivisionName, permanentBarangayName, permanentCityName, permanentProvinceName)
-                VALUES
-                ($userInfoID, '{$_POST['blockLotNoPermanent']}', '{$_POST['streetNamePermanent']}', '{$_POST['phasePermanent']}', '{$_POST['subdivisionNamePermanent']}', '{$_POST['barangayNamePermanent']}', '{$_POST['cityNamePermanent']}', '{$_POST['provinceNamePermanent']}')";
-            mysqli_query($conn, $insertPermanent);
+            // Insert into permanent address
+            $sqlPermanent = "INSERT INTO permanentaddresses (userInfoID, permanentCityName, permanentProvinceName, permanentStreetName, permanentBarangayName, permanentBlockLotNo, permanentPhase, permanentSubdivisionName, permanentPurok)
+                             VALUES ('$userInfoID', '$permanentCityName', '$permanentProvinceName', '$permanentStreetName', '$permanentBarangayName', '$permanentBlockLotNo', '$permanentPhase', '$permanentSubdivisionName', '$permanentPurok')";
+            mysqli_query($conn, $sqlPermanent);
 
-            $modalNotif = "Resident successfully added!";
-            $modalNotifType = "success";
-            $_POST = []; // reset form
+            // Insert into users
+            $username = strtolower($firstName . "." . $lastName);
+            $password = password_hash("123456", PASSWORD_DEFAULT);
+
+            $sqlUser = "INSERT INTO users (userInfoID, username, password, email, phoneNumber, role, isNew)
+                        VALUES ('$userInfoID', '$username', '$password', '$email', '$phoneNumber', '$userType', 'No')";
+            mysqli_query($conn, $sqlUser);
+
+            $pageNotif = "Resident added successfully!";
+            $pageNotifType = "success";
+            $showModal = false;
         } else {
-            $modalNotif = "Error adding resident info: " . mysqli_error($conn);
+            $modalNotif = "Error: " . mysqli_error($conn);
             $modalNotifType = "danger";
+            $showModal = true;
         }
-    } else {
-        $modalNotif = "Error adding user account: " . mysqli_error($conn);
-        $modalNotifType = "danger";
     }
 }
 
-// ===================== GET RESIDENTS =====================
+// ===================== GET FILTER INPUTS =====================
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $sortBy = isset($_GET['sortBy']) ? $_GET['sortBy'] : 'lastName';
-$order = isset($_GET['order']) && strtoupper($_GET['order']) === 'DESC' ? 'DESC' : 'ASC';
+$order = isset($_GET['order']) ? $_GET['order'] : 'ASC';
 
-$allowedSort = ['lastName', 'firstName', 'birthDate', 'gender'];
-if (!in_array($sortBy, $allowedSort)) {
-    $sortBy = 'lastName';
+// ===================== PAGINATION =====================
+$perPage = 10; // rows per page
+$currentPage = isset($_GET['p']) ? (int) $_GET['p'] : 1;
+if ($currentPage < 1) {
+    $currentPage = 1;
 }
+$offset = ($currentPage - 1) * $perPage;
 
-$sql = "SELECT 
-    ui.userInfoID,
-    ui.userID,
-    ui.firstName,
-    ui.middleName,
-    ui.lastName,
-    ui.suffix,
-    ui.gender,
-    ui.birthDate,
-    a.cityName,
-    a.provinceName
-FROM userInfo ui
-INNER JOIN users u ON ui.userID = u.userID
+// ===================== COUNT TOTAL RECORDS =====================
+$countSql = "SELECT COUNT(*) as total 
+FROM users u
+INNER JOIN userInfo ui ON u.userID = ui.userID
 LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
 WHERE u.role = 'user'";
 
+$countParams = [];
+$countTypes = '';
+
 if ($search !== '') {
-    $term = "%$search%";
-    $sql .= " AND (
-        ui.firstName LIKE '$term' OR
-        ui.middleName LIKE '$term' OR
-        ui.lastName LIKE '$term' OR
-        ui.birthDate LIKE '$term' OR
-        ui.gender LIKE '$term' OR
-        CONCAT_WS(' ', a.blockLotNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE '$term'
+    $countSql .= " AND (
+        ui.firstName LIKE ? OR
+        ui.middleName LIKE ? OR
+        ui.lastName LIKE ? OR
+        ui.birthDate LIKE ? OR
+        ui.gender LIKE ? OR
+        CONCAT_WS(' ', a.houseNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE ?
     )";
+    $term = "%$search%";
+    $countParams = [$term, $term, $term, $term, $term, $term];
+    $countTypes = 'ssssss';
 }
 
-$sql .= " ORDER BY $sortBy $order";
+$countStmt = $conn->prepare($countSql);
+if (!empty($countParams)) {
+    $countStmt->bind_param($countTypes, ...$countParams);
+}
+$countStmt->execute();
+$countResult = $countStmt->get_result()->fetch_assoc();
+$totalRecords = $countResult['total'];
+$totalPages = max(1, ceil($totalRecords / $perPage));
 
-$result = mysqli_query($conn, $sql);
+// ===================== BASE SQL =====================
+$sql = "SELECT 
+    u.userID,
+    u.email,
+    u.phoneNumber,
+    u.role,
+    ui.userInfoID,
+    ui.firstName,
+    ui.middleName,
+    ui.lastName,
+    ui.gender,
+    ui.age,
+    ui.birthDate,
+    ui.birthPlace,
+    ui.residencyType,
+    ui.lengthOfStay,
+    ui.civilStatus,
+    ui.citizenship,
+    ui.occupation,
+    a.cityName,
+    a.provinceName,
+    a.barangayName,
+    a.streetName,
+    -- a.houseNo,
+    a.phase,
+    a.subdivisionName,
+    a.purok
+FROM users u
+INNER JOIN userInfo ui ON u.userID = ui.userID
+LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
+WHERE u.role = 'user'";
+
+$params = [];
+$types = '';
+
+// ===================== ADD SEARCH =====================
+if ($search !== '') {
+    $sql .= " AND (
+        ui.firstName LIKE ? OR
+        ui.middleName LIKE ? OR
+        ui.lastName LIKE ? OR
+        ui.birthDate LIKE ? OR
+        ui.gender LIKE ? OR
+        CONCAT_WS(' ', a.houseNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE ?
+    )";
+
+    $term = "%$search%";
+    $params = array_merge($params, [$term, $term, $term, $term, $term, $term]);
+    $types .= 'ssssss';
+}
+
+// ===================== ADD SORT + LIMIT =====================
+$sql .= " ORDER BY $sortBy $order LIMIT ? OFFSET ?";
+$params[] = $perPage;
+$params[] = $offset;
+$types .= 'ii';
+
+// ===================== PREPARE & EXECUTE =====================
+$stmt = $conn->prepare($sql);
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
+
+<!-- ===================== MODAL ALERT ===================== -->
+<?php if (!empty($modalNotif)): ?>
+    <div class="alert alert-<?= $modalNotifType ?> mb-3">
+        <?= $modalNotif ?>
+    </div>
+<?php endif; ?>
+
+<!-- ===================== PAGE ALERT ===================== -->
+<?php if (!empty($pageNotif)): ?>
+    <div class="alert alert-<?= $pageNotifType ?> mb-3">
+        <?= $pageNotif ?>
+    </div>
+<?php endif; ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -137,7 +265,6 @@ $result = mysqli_query($conn, $sql);
 </style>
 
 <body>
-
     <div class="container-fluid p-3 p-md-4">
         <div class="card shadow-lg border-0 rounded-3">
             <div class="card-body p-0">
@@ -194,6 +321,7 @@ $result = mysqli_query($conn, $sql);
                             </form>
                         </div>
 
+                        <!-- Add Button (outside the form) -->
                         <div class="col-md-2 d-flex align-items-end">
                             <button class="btn btn-custom w-100" data-bs-toggle="modal"
                                 data-bs-target="#addResidentModal">
@@ -218,18 +346,29 @@ $result = mysqli_query($conn, $sql);
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if ($result->num_rows > 0): ?>
-                                            <?php while ($row = $result->fetch_assoc()): ?>
+                                        <?php if (mysqli_num_rows($result) > 0): ?>
+                                            <?php while ($resultRow = mysqli_fetch_assoc($result)): ?>
                                                 <tr>
-                                                    <td><?= htmlspecialchars($row['lastName']); ?></td>
-                                                    <td><?= htmlspecialchars($row['firstName']); ?></td>
-                                                    <td><?= htmlspecialchars($row['middleName']); ?></td>
-                                                    <td><?= htmlspecialchars($row['birthDate']); ?></td>
-                                                    <td><?= htmlspecialchars($row['gender']); ?></td>
-                                                    <td><?= htmlspecialchars($row['cityName'] . ', ' . $row['provinceName']); ?>
+                                                    <td>
+                                                        <?= htmlspecialchars($resultRow['lastName']); ?>
                                                     </td>
                                                     <td>
-                                                        <a href="adminContent/viewResident.php?userID=<?= $row['userID'] ?: 0 ?>"
+                                                        <?= htmlspecialchars($resultRow['firstName']); ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= htmlspecialchars($resultRow['middleName']); ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= htmlspecialchars($resultRow['birthDate']); ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= htmlspecialchars($resultRow['gender']); ?>
+                                                    </td>
+                                                    <td>
+                                                        <?= htmlspecialchars($resultRow['cityName'] . ', ' . $resultRow['provinceName']); ?>
+                                                    </td>
+                                                    <td>
+                                                        <a href="adminContent/viewResident.php?userID=<?= $resultRow['userID'] ?: 0 ?>"
                                                             class="btn btn-sm btn-success">
                                                             <i class="fas fa-eye me-1"></i>
                                                         </a>
@@ -239,10 +378,6 @@ $result = mysqli_query($conn, $sql);
                                                     </td>
                                                 </tr>
                                             <?php endwhile; ?>
-                                        <?php else: ?>
-                                            <tr>
-                                                <td colspan="7" class="text-center">No users found</td>
-                                            </tr>
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
@@ -340,9 +475,8 @@ $result = mysqli_query($conn, $sql);
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Block & Lot | House no.</label>
-                                                    <input type="text" class="form-control" id="blockLotNo"
-                                                        name="blockLotNo"
-                                                        value="<?= isset($_POST['blockLotNo']) ? htmlspecialchars($_POST['blockLotNo']) : '' ?>"
+                                                    <input type="text" class="form-control" id="houseNo" name="houseNo"
+                                                        value="<?= isset($_POST['houseNo']) ? htmlspecialchars($_POST['houseNo']) : '' ?>"
                                                         required>
                                                 </div>
                                                 <div class="col-md-3">
@@ -391,9 +525,9 @@ $result = mysqli_query($conn, $sql);
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Block & Lot | House no.</label>
-                                                    <input type="text" class="form-control" id="blockLotNoPermanent"
-                                                        name="blockLotNoPermanent"
-                                                        value="<?= isset($_POST['blockLotNo']) ? htmlspecialchars($_POST['blockLotNo']) : '' ?>"
+                                                    <input type="text" class="form-control" id="houseNoPermanent"
+                                                        name="houseNoPermanent"
+                                                        value="<?= isset($_POST['houseNo']) ? htmlspecialchars($_POST['houseNo']) : '' ?>"
                                                         required>
                                                 </div>
                                                 <div class="col-md-3">
@@ -546,7 +680,7 @@ $result = mysqli_query($conn, $sql);
                             </div>
                         </div>
 
-                        <!-- <div class="card-footer bg-light">
+                        <div class="card-footer bg-light">
                             <div class="row align-items-center">
                                 <div class="col-12 col-md-6">
                                     <div class="text-center text-md-start">
@@ -560,9 +694,11 @@ $result = mysqli_query($conn, $sql);
                                     <nav class="d-flex justify-content-center justify-content-md-end">
                                         <ul class="pagination pagination-sm mb-0">
                                             <?php
+                                            // Preserve filters
                                             $queryBase = "page=resident&search=" . urlencode($search) . "&sortBy=" . urlencode($sortBy) . "&order=" . urlencode($order);
                                             ?>
 
+                                            <!-- Previous -->
                                             <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
                                                 <a class="page-link"
                                                     href="?<?= $queryBase ?>&p=<?= max(1, $currentPage - 1) ?>"
@@ -571,12 +707,14 @@ $result = mysqli_query($conn, $sql);
                                                 </a>
                                             </li>
 
+                                            <!-- Numbered pages -->
                                             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                                 <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
                                                     <a class="page-link" href="?<?= $queryBase ?>&p=<?= $i ?>"><?= $i ?></a>
                                                 </li>
                                             <?php endfor; ?>
 
+                                            <!-- Next -->
                                             <li
                                                 class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
                                                 <a class="page-link"
@@ -589,7 +727,7 @@ $result = mysqli_query($conn, $sql);
                                     </nav>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -597,7 +735,7 @@ $result = mysqli_query($conn, $sql);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- <?php if ($showModal): ?>
+    <?php if ($showModal): ?>
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 let myModalEl = document.getElementById("addResidentModal");
@@ -614,7 +752,7 @@ $result = mysqli_query($conn, $sql);
                 <?php endif; ?>
             });
         </script>
-    <?php endif; ?> -->
+    <?php endif; ?>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
@@ -652,7 +790,7 @@ $result = mysqli_query($conn, $sql);
         document.getElementById('sameAsCurrent').addEventListener('change', function () {
             const isChecked = this.checked;
 
-            const fields = ['blockLotNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName'];
+            const fields = ['houseNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName'];
 
             fields.forEach(field => {
                 const current = document.getElementById(field);
