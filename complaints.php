@@ -13,7 +13,7 @@ if (isset($_GET['page'])) {
             break;
         case "complaintSection":
             if (!isset($_SESSION['userID'])) {
-                header("Location: signIn.php");
+                header("Location: login.php");
             }
             break;
         case "submittedComplaints":
@@ -35,7 +35,7 @@ if (isset($_GET['page'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>E-Barangay | Reports</title>
+    <title>E-Barangay | Comaplints</title>
 
     <!-- Icon -->
     <link rel="icon" href="assets/images/logoSanAntonio.png">
@@ -46,7 +46,7 @@ if (isset($_GET['page'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/navbar/style.css">
-    <link rel="stylesheet" href="assets/css/reports/style.css">
+    <link rel="stylesheet" href="assets/css/complaints/style.css">
     <link rel="stylesheet" href="assets/css/footer/style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -103,7 +103,7 @@ if (isset($_GET['page'])) {
                                 a Complaint</a>
                             <a href="?page=submittedComplaints"
                                 class="btn btn-primary filterButton m-2 w-100 <?php echo ($page == 'submittedComplaints') ? 'active' : ''; ?>">Submitted
-                                Reports</a>
+                                Complaints</a>
                         </div>
                     </div>
                 </div>
@@ -111,8 +111,8 @@ if (isset($_GET['page'])) {
             </div>
 
             <div class="col-12 col-lg-9 p-0">
-                <div class="contentCard card m-1 p-2">
-                    <div class="row px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
+                <div class="contentCard card m-1">
+                    <div class="row py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
 
                         <?php include("reportContent/" . $page . ".php"); ?>
 

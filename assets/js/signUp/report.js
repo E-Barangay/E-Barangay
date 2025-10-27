@@ -134,3 +134,46 @@ function setCoordinates(lat, lng) {
     document.getElementById('lat').value = lat;
     document.getElementById('lng').value = lng;
 }
+
+
+(() => {
+    'use strict'
+
+    const form = document.querySelector('.needs-validation')
+    const submitButton = document.getElementById('submitBtn');
+    const confirmModalEl = document.getElementById('exampleModal')
+    const warningModalEl = document.getElementById('warningModal')
+
+    const confirmModal = new bootstrap.Modal(confirmModalEl)
+    const warningModal = new bootstrap.Modal(warningModalEl)
+
+    submitButton.addEventListener('click', event => {
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            warningModal.show();
+        } else {
+            confirmModal.show();
+        }
+    });
+
+
+    // Ensure confirmation modal is not triggered until warning modal is fully hidden
+    warningModalEl.addEventListener('hidden.bs.modal', () => {
+        // Focus the first empty required field (optional)
+        const firstInvalid = form.querySelector(':invalid')
+        if (firstInvalid) firstInvalid.focus()
+    })
+
+    // Optional: normal form submission validation
+    form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+            form.classList.add('was-validated')
+        }
+    })
+})()
+
+
+
+

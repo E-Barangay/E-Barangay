@@ -1,11 +1,13 @@
 <div class="content">
     <div class="p-md-5 p-4">
         <div class="d-flex flex-column align-items-center">
-            <div class="card d-inline-block p-3 text-center" style="background-color: #19AFA5">
+
+            <div class="card d-inline-block p-3 text-center rounded-2 border-0" style="background-color: #19AFA5">
                 <h2 class="fw-bolder m-0 text-light">REPORT COMMUNITY CONCERNS</h2>
             </div>
 
-            <p class = "py-5">Your participation is vital in creating a better community for everyone. This application allows
+            <p class="py-5">Your participation is vital in creating a better community for everyone. This application
+                allows
                 you
                 to easily report various issues you encounter in our barangay. Whether it’s a malfunctioning
                 streetlight, persistent noise disturbances, uncollected garbage, or any other public concern,

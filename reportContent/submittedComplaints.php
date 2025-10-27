@@ -26,100 +26,109 @@ if (isset($_SESSION['userID'])) {
 
 
 <div class="content">
-  <div class="p-md-5 p-4">
-    <div class="d-flex justify-content-center mb-3">
+  <div class="p-md-1 p-0">
+
+  <div class="card py-3 mt-2 mb-2 text-center" style="background-color: #19AFA5; border: none; border-radius: 12px;">
+        <span class="m-0" style="font-size: clamp(16px, 4vw, 20px); font-weight: bold; color: white;">Your Submitted Complaints</span>
+    </div>
+
+    <!-- <div class="d-flex justify-content-center mb-3">
       <div class="card p-3 text-center" style="background-color: #19AFA5; border: none;">
         <h2 class="fw-bold fs-5 text-light mb-0">Your Submitted Complaints</h2>
       </div>
-    </div>
+    </div> -->
 
-    <table class="mt-2 table table-striped text-center">
-      <thead>
-        <tr>
-          <th>No.</th>
-          <th>Date Submitted</th>
-          <th>Title</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php if (!empty($complaints)): ?>
-          <?php foreach ($complaints as $index => $complaint): ?>
-            <tr>
-              <td><?= $index + 1 ?></td>
-              <td><?= date("Y-m-d h:i A", strtotime($complaint['requestDate'])) ?></td>
-              <td><?= htmlspecialchars($complaint['complaintTitle']) ?></td>
-              <td><?= ucfirst($complaint['complaintStatus']) ?></td>
-              <td>
-                <button class="btn btn-sm filterButton" data-bs-toggle="modal"
-                  data-bs-target="#complaintModal<?= $complaint['complaintID'] ?>">
-                  View
-                </button>
-              </td>
-            </tr>
+    <div class="table-responsive">
+      <table class="mt-2 table table-striped text-center">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Date Submitted</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php if (!empty($complaints)): ?>
+            <?php foreach ($complaints as $index => $complaint): ?>
+              <tr>
+                <td><?= $index + 1 ?></td>
+                <td><?= date("Y-m-d h:i A", strtotime($complaint['requestDate'])) ?></td>
+                <td><?= htmlspecialchars($complaint['complaintTitle']) ?></td>
+                <td><?= ucfirst($complaint['complaintStatus']) ?></td>
+                <td>
+                  <button class="btn btn-sm filterButton" data-bs-toggle="modal"
+                    data-bs-target="#complaintModal<?= $complaint['complaintID'] ?>">
+                    View
+                  </button>
+                </td>
+              </tr>
 
-            <!-- Modal -->
-            <div class="modal fade" id="complaintModal<?= $complaint['complaintID'] ?>" tabindex="-1"
-              aria-labelledby="modalLabel<?= $complaint['complaintID'] ?>" aria-hidden="true">
-              <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content printableArea">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel<?= $complaint['complaintID'] ?>">Complaint Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <div class="row mb-2">
-                      <div class="col-md-6"><strong>Title:</strong> <?= htmlspecialchars($complaint['complaintTitle']) ?>
-                      </div>
-                      <div class="col-md-6"><strong>Relation:</strong>
-                        <?= htmlspecialchars($complaint['victimRelationship']) ?></div>
+              <!-- Modal -->
+              <div class="modal fade" id="complaintModal<?= $complaint['complaintID'] ?>" tabindex="-1"
+                aria-labelledby="modalLabel<?= $complaint['complaintID'] ?>" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content printableArea">
+                    <div class="modal-header" style="background-color: #19AFA5">
+                      <h5 class="modal-title text-light" id="modalLabel<?= $complaint['complaintID'] ?>">Complaint Details</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="row mb-2">
-                      <div class="col-md-6"><strong>Address:</strong>
-                        <?= htmlspecialchars($complaint['complaintAddress']) ?></div>
-                      <div class="col-md-6"><strong>Phone:</strong>
-                        <?= htmlspecialchars($complaint['complaintPhoneNumber']) ?></div>
-                    </div>
-                    <div class="row mb-2">
-                      <div class="col-md-6"><strong>Victim:</strong> <?= htmlspecialchars($complaint['complaintVictim']) ?>
-                      </div>
-                      <div class="col-md-6"><strong>Accused:</strong>
-                        <?= htmlspecialchars($complaint['complaintAccused']) ?></div>
-                    </div>
-                    <div class="mb-3">
-                      <strong>Statement:</strong>
-                      <p><?= htmlspecialchars($complaint['complaintDescription']) ?></p>
-                    </div>
-
-                    <?php if (!empty($complaint['images'])): ?>
-                      <div class="mb-3">
-                        <strong>Uploaded Evidence:</strong>
-                        <div class="d-flex flex-wrap">
-                          <?php foreach ($complaint['images'] as $img): ?>
-                            <img src="<?= htmlspecialchars($img) ?>" alt="Evidence Image">
-                          <?php endforeach; ?>
+                    <div class="modal-body">
+                      <div class="row mb-2">
+                        <div class="col-md-6"><strong>Title:</strong> <?= htmlspecialchars($complaint['complaintTitle']) ?>
                         </div>
+                        <div class="col-md-6"><strong>Relation:</strong>
+                          <?= htmlspecialchars($complaint['victimRelationship']) ?></div>
                       </div>
-                    <?php endif; ?>
-                  </div>
-                  <div class="modal-footer">
-                    <button onclick="printComplaint('complaintModal<?= $complaint['complaintID'] ?>')"
-                      class="btn filterButton">Print Complaint</button>
-                    <button type="button" class="btn filterButton" data-bs-dismiss="modal">Close</button>
+                      <div class="row mb-2">
+                        <div class="col-md-6"><strong>Address:</strong>
+                          <?= htmlspecialchars($complaint['complaintAddress']) ?></div>
+                        <div class="col-md-6"><strong>Phone:</strong>
+                          <?= htmlspecialchars($complaint['complaintPhoneNumber']) ?></div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-md-6"><strong>Victim:</strong>
+                          <?= htmlspecialchars($complaint['complaintVictim']) ?>
+                        </div>
+                        <div class="col-md-6"><strong>Accused:</strong>
+                          <?= htmlspecialchars($complaint['complaintAccused']) ?></div>
+                      </div>
+                      <div class="mb-3">
+                        <strong>Statement:</strong>
+                        <p><?= htmlspecialchars($complaint['complaintDescription']) ?></p>
+                      </div>
+
+                      <?php if (!empty($complaint['images'])): ?>
+                        <div class="mb-3">
+                          <strong>Uploaded Evidence:</strong>
+                          <div class="d-flex flex-wrap">
+                            <?php foreach ($complaint['images'] as $img): ?>
+                              <img src="<?= htmlspecialchars($img) ?>" alt="Evidence Image">
+                            <?php endforeach; ?>
+                          </div>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="modal-footer">
+                      <!-- <button onclick="printComplaint('complaintModal<?= $complaint['complaintID'] ?>')"
+                        class="btn filterButton">Print Complaint</button> -->
+                      <button type="button" class="btn filterButton" data-bs-dismiss="modal">Close</button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-          <?php endforeach; ?>
-        <?php else: ?>
-          <tr>
-            <td colspan="5">No complaints submitted yet.</td>
-          </tr>
-        <?php endif; ?>
-      </tbody>
-    </table>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <tr>
+              <td colspan="5">No complaints submitted yet.</td>
+            </tr>
+          <?php endif; ?>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 
