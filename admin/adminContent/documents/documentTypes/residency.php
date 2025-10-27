@@ -16,7 +16,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <img src="../uploads/profiles/<?php echo $profilePicture ?>" style="width: 150px; height: 150px; object-fit: contain;" alt="2x2 Photo">
+            <img src="../../uploads/profiles/<?php echo $profilePicture ?>" style="width: 150px; height: 150px; object-fit: contain;" alt="2x2 Photo">
         </div>
     </div>
 </div>

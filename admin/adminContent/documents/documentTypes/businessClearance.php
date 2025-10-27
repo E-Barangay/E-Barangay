@@ -48,7 +48,7 @@
 <div class="col-12 d-block d-md-none">
     <div class="row">
         <div class="col text-center mb-3">
-            <img src="../uploads/profiles/<?php echo $profilePicture ?>" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover; object-position: center;">
+            <img src="../../uploads/profiles/<?php echo $profilePicture ?>" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover; object-position: center;">
         </div>
     </div>
 </div>
