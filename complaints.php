@@ -35,7 +35,7 @@ if (isset($_GET['page'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>E-Barangay | Comaplints</title>
+    <title>E-Barangay | Complaints</title>
 
     <!-- Icon -->
     <link rel="icon" href="assets/images/logoSanAntonio.png">
@@ -74,7 +74,7 @@ if (isset($_GET['page'])) {
 
                 <!-- Pop Up when screen is in small size -->
 
-                <div class="row mb-2 g-0 d-sm-none d-flex justify-content-between">
+                <!-- <div class="row mb-2 g-0 d-sm-none d-flex justify-content-between">
 
                     <div class="col-4 d-flex justify-content-center">
                         <a href="?page=complaintSection" class="btn filterButton p-2 w-75 text-center">
@@ -91,9 +91,9 @@ if (isset($_GET['page'])) {
                             <i class="bi bi-send-fill"></i>
                         </a>
                     </div>
-                </div>
+                </div> -->
 
-                <div class="filterCard card m-1 p-3 d-none d-md-block">
+                <div class="filterCard card m-1 p-3">
                     <div class="row">
                         <div class="col d-flex flex-column align-items-center">
                             <a href="?page=complaintSection"
