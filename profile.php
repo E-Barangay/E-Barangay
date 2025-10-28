@@ -25,7 +25,6 @@ $lastName = $userDataRow['lastName'];
 $suffix = $userDataRow['suffix'];
 $gender = $userDataRow['gender'];
 $birthDate = $userDataRow['birthDate'];
-$age = $userDataRow['age'];
 $birthPlace = $userDataRow['birthPlace'];
 $bloodType = $userDataRow['bloodType'];
 $civilStatus = $userDataRow['civilStatus'];
@@ -37,6 +36,14 @@ $remarks = $userDataRow['remarks'];
 
 $phoneNumber = $userDataRow['phoneNumber'];
 $email = $userDataRow['email'];
+
+$age = '';
+if (!empty($birthDate)) {
+    $birthDateTime = new DateTime($birthDate);
+    $currentDate = new DateTime();
+    $ageYears = $currentDate->diff($birthDateTime)->y;
+    $age = $ageYears . ' ' . ($ageYears <= 1 ? 'year' : 'years') . ' old';
+}
 
 function formatAddress($value) {
     return ucwords(strtolower($value));
@@ -60,7 +67,11 @@ $permanentBarangayName = formatAddress($userDataRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userDataRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
 
-$userInfoID = $userDataRow['userInfoID'];
+$userInfoIDQuery = "SELECT userInfoID FROM userInfo WHERE userID = $userID";
+$userInfoIDResult = executeQuery($userInfoIDQuery);
+$userInfoIDRow = mysqli_fetch_assoc($userInfoIDResult);
+
+$userInfoID = $userInfoIDRow['userInfoID'];
 
 if (isset($_POST['saveButton'])) {
     $firstName = $_POST['firstName'];
@@ -99,18 +110,14 @@ if (isset($_POST['saveButton'])) {
     $permanentCityName = strtoupper($_POST['permanentCityName']);
     $permanentProvinceName = strtoupper($_POST['permanentProvinceName']);
 
-    $birthDateObj = new DateTime($birthDate);
-    $today = new DateTime();
-    $calculatedAge = $today->diff($birthDateObj)->y;
-
     $updateUserInfoQuery = "UPDATE userInfo SET firstName = '$firstName', middleName = '$middleName', lastName = '$lastName', 
-                        suffix = '$suffix', gender = '$gender', birthDate = '$birthDate', age = '$calculatedAge', birthPlace = '$birthPlace',
+                        suffix = '$suffix', gender = '$gender', birthDate = '$birthDate', age = '$age', birthPlace = '$birthPlace',
                         bloodType = '$bloodType', civilStatus = '$civilStatus', citizenship = '$citizenship', occupation = '$occupation',
                         lengthOfStay = '$lengthOfStay', residencyType = '$residencyType', remarks = '$remarks' WHERE userID = $userID;";
     $updateUserInfoResult = executeQuery($updateUserInfoQuery);
 
     $updateUserContactQuery = "UPDATE users SET phoneNumber = '$phoneNumber', email = '$email' WHERE userID = $userID;";
-    $updateUserInfoResult = executeQuery($updateUserInfoQuery);
+    $updateUserInfoResult = executeQuery($updateUserContactQuery);
 
     $updateAddressQuery = "UPDATE addresses SET blockLotNo = '$blockLotNo', phase = '$phase', subdivisionName = '$subdivisionName',
                         purok = '$purok', streetName = '$streetName', barangayName = '$barangayName', cityName = '$cityName',
@@ -134,10 +141,13 @@ if (isset($_POST['saveButton'])) {
         }
     }
 
-    if (isset($_POST['confirmButton'])) {
-        $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = NULL WHERE userInfoID = $userInfoID";
-        $updateProfilePictureResult = executeQuery($updateProfilePictureQuery);
-    }
+    header("Location: profile.php");
+    exit();
+}
+
+if (isset($_POST['confirmButton'])) {
+    $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = NULL WHERE userInfoID = $userInfoID";
+    $updateProfilePictureResult = executeQuery($updateProfilePictureQuery);
 
     header("Location: profile.php");
     exit();
@@ -178,6 +188,24 @@ if (isset($_POST['saveButton'])) {
         <div class="container pt-3">
             <div class="row">
                 <div class="col">
+
+                    <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
+                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
+                        <?php unset($_SESSION['success']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
+                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
+                        <?php unset($_SESSION['success']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
+                        <div class="alert alert-warning text-center mb-4">Please complete your profile information below to proceed with your document request.</div>
+                        <?php unset($_SESSION['warning']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation2'): ?>
+                        <div class="alert alert-warning text-center mb-4">Please complete your profile information below to proceed with your complaint.</div>
+                        <?php unset($_SESSION['warning']); ?>
+                    <?php endif; ?>
+
                     <div class="card profileCard p-4 p-md-3 p-lg-5" style="width:100%; height: 100%;">
                         <div class="row pb-2 pb-sm-3">
                             <div class="col-lg-11 col-md-10 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
@@ -302,14 +330,14 @@ if (isset($_POST['saveButton'])) {
 
                             <div class="col-lg-3 col-md-5 col-6 mb-3"> 
                                 <div class="form-floating"> 
-                                    <input type="text" class="form-control" id="birthDate" name="birthDate" value="<?php echo date("F j, Y", strtotime($birthDate)); ?>" placeholder="Date of Birth" disabled> 
+                                    <input type="date" class="form-control" id="birthDate" name="birthDate" value="<?php echo $birthDate?>" placeholder="Date of Birth" disabled> 
                                     <label for="birthDate">Date of Birth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="age" name="age" value="<?php echo $age . ($age === 1 ? ' year old' : ' years old'); ?>" placeholder="Age" readonly disabled>
+                                    <input type="text" class="form-control" id="age" name="age" value="<?php echo $age ?>" placeholder="Age" readonly disabled>
                                     <label for="age">Age</label>
                                 </div>
                             </div>
@@ -366,36 +394,23 @@ if (isset($_POST['saveButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-5 col-6 mb-3">
+                            <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?php echo !empty($lengthOfStay) ? (int)$lengthOfStay . ((int)$lengthOfStay == 1 ? ' year' : ' years') : ''; ?>" placeholder="Length Of Stay (in years)" disabled>
                                     <label for="lengthOfStay">Length Of Stay (in years)</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-4 col-6 mb-3">
+                            <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select" id="residencyType" disabled readonly>
-                                        <option value="" <?php echo empty($residencyType) ? 'selected' : ''; ?>>Type of Residency</option>
-                                        <option value="Bonafide" <?php echo ($residencyType === 'Bonafide')   ? 'selected' : ''; ?>>Bonafide</option>
-                                        <option value="Migrant" <?php echo ($residencyType === 'Migrant') ? 'selected' : ''; ?>>Migrant</option>
-                                        <option value="Transient" <?php echo ($residencyType === 'Transient')  ? 'selected' : ''; ?>>Transient</option>
-                                        <option value="Foreign" <?php echo ($residencyType === 'Foreign') ? 'selected' : ''; ?>>Foreign</option>
-                                        <option value="" disabled>
-                                            ℹ️ No need to select — this is set automatically based on your length of stay
-                                        </option>
-
-                                    <input type="hidden" id="residencyTypeHidden" name="residencyType" value="<?php echo $residencyType ?>">
+                                    <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" readonly disabled>
                                     <label for="residencyType">Type of Residency</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-5 col-12 mb-4">
+                            <div class="col-lg-3 col-md-7 col-12 mb-4">
                                 <div class="form-floating">
-                                    <select class="form-select" id="remarks" name="remarks" disabled>
-                                        <option value="" <?php echo empty($remarks) ? 'selected' : ''; ?>>Remarks</option>
-                                        <option value="No Derogatory Record" <?php echo ($remarks === 'No Derogatory Record')   ? 'selected' : ''; ?>>No Derogatory Record</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="remarks" name="remarks" value="<?php echo $remarks ?>" placeholder="Type of Residency" readonly disabled>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>

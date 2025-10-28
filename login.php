@@ -29,7 +29,8 @@ if (isset($_POST['next'])) {
 
             $verificationCode = random_int(100000, 999999);
             $_SESSION['verificationCode'] = $verificationCode;
-            $_SESSION['verificationCodeExpiry'] = time() + (10 * 60);
+            $verificationCodeExpiry = date('Y-m-d H:i:s', time() + (5 * 60));
+            $_SESSION['verificationCodeExpiry'] = $verificationCodeExpiry;
 
             $_SESSION['success'] = 'emailSent';
             $loginStep = "verification";
@@ -81,7 +82,7 @@ if (isset($_POST['next'])) {
                                                 <h2 style="text-align:center; letter-spacing:5px; font-size:32px; color:#19AFA5; margin:20px 0;">' . $verificationCode . '</h2>
 
                                                 <p style="font-size:15px; color:#333;">
-                                                    Please enter this code on the verification page to complete your process. This code will expire in <strong>10 minutes</strong> for your security.
+                                                    Please enter this code on the verification page to complete your process. This code will expire in <strong>5 minutes</strong> for your security.
                                                 </p>
 
                                                 <p style="font-size:15px; color:#333;">
@@ -116,7 +117,7 @@ if (isset($_POST['next'])) {
                 echo "Email failed. Error: {$mail->ErrorInfo}";
             }
 
-            $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode' WHERE email = '$email'";
+            $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode', verificationCodeExpiry = '$verificationCodeExpiry' WHERE email = '$email'";
             executeQuery($verificationCodeInsertion);
 
         } elseif ($user['isNew'] === 'No' && isset($_SESSION['resetMode']) && $_SESSION['resetMode'] === true) {
@@ -124,7 +125,8 @@ if (isset($_POST['next'])) {
 
             $verificationCode = random_int(100000, 999999);
             $_SESSION['verificationCode'] = $verificationCode;
-            $_SESSION['verificationCodeExpiry'] = time() + (10 * 60);
+            $verificationCodeExpiry = date('Y-m-d H:i:s', time() + (5 * 60));
+            $_SESSION['verificationCodeExpiry'] = $verificationCodeExpiry;
 
             $_SESSION['success'] = 'resetVerificationSent';
             $loginStep = 'verification';
@@ -176,7 +178,7 @@ if (isset($_POST['next'])) {
                                                 <h2 style="text-align:center; letter-spacing:5px; font-size:32px; color:#19AFA5; margin:20px 0;">' . $verificationCode . '</h2>
 
                                                 <p style="font-size:15px; color:#333;">
-                                                    Please enter this code on the password reset page to proceed. This code will expire in <strong>10 minutes</strong> for your security.
+                                                    Please enter this code on the password reset page to proceed. This code will expire in <strong>5 minutes</strong> for your security.
                                                 </p>
 
                                                 <p style="font-size:15px; color:#333;">
@@ -211,8 +213,8 @@ if (isset($_POST['next'])) {
                 echo "Email failed. Error: {$mail->ErrorInfo}";
             }
 
-            $verificationCodeUpdate = "UPDATE users SET verificationCode = '$verificationCode' WHERE email = '$email'";
-            executeQuery($verificationCodeUpdate);
+            $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode', verificationCodeExpiry = '$verificationCodeExpiry' WHERE email = '$email'";
+            executeQuery($verificationCodeInsertion);
         
         } else {
             $_SESSION['email'] = $email;
@@ -237,7 +239,8 @@ if (isset($_POST['resend'])) {
 
     $verificationCode = random_int(100000, 999999);
     $_SESSION['verificationCode'] = $verificationCode;
-    $_SESSION['verificationCodeExpiry'] = time() + (10 * 60);
+    $verificationCodeExpiry = date('Y-m-d H:i:s', time() + (5 * 60));
+    $_SESSION['verificationCodeExpiry'] = $verificationCodeExpiry;
 
     $_SESSION['success'] = 'codeResent';
     $loginStep = "verification";
@@ -281,22 +284,22 @@ if (isset($_POST['resend'])) {
                                         <p style="font-size:15px; color:#333;">Hi <strong>user</strong>,</p>
 
                                         <p style="font-size:15px; color:#333;">
-                                            We received a request to verify your account for <strong>San Antonio e-Desk</strong>.
+                                            We noticed you requested to resend your One-Time Password (OTP) for <strong>San Antonio e-Desk</strong>.
                                         </p>
 
-                                        <p style="font-size:15px; color:#333;">Your One-Time Password (OTP) is:</p>
+                                        <p style="font-size:15px; color:#333;">Your new OTP is:</p>
 
                                         <h2 style="text-align:center; letter-spacing:5px; font-size:32px; color:#19AFA5; margin:20px 0;">' . $verificationCode . '</h2>
 
                                         <p style="font-size:15px; color:#333;">
-                                            Please enter this code on the verification page to complete your process. This code will expire in <strong>10 minutes</strong> for your security.
+                                            Please enter this code on the verification page to continue. This new code will expire in <strong>5 minutes</strong> for your security.
                                         </p>
 
                                         <p style="font-size:15px; color:#333;">
-                                            If you didn’t request this verification, please ignore this email or contact our support team immediately.
+                                            If you did not request this new code, you can safely ignore this message — your account remains secure.
                                         </p>
 
-                                        <p style="font-size:15px; color:#333;">Thank you for keeping your account secure!</p>
+                                        <p style="font-size:15px; color:#333;">Thank you,<br><strong>San Antonio e-Desk Team</strong></p>
 
                                         <p style="margin-top:30px; color:#333;">
                                             Warm regards,<br>
@@ -324,8 +327,8 @@ if (isset($_POST['resend'])) {
         echo "Email failed. Error: {$mail->ErrorInfo}";
     }
 
-    $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode' WHERE email = '$email'";
-    executeQuery($verificationCodeInsertion);  
+    $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode', verificationCodeExpiry = '$verificationCodeExpiry' WHERE email = '$email'";
+    executeQuery($verificationCodeInsertion);
 }
 
 if (isset($_POST['verify'])) {
@@ -337,17 +340,23 @@ if (isset($_POST['verify'])) {
     $verificationCodeRow = mysqli_fetch_assoc($verificationCodeCheckResult);
 
     if ($verificationCode === $verificationCodeRow['verificationCode']) {
-        if ($verificationCodeRow['isNew'] === 'No') {
-            unset($_SESSION['resetMode']);
-            $_SESSION['email'] = $email;
+        $currentTime = date('Y-m-d H:i:s');
+        if ($currentTime <= $verificationCodeRow['verificationCodeExpiry']) {
+            if ($verificationCodeRow['isNew'] === 'No') {
+                unset($_SESSION['resetMode']);
+                $_SESSION['email'] = $email;
 
-            $_SESSION['success'] = 'verifiedReset';
-            $loginStep = 'newPassword';
+                $_SESSION['success'] = 'verifiedReset';
+                $loginStep = 'newPassword';
+            } else {
+                $_SESSION['email'] = $email;
+                
+                $_SESSION['success'] = 'verifiedNewUser';
+                $loginStep = 'notExistingPassword';
+            }
         } else {
-            $_SESSION['email'] = $email;
-            
-            $_SESSION['success'] = 'verifiedNewUser';
-            $loginStep = 'notExistingPassword';
+            $_SESSION['alert'] = 'verificationCodeExpired';
+            $loginStep = 'verification';
         }
     } else {
         $_SESSION['alert'] = 'invalidVerificationCode';
@@ -394,7 +403,7 @@ if (isset($_POST['setPassword'])) {
                     } else {
                         $_SESSION['success'] = 'passwordCreated';
 
-                        header("Location: index.php");
+                        header("Location: profile.php");
                     }
                 }
             }
@@ -540,6 +549,10 @@ if (isset($_POST['login'])) {
                                 <div class="alert alert-success">Verification successful! Please create a new password for your account.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
+                            <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'verificationCodeExpired'): ?>
+                                <div class="alert alert-danger">Your verification code has expired. Please resend a new code.</div>
+                                <?php unset($_SESSION['alert']); ?>
+                            <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidVerificationCode'): ?>
                                 <div class="alert alert-danger">Invalid verification code.</div>
                                 <?php unset($_SESSION['alert']); ?>
@@ -562,16 +575,16 @@ if (isset($_POST['login'])) {
 
                             <div class="col">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" id="emailInput" name="email" placeholder="Email address/Phone Number" required>
-                                    <label for="emailInput">Email address/Phone Number</label>
+                                    <input type="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" id="emailInput" name="email" placeholder="Email address" required>
+                                    <label for="emailInput">Email address</label>
                                 </div>
                             </div>
 
                         <?php } elseif ($loginStep == "verification") { ?>
 
-                           <div class="col">
+                            <div class="col">
                                 <div class="form-floating">
-                                    <input type="number" class="form-control" value="<?php echo isset($_POST['verificationCode']) ? htmlspecialchars($_POST['verificationCode']) : ''; ?>" id="verificationInput" name="verificationCode" placeholder="Enter 6-digit verification code" inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length > 6) this.value = this.value.slice(0, 6);" required>
+                                    <input type="number" class="form-control" value="<?php echo isset($_POST['verificationCode']) ? htmlspecialchars($_POST['verificationCode']) : ''; ?>" id="verificationInput" name="verificationCode" placeholder="Enter 6-digit verification code" inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length > 6) this.value = this.value.slice(0, 6);" min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                                     <label for="verificationInput">Enter 6-digit verification code</label>
                                 </div>
                             </div>

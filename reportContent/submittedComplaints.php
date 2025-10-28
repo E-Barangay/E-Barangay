@@ -122,7 +122,10 @@ if (isset($_SESSION['userID'])) {
             <?php endforeach; ?>
           <?php else: ?>
             <tr>
-              <td colspan="5">No complaints submitted yet.</td>
+              <td colspan="7" class="text-center py-4">
+                  <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+                  <p class="text-muted m-0">You have not made any complaints yet.</p>
+              </td>
             </tr>
           <?php endif; ?>
         </tbody>

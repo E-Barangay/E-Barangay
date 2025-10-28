@@ -10,15 +10,52 @@ if(mysqli_num_rows($documentsResult) > 0)   {
     while ($documentsRow = mysqli_fetch_assoc($documentsResult)) { 
         $modalID = toCamelCase($documentsRow['documentName']);    
     ?>
-
         <div class="col-6 col-md-4 col-lg-4 p-1">
             <div class="documentCard card my-0 my-sm-2">
                 <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top"
                     style="width: 100%; height: 500px; object-fit: cover;" alt="Document">
                 <div class="mt-auto">
-                    <button class="btn btn-primary documentButton mt-2" type="button" data-bs-toggle="modal" data-bs-target="#<?php echo toCamelCase($documentsRow['documentName']) . "Modal"; ?>">
-                        <?php echo $documentsRow['documentName'] ?>
-                    </button>
+
+                    <?php 
+
+                    $isProfileComplete = !(
+                        empty($userDataRow['firstName'])
+                        || empty($userDataRow['lastName'])
+                        || empty($userDataRow['gender'])
+                        || empty($userDataRow['birthDate'])
+                        || empty($userDataRow['birthPlace'])
+                        || empty($userDataRow['civilStatus'])
+                        || empty($userDataRow['citizenship'])
+                        || empty($userDataRow['lengthOfStay'])
+                        || empty($userDataRow['residencyType'])
+                        || empty($userDataRow['phoneNumber'])
+                        || empty($userDataRow['email'])
+                        || empty($userDataRow['purok'])
+                        || empty($userDataRow['barangayName'])
+                        || empty($userDataRow['cityName'])
+                        || empty($userDataRow['provinceName'])
+                        || empty($userDataRow['permanentPurok'])
+                        || empty($userDataRow['permanentBarangayName'])
+                        || empty($userDataRow['permanentCityName'])
+                        || empty($userDataRow['permanentProvinceName'])
+                    );
+
+                    if (!$isProfileComplete) { ?>
+                        
+                        <form method="POST">
+                            <button class="btn btn-primary documentButton mt-2" type="submit" name="documentButton">
+                                <?php echo $documentsRow['documentName']; ?>
+                            </button>
+                        </form>
+
+                    <?php } else { ?>
+
+                        <button class="btn btn-primary documentButton mt-2" type="button" data-bs-toggle="modal" data-bs-target="#<?php echo $modalID; ?>Modal">
+                            <?php echo $documentsRow['documentName']; ?>
+                        </button>
+
+                    <?php } ?>
+                    
                 </div>
             </div>
         </div>
@@ -76,7 +113,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                 </div>
 
                                 <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" id="controlNo" name="controlNo" placeholder="Control No." min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)">
+                                    <input type="number" class="form-control" id="controlNo" name="controlNo" placeholder="Control No." inputmode="numeric" min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)">
                                     <label for="controlNo">Control No.</label>
                                 </div>
 

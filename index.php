@@ -54,10 +54,6 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
         <div class="row m-0">
             <div class="col p-0">
 
-                <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
-                    <div class="alert alert-success text-center mb-4">Your password has been set successfully! You can now explore our services.</div>
-                    <?php unset($_SESSION['success']); ?>
-                <?php endif; ?>
                 <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordResetted'): ?>
                     <div class="alert alert-success text-center mb-4">Your password has been reset successfully!</div>
                     <?php unset($_SESSION['success']); ?>

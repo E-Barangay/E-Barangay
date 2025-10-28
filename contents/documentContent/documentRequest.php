@@ -1,6 +1,6 @@
 <?php
 
-$documentRequestQuery = "SELECT * FROM documents LEFT JOIN documentTypes ON documents.documentTypeID = documentTypes.documentTypeID ORDER BY requestDate DESC";
+$documentRequestQuery = "SELECT * FROM documents LEFT JOIN documentTypes ON documents.documentTypeID = documentTypes.documentTypeID WHERE userID = $userID ORDER BY requestDate DESC";
 $documentRequestResult = executeQuery($documentRequestQuery);
 
 ?>

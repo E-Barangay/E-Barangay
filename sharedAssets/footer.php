@@ -30,6 +30,37 @@
                     <li class="footer-item mb-3"><a href="javascript:void(0)" onclick="showSection('staff-section')"
                             class="footer-link p-0">Staffs</a></li>
                 </ul>
+
+                <div class="d-block d-lg-none">
+                    <section id="mission-section-sm" class="container py-3" style="display: none;">
+                        <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Mission</h2>
+                        <p style="color: black;">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus totam
+                            cupiditate cumque laborum adipisci, unde eos odio consectetur natus perferendis!
+                        </p>
+                    </section>
+
+                    <section id="vision-section-sm" class="container py-3" style="display: none;">
+                        <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Vision</h2>
+                        <p style="color: black;">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis dolor accusamus
+                            obcaecati consequuntur nesciunt, pariatur dicta vitae laboriosam dolores illum.
+                        </p>
+                    </section>
+
+                    <section id="executives-section-sm" class="container py-3" style="display: none;">
+                        <h2 class="mb-3" style="color:#19AFA5;">Executives</h2>
+                        <img src="assets/images/executives.jpg" alt="Barangay Executives" class="img-fluid rounded">
+                    </section>
+
+                    <section id="staff-section-sm" class="container py-3" style="display: none;">
+                        <h2 class="mb-3" style="color:#19AFA5;">Staffs</h2>
+                        <p style="color: black;">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iusto ducimus
+                            libero dolorem amet minus velit aut molestiae ex corrupti.
+                        </p>
+                    </section>
+                </div>
             </div>
             <hr class="d-block d-lg-none">
             <div class="col-12 col-lg-2 text-center text-lg-start py-4">
@@ -37,7 +68,7 @@
                 <ul class="nav flex-column">
                     <li class="footer-item mb-3"><a href="index.php" class="footer-link p-0">Announcements</a></li>
                     <li class="footer-item mb-3"><a href="documents.php" class="footer-link p-0">Documents</a></li>
-                    <li class="footer-item mb-3"><a href="reports.php" class="footer-link p-0">Reports</a></li>
+                    <li class="footer-item mb-3"><a href="reports.php" class="footer-link p-0">Complaints</a></li>
                 </ul>
             </div>
             <hr class="d-block d-lg-none">
@@ -53,35 +84,38 @@
                                 style="font-size: 20px; vertical-align: middle;"></i> 0912 345 6789</a></li>
                 </ul>
             </div>
-            <section id="mission-section" class="container py-5" style="display: none;">
-                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Mission</h2>
-                <p style="color: black;">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus totam
-                    cupiditate cumque laborum adipisci, unde eos odio consectetur natus perferendis!
-                </p>
-            </section>
 
-            <section id="vision-section" class="container py-5" style="display: none;">
-                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Vision</h2>
-                <p style="color: black;">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis dolor accusamus
-                    obcaecati consequuntur nesciunt, pariatur dicta vitae laboriosam dolores illum.
-                </p>
-            </section>
+            <div class="d-none d-lg-block">
+                <section id="mission-section" class="container py-3" style="display: none;">
+                    <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Mission</h2>
+                    <p style="color: black;">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus totam
+                        cupiditate cumque laborum adipisci, unde eos odio consectetur natus perferendis!
+                    </p>
+                </section>
 
-            <section id="executives-section" class="container py-5 text-center" style="display: none;">
-                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Executives</h2>
-                <img src="assets/images/executives.jpg" alt="Barangay Executives" class="img-fluid rounded">
-            </section>
+                <section id="vision-section" class="container py-3" style="display: none;">
+                    <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Vision</h2>
+                    <p style="color: black;">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis dolor accusamus
+                        obcaecati consequuntur nesciunt, pariatur dicta vitae laboriosam dolores illum.
+                    </p>
+                </section>
 
+                <section id="executives-section" class="container py-3" style="display: none;">
+                    <h2 class="mb-3" style="color:#19AFA5;">Executives</h2>
+                    <img src="assets/images/executives.jpg" alt="Barangay Executives" class="img-fluid rounded">
+                </section>
 
-            <section id="staff-section" class="container py-5" style="display: none;">
-                <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Staffs</h2>
-                <p style="color: black;">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iusto ducimus
-                    libero dolorem amet minus velit aut molestiae ex corrupti.
-                </p>
-            </section>
+                <section id="staff-section" class="container py-3" style="display: none;">
+                    <h2 class="mb-3" style="color:#19AFA5;">Staffs</h2>
+                    <p style="color: black;">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iusto ducimus
+                        libero dolorem amet minus velit aut molestiae ex corrupti.
+                    </p>
+                </section>
+            </div>
+            
         </div>
         <div class="row">
             <div class="col text-center py-4 text-adapt" style="color: black;">
@@ -92,9 +126,11 @@
     </footer>
     <script>
         function showSection(sectionId) {
-            var sections = ['mission-section', 'vision-section', 'executives-section', 'staff-section'];
+            var sections = ['mission-section', 'vision-section', 'executives-section', 'staff-section',
+                            'mission-section-sm', 'vision-section-sm', 'executives-section-sm', 'staff-section-sm'];
             sections.forEach(function (id) {
-                document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+                var el = document.getElementById(id);
+                if (el) el.style.display = (id === sectionId || id === sectionId + '-sm') ? 'block' : 'none';
             });
         }
     </script>
