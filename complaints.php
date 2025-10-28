@@ -5,17 +5,55 @@ session_start();
 
 $page = "complaintSection";
 
+$userID = $_SESSION['userID'];
+
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
     switch ($page) {
-        case "makeComplaint":
-            $page = "makeComplaint";
-            break;
         case "complaintSection":
             if (!isset($_SESSION['userID'])) {
                 header("Location: login.php");
             }
             break;
+        case "makeComplaint":
+            $userQuery = "SELECT * FROM users 
+                        LEFT JOIN userInfo ON users.userID = userInfo.userID 
+                        LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
+                        LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+                        WHERE users.userID = $userID";
+            $userResult = executeQuery($userQuery);
+
+            $userDataRow = mysqli_fetch_assoc($userResult);
+
+            $isProfileComplete = !(
+                empty($userDataRow['firstName'])
+                || empty($userDataRow['lastName'])
+                || empty($userDataRow['gender'])
+                || empty($userDataRow['birthDate'])
+                || empty($userDataRow['birthPlace'])
+                || empty($userDataRow['civilStatus'])
+                || empty($userDataRow['citizenship'])
+                || empty($userDataRow['lengthOfStay'])
+                || empty($userDataRow['residencyType'])
+                || empty($userDataRow['phoneNumber'])
+                || empty($userDataRow['email'])
+                || empty($userDataRow['purok'])
+                || empty($userDataRow['barangayName'])
+                || empty($userDataRow['cityName'])
+                || empty($userDataRow['provinceName'])
+                || empty($userDataRow['permanentPurok'])
+                || empty($userDataRow['permanentBarangayName'])
+                || empty($userDataRow['permanentCityName'])
+                || empty($userDataRow['permanentProvinceName'])
+            );
+
+            if (!$isProfileComplete) {
+                $_SESSION['warning'] = 'incompleteInformation2';
+                header("Location: profile.php");
+            } else {
+                $page = "makeComplaint";
+                break;
+            }
         case "submittedComplaints":
             $page = "submittedComplaints";
             break;
@@ -90,8 +128,8 @@ if (isset($_GET['page'])) {
             </div>
 
             <div class="col-12 col-lg-9 p-0">
-                <div class="contentCard card m-1">
-                    <div class="row py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
+                <div class="contentCard card m-1 p-2">
+                    <div class="row  px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
 
                         <?php include("reportContent/" . $page . ".php"); ?>
 

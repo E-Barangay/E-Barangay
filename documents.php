@@ -74,6 +74,13 @@ $documentsResult = executeQuery($documentsQuery);
 
 $searchDisplay = !empty($searchTerm) ? htmlspecialchars($searchTerm) : 'document';
 
+
+if (isset($_POST['documentButton'])) {
+    $_SESSION['warning'] = 'incompleteInformation1';
+
+    header("Location: profile.php");
+}
+
 if (isset($_POST['proceedButton'])) {
     $documentTypeID = $_POST['documentTypeID'] ?? '';
 
