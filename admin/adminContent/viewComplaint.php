@@ -98,14 +98,41 @@ function getStatusBadgeClass($status)
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body {
-      background: #f1f3f5;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
     }
 
-    .sidebar-controls {
-      border-left: 1px dashed #dee2e6;
-      padding-left: 1rem;
-      height: 100%;
-      /* make border stretch full height */
+    .card {
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      border: none;
+    }
+
+    .info-row {
+      border-bottom: 1px solid #e9ecef;
+      padding: 12px 0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .status-badge {
+      font-size: 1rem;
+      padding: 8px 16px;
+    }
+
+    .btn-primary {
+      background-color: #31afab;
+      border-color: #31afab;
+    }
+
+    .btn-primary:hover {
+      background-color: #2a9995;
+      border-color: #2a9995;
+    }
+
+    .view-mode {
+      display: block;
     }
 
     .status-badge {
@@ -123,175 +150,219 @@ function getStatusBadgeClass($status)
 </head>
 
 <body>
-  <div class="container px-3 mt-4">
+  <div class="container.fluid p-3 p-md-4">
     <form method="POST" action="">
       <input type="hidden" name="complaintID" value="<?= $complaint['complaintID'] ?>">
-      <div class="row g-4 d-flex align-items-start">
-
-        <!-- Complaint Details Card -->
-        <div class="col-md-7">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">
-                  <i class="fas fa-file-alt text-primary me-2"></i> Complaint Details
-                </h5>
-                <span class="badge <?= getStatusBadgeClass($complaint['complaintStatus']) ?> status-badge">
-                  <?= ucfirst($complaint['complaintStatus'] ?? 'No data') ?>
-                </span>
-              </div>
-
-              <!-- Complaint Info -->
-              <div class="mb-3">
-                <p><strong>Title:</strong>
-                  <span
-                    class="view-mode"><?= $complaint['complaintTitle'] ?? '<span class="text-muted">No data</span>' ?></span>
-                  <input type="text" class="form-control d-none edit-mode" name="complaintTitle"
-                    value="<?= htmlspecialchars($complaint['complaintTitle']) ?>">
-                </p>
-                <p><strong>Date Submitted:</strong>
-                  <?= $complaint['requestDate'] ?? '<span class="text-muted">No data</span>' ?></p>
-                <p><strong>Complainant:</strong>
-                  <span
-                    class="view-mode"><?= $complaint['complainantName'] ?? '<span class="text-muted">No data</span>' ?></span>
-                  <input type="text" class="form-control d-none edit-mode" name="complainantName"
-                    value="<?= htmlspecialchars($complaint['complainantName']) ?>">
-                </p>
-                <p><strong>Phone Number:</strong>
-                  <span
-                    class="view-mode"><?= $complaint['complaintPhoneNumber'] ?? '<span class="text-muted">No data</span>' ?></span>
-                  <input type="text" class="form-control d-none edit-mode" name="complaintPhoneNumber"
-                    value="<?= htmlspecialchars($complaint['complaintPhoneNumber']) ?>">
-                </p>
-                <p><strong>Description:</strong>
-                  <span
-                    class="view-mode"><?= $complaint['complaintDescription'] ?? '<span class="text-muted">No data</span>' ?></span>
-                  <textarea class="form-control d-none edit-mode"
-                    name="complaintDescription"><?= htmlspecialchars($complaint['complaintDescription']) ?></textarea>
-                </p>
-                <p><strong>Action:</strong>
-                  <span
-                    class="view-mode"><?= $complaint['actionTaken'] ?? '<span class="text-muted">No data</span>' ?></span>
-                  <textarea class="form-control d-none edit-mode"
-                    name="actionTaken"><?= htmlspecialchars($complaint['actionTaken']) ?></textarea>
-                </p>
-              </div>
-
-              <!-- Victim & Perpetrator Info -->
-              <div class="row">
-                <div class="col-md-6">
-                  <p><strong>Victim:</strong>
-                    <span
-                      class="view-mode"><?= $complaint['complaintVictim'] ?? '<span class="text-muted">No data</span>' ?></span>
-                    <input type="text" class="form-control d-none edit-mode" name="complaintVictim"
-                      value="<?= htmlspecialchars($complaint['complaintVictim']) ?>">
-                  </p>
+      <div class="row">
+        <div class="col-12">
+          <div class="card mb-4">
+            <div class="card-header text-white" style="background-color: #31afab;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-file-alt me-3 fs-4"></i>
+                  <div>
+                    <h4 class="mb-0 fw-semibold">Complaint Details</h4>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <p><strong>Victim Age:</strong>
-                    <span
-                      class="view-mode"><?= $complaint['victimAge'] ?? '<span class="text-muted">No data</span>' ?></span>
-                    <input type="number" class="form-control d-none edit-mode" name="victimAge"
-                      value="<?= htmlspecialchars($complaint['victimAge']) ?>">
-                  </p>
+                <div class="d-flex gap-2">
+                  <a href="../index.php?page=complaints" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-arrow-left me-2"></i>Back to List
+                  </a>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <p><strong>Perpetrator:</strong>
-                    <span
-                      class="view-mode"><?= $complaint['complaintAccused'] ?? '<span class="text-muted">No data</span>' ?></span>
-                    <input type="text" class="form-control d-none edit-mode" name="complaintAccused"
-                      value="<?= htmlspecialchars($complaint['complaintAccused']) ?>">
-                  </p>
-                </div>
-                <div class="col-md-6">
-                  <p><strong>Relationship:</strong>
-                    <span
-                      class="view-mode"><?= $complaint['victimRelationship'] ?? '<span class="text-muted">No data</span>' ?></span>
-                    <input type="text" class="form-control d-none edit-mode" name="victimRelationship"
-                      value="<?= htmlspecialchars($complaint['victimRelationship']) ?>">
-                  </p>
-                </div>
-              </div>
+            </div>
+          </div>
 
-              <!-- Evidence -->
-              <div class="mb-3">
-                <strong>Evidence:</strong>
-                <?php if (!empty($complaint['evidence'])): ?>
-                  <button type="button" class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal"
-                    data-bs-target="#evidenceModal">
-                    <i class="fas fa-eye me-1"></i> View Evidence
-                  </button>
-                  <div class="modal fade" id="evidenceModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title">Evidence Preview</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body text-center">
-                          <img src="../../uploads/<?= htmlspecialchars($complaint['evidence']) ?>"
-                            class="img-fluid rounded">
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card h-100">
+                <div class="card-header bg-light">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                      <i class="fas fa-info-circle me-2"></i>
+                      <div class="view-mode d-inline">
+                        <?= !empty($complaint['complaintTitle']) ? htmlspecialchars($complaint['complaintTitle']) : '<span class="text-muted">No data</span>' ?>
+                      </div>
+                      <input type="text" class="form-control edit-mode d-none d-inline" name="complaintTitle"
+                        value="<?= htmlspecialchars($complaint['complaintTitle']) ?>">
+                    </h5>
+                    <span class="badge <?= getStatusBadgeClass($complaint['complaintStatus']) ?> status-badge">
+                      <?= ucfirst($complaint['complaintStatus'] ?? 'No data') ?>
+                    </span>
+                  </div>
+                </div>
+                <div class="card-body" id="documentInfo">
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Date Submitted:</strong>
+                        <div class="mt-1">
+                          <span class="text-muted"><?= htmlspecialchars($complaint['requestDate']) ?></span>
                         </div>
                       </div>
                     </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Evidence:</strong>
+                        <?php if (!empty($complaint['evidence'])): ?>
+                          <button type="button" class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal"
+                            data-bs-target="#evidenceModal">
+                            <i class="fas fa-eye me-1"></i> View Evidence
+                          </button>
+                          <div class="modal fade" id="evidenceModal" tabindex="-1">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title">Evidence Preview</h5>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                  <img src="../../uploads/<?= htmlspecialchars($complaint['evidence']) ?>"
+                                    class="img-fluid rounded">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        <?php else: ?>
+                          <span class="text-muted ms-2">No evidence</span>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Complainant:</strong>
+                        <div class="mt-1">
+                          <span
+                            class="view-mode"><?= $complaint['complainantName'] ?? '<span class="text-muted">No data</span>' ?></span>
+                          <input type="text" class="form-control d-none edit-mode" name="complainantName"
+                            value="<?= htmlspecialchars($complaint['complainantName']) ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Phone Number:</strong>
+                        <div class="mt-1">
+                          <span
+                            class="view-mode"><?= $complaint['complaintPhoneNumber'] ?? '<span class="text-muted">No data</span>' ?></span>
+                          <input type="text" class="form-control d-none edit-mode" name="complaintPhoneNumber"
+                            value="<?= htmlspecialchars($complaint['complaintPhoneNumber']) ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Description:</strong>
+                        <div class="mt-1">
+                          <span
+                            class="view-mode"><?= $complaint['complaintDescription'] ?? '<span class="text-muted">No data</span>' ?></span>
+                          <textarea class="form-control d-none edit-mode"
+                            name="complaintDescription"><?= htmlspecialchars($complaint['complaintDescription']) ?></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Action:</strong>
+                        <div class="mt-1">
+                          <span
+                            class="view-mode"><?= $complaint['actionTaken'] ?? '<span class="text-muted">No data</span>' ?></span>
+                          <textarea class="form-control d-none edit-mode"
+                            name="actionTaken"><?= htmlspecialchars($complaint['actionTaken']) ?></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Victim:</strong>
+                        <div class="mt-1">
+                          <span
+                            class="view-mode"><?= $complaint['complaintVictim'] ?? '<span class="text-muted">No data</span>' ?></span>
+                          <input type="text" class="form-control d-none edit-mode" name="complaintVictim"
+                            value="<?= htmlspecialchars($complaint['complaintVictim']) ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Victim Age:</strong>
+                        <span
+                          class="view-mode"><?= $complaint['victimAge'] ?? '<span class="text-muted">No data</span>' ?></span>
+                        <input type="number" class="form-control d-none edit-mode" name="victimAge"
+                          value="<?= htmlspecialchars($complaint['victimAge']) ?>">
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Perpetrator:</strong>
+                        <span
+                          class="view-mode"><?= $complaint['complaintAccused'] ?? '<span class="text-muted">No data</span>' ?></span>
+                        <input type="text" class="form-control d-none edit-mode" name="complaintAccused"
+                          value="<?= htmlspecialchars($complaint['complaintAccused']) ?>">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="info-row">
+                        <strong class="text-muted">Relationship:</strong>
+                        <span
+                          class="view-mode"><?= $complaint['victimRelationship'] ?? '<span class="text-muted">No data</span>' ?></span>
+                        <input type="text" class="form-control d-none edit-mode" name="victimRelationship"
+                          value="<?= htmlspecialchars($complaint['victimRelationship']) ?>">
+                      </div>
+                    </div>
+                    <div class="mt-4">
+                      <h6 class="fw-semibold mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> Location Map
+                        (Placeholder)</h6>
+                      <div id="map" class="rounded shadow-sm" style="height:200px; background:#f8f9fa;"></div>
+                    </div>
                   </div>
-                <?php else: ?>
-                  <span class="text-muted ms-2">No evidence</span>
-                <?php endif; ?>
+                </div>
               </div>
+            </div>
 
-              <!-- Map -->
-              <div class="mt-4">
-                <h6 class="fw-semibold mb-2"><i class="fas fa-map-marker-alt text-danger me-1"></i> Location Map
-                  (Placeholder)</h6>
-                <div id="map" class="rounded shadow-sm" style="height:200px; background:#f8f9fa;"></div>
+            <div class="col-lg-4">
+              <div class="card">
+                <div class="card-header bg-light">
+                  <h5 class="card-title mb-0">
+                    <i class="fas fa-tasks me-2"></i>Status & Actions
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3 text-center">
+                    <span class="badge <?= $badgeClass ?> status-badge">
+                      <i class="fas fa-circle me-2"></i><?= $complaint['complaintStatus'] ?>
+                    </span>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label"><strong>Change Status:</strong></label>
+                    <select name="complaintStatus" id="complaintStatus" class="form-select" required disabled>
+                      <option disabled>-- Select Status --</option>
+                      <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
+                        <option value="<?= $st ?>" <?= $complaint['complaintStatus'] == $st ? 'selected' : '' ?>><?= $st ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                  <div class="d-flex justify-content-end gap-2">
+                    <button type="button" id="editBtn" class="btn btn-warning w-100 w-md-auto">
+                      <i class="fas fa-edit me-1"></i> Edit
+                    </button>
+                  </div>
+                  <div id="editActions" class="d-none mt-3">
+                    <button type="submit" name="saveComplaint" class="btn btn-success w-100 w-md-auto me-2">
+                      <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                    <button type="button" id="cancelEditBtn" class="btn btn-danger w-100 w-md-auto mt-2 mt-md-2">
+                      <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Admin Sidebar -->
-        <div class="col-md-4">
-          <div class="card shadow-sm border-0">
-            <div class="card-body">
-              <h6 class="fw-bold mb-3">
-                <i class="fas fa-tools me-1 text-dark"></i> Admin Controls
-              </h6>
-
-              <div class="mb-3">
-                <label for="complaintStatus" class="form-label">Change Status</label>
-                <select name="complaintStatus" id="complaintStatus" class="form-select" required>
-                  <option disabled>-- Select Status --</option>
-                  <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified', 'VAWC'] as $st): ?>
-                    <option value="<?= $st ?>" <?= $complaint['complaintStatus'] == $st ? 'selected' : '' ?>><?= $st ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
-
-              <div class="d-flex justify-content-between flex-wrap gap-2">
-                <a href="../index.php?page=complaints" class="btn btn-secondary w-100 w-md-auto">
-                  <i class="fas fa-arrow-left me-1"></i> Back
-                </a>
-                <button type="button" id="editBtn" class="btn btn-warning w-100 w-md-auto">
-                  <i class="fas fa-edit me-1"></i> Edit
-                </button>
-              </div>
-
-              <div id="editActions" class="d-none mt-3">
-                <button type="submit" name="saveComplaint" class="btn btn-success w-100 w-md-auto me-2">
-                  <i class="fas fa-save me-1"></i> Save Changes
-                </button>
-                <button type="button" id="cancelEditBtn" class="btn btn-danger w-100 w-md-auto mt-2 mt-md-2">
-                  <i class="fas fa-times me-1"></i> Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </form>
   </div>
@@ -308,23 +379,24 @@ function getStatusBadgeClass($status)
     const editBtn = document.getElementById('editBtn');
     const cancelBtn = document.getElementById('cancelEditBtn');
     const editActions = document.getElementById('editActions');
-    const viewFields = document.querySelectorAll('.view-mode');
-    const editFields = document.querySelectorAll('.edit-mode');
+    const statusDropdown = document.getElementById('complaintStatus');
 
     function toggleEditMode(isEditing) {
-      viewFields.forEach(el => el.classList.toggle('d-none', isEditing));
-      editFields.forEach(el => el.classList.toggle('d-none', !isEditing));
+      // Show/hide input fields
+      document.querySelectorAll('.view-mode').forEach(el => el.classList.toggle('d-none', isEditing));
+      document.querySelectorAll('.edit-mode').forEach(el => el.classList.toggle('d-none', !isEditing));
+
+      // Enable/disable the status dropdown
+      if (statusDropdown) statusDropdown.disabled = !isEditing;
+
+      // Toggle action buttons
       editActions.classList.toggle('d-none', !isEditing);
       editBtn.classList.toggle('d-none', isEditing);
     }
 
-    if (editBtn) {
-      editBtn.addEventListener('click', () => toggleEditMode(true));
-    }
-
-    if (cancelBtn) {
-      cancelBtn.addEventListener('click', () => toggleEditMode(false));
-    }
+    // Event listeners
+    if (editBtn) editBtn.addEventListener('click', () => toggleEditMode(true));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => toggleEditMode(false));
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

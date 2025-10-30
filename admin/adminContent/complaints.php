@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $complaintStatus = 'Criminal'; // ✅ Always set as Criminal
   $complaintDescription = $_POST['complaintDescription'] ?? '';
-  $phoneNumber = $_POST['complaintPhoneNumber'] ?? '';
+  $phoneNumber = $_POST['phoneNumber'] ?? '';
   $complainantName = $_POST['complainantName'] ?? '';
   $complaintVictim = $_POST['complaintVictim'] ?? '';
   $victimAge = $_POST['victimAge'] ?? null;
@@ -43,33 +43,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // ✅ Insert new complaint
-  $stmt = $conn->prepare("INSERT INTO complaints 
-    (userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, requestDate, 
-     complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complaintVictim, 
-     complainantName, victimAge, victimRelationship, actionTaken, evidence, isDeleted) 
-    VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'no')");
+  $stmt = "INSERT INTO complaints (
+    userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, 
+    requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, 
+    complaintVictim, complainantName, victimAge, victimRelationship, actionTaken, evidence, isDeleted
+) VALUES (
+    '1',
+    '$complaintCategoryID',
+    '$complaintTypeID',
+    '$complaintTitle',
+    '$complaintDescription',
+    '$requestDate',
+    '$complaintStatus',
+    '$phoneNumber',
+    '$complaintAccused',
+    '$complaintAddress',
+    '$complaintVictim',
+    '$complainantName',
+    '$victimAge',
+    '$victimRelationship',
+    '$actionTaken',
+    '$evidenceFile',
+    'no'
+)";
 
-  $stmt->bind_param(
-    "iisssssssssisss",
-    $complaintCategoryID,
-    $complaintTypeID,
-    $complaintTitle,
-    $complaintDescription,
-    $requestDate,
-    $complaintStatus,
-    $phoneNumber,
-    $complaintAccused,
-    $complaintAddress,
-    $complaintVictim,
-    $complainantName,
-    $victimAge,
-    $victimRelationship,
-    $actionTaken,
-    $evidenceFile
-  );
-
-  $stmt->execute();
-  $stmt->close();
+  mysqli_query($conn, $stmt);
 
   echo "<script>window.location.href = 'http://localhost/E-Barangay/E-Barangay/admin/index.php?page=complaints';</script>";
   exit;
@@ -101,9 +99,9 @@ $offset = ($currentPage - 1) * $perPage;
 
 // ✅ Base query
 $sql = "SELECT 
+    r.*, 
+    COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), r.complainantName) AS reporterName,
     r.complaintID AS concernID,
-    r.requestDate,
-    COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), complainantName) AS reporterName,
     r.complaintTitle AS concernType,
     r.complaintPhoneNumber AS phoneNumber,
     r.complaintStatus AS status
@@ -112,7 +110,7 @@ LEFT JOIN users u ON r.userID = u.userID
 LEFT JOIN userinfo ui ON u.userID = ui.userID
 WHERE r.isDeleted = 'no'";
 
-$countSql = "SELECT COUNT(*) as total
+$countSql = "SELECT COUNT(*) AS total
 FROM complaints r
 LEFT JOIN users u ON r.userID = u.userID
 LEFT JOIN userinfo ui ON u.userID = ui.userID
@@ -204,17 +202,78 @@ function getBorderClass($status)
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Community Concerns Management</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link rel="icon" href="assets/images/logoSanAntonio.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
+
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       background: #e9e9e9;
+    }
+
+    .card {
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      border: none;
+    }
+
+    .btn-primary {
+      background-color: #31afab;
+      border-color: #31afab;
+    }
+
+    .btn-primary:hover {
+      background-color: #2a9995;
+      border-color: #2a9995;
+    }
+
+    .modal-header {
+      background-color: #31afab;
+      color: white;
+    }
+
+    .modal-header .btn-close {
+      filter: invert(1);
+    }
+
+    .pagination .page-link {
+      color: #31afab;
+      background-color: white;
+      border: 1px solid #dee2e6;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .pagination .page-item.active .page-link {
+      background-color: #31afab;
+      border-color: #31afab;
+      color: white;
+    }
+
+    .pagination .page-link:hover {
+      background-color: #e9f8f8;
+      color: #31afab;
+    }
+
+    .btn-info {
+      background-color: #31afab !important;
+      border-color: #31afab !important;
+    }
+
+    .btn-info:hover {
+      background-color: #2a9995 !important;
+      border-color: #2a9995 !important;
     }
 
     .table-hover tbody tr:hover {
@@ -230,19 +289,8 @@ function getBorderClass($status)
       color: #fff;
     }
 
-    .btn-custom {
-      background-color: #31afab;
-      color: #fff;
-    }
-
-    .btn-custom:hover {
-      background-color: #279995;
-      color: #fff;
-    }
-
     #addComplaintModal .modal-body {
       max-height: calc(100vh - 200px);
-      /* Adjust as needed */
       overflow-y: auto;
     }
   </style>
@@ -265,56 +313,56 @@ function getBorderClass($status)
           </div>
         </div>
 
-        <div class="p-3 p-md-3">
-          <div class="row g-3 mb-4">
-            <!-- Filter Form -->
-            <div class="col-md-12">
-              <form method="GET" action="index.php" class="row g-3">
-                <input type="hidden" name="page" value="complaints">
+        <div class="p-3 p-md-4">
+          <form method="GET" action="index.php">
+            <input type="hidden" name="page" value="complaints">
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-lg-3 col-md-6">
+                    <div class="input-group">
+                      <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                      </span>
+                      <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                        class="form-control border-start-0" placeholder="Search Reporter, ID, or Title">
+                    </div>
+                  </div>
 
-                <div class="col-md-3">
-                  <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                      <i class="fas fa-search text-muted"></i>
-                    </span>
-                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
-                      class="form-control border-start-0" placeholder="Search Reporter, ID, or Title">
+                  <div class="col-md-2">
+                    <select name="complaintStatus" class="form-select">
+                      <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
+                      <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
+                        <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+
+                  <div class="col-md-2">
+                    <select name="complaintType" class="form-select">
+                      <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Type</option>
+                      <?php foreach (['Noise Complaints', 'Boundary and Land Disputes', 'Neighborhood Quarrels', 'Animal-Related Complaints', 'Youth-Related Issues', 'Barangay Clearance and Permit Concerns', 'Garbage and Sanitation Complaints', 'Alcohol-Related Disturbances', 'Traffic and Parking Issues', 'Physical Assault and Threats', 'Water Supply Disputes', 'Business-Related Conflicts', 'Curfew Violations', 'Smoking and Littering Violations', 'Illegal Structures and Encroachments', 'Physical Abuse', 'Sexual Abuse', 'Psychological Abuse/Emotional Abuse', 'Economic Abuse', 'Neglect', 'Other'] as $st): ?>
+                        <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+
+                  <div class="col-md-3">
+                    <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="form-control">
+                  </div>
+
+                  <div class="col-md-2">
+                    <button type="submit" class="btn btn-info text-white w-100">
+                      <i class="fas fa-filter me-2"></i>Filter
+                    </button>
                   </div>
                 </div>
-
-                <div class="col-md-2">
-                  <select name="complaintStatus" class="form-select">
-                    <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Status</option>
-                    <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
-                      <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-
-                <div class="col-md-2">
-                  <select name="complaintType" class="form-select">
-                    <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Type</option>
-                    <?php foreach (['Noise Complaints', 'Boundary and Land Disputes', 'Neighborhood Quarrels', 'Animal-Related Complaints', 'Youth-Related Issues', 'Barangay Clearance and Permit Concerns', 'Garbage and Sanitation Complaints', 'Alcohol-Related Disturbances', 'Traffic and Parking Issues', 'Physical Assault and Threats', 'Water Supply Disputes', 'Business-Related Conflicts', 'Curfew Violations', 'Smoking and Littering Violations', 'Illegal Structures and Encroachments', 'Physical Abuse', 'Sexual Abuse', 'Psychological Abuse/Emotional Abuse', 'Economic Abuse', 'Neglect', 'Other'] as $st): ?>
-                      <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
-
-                <div class="col-md-3">
-                  <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="form-control">
-                </div>
-
-                <div class="col-md-2">
-                  <button type="submit" class="btn btn-custom w-100">
-                    <i class="fas fa-filter me-2"></i>Filter
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
+          </form>
 
           <div class="card shadow-sm">
-            <div class="card-body p-2">
+            <div class="card-body p-0">
               <div class="table-responsive">
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
@@ -343,14 +391,39 @@ function getBorderClass($status)
                           <td>
                             <!-- View button -->
                             <a href="adminContent/viewComplaint.php?complaintID=<?= $row['concernID'] ?>"
-                              class="btn btn-sm btn-success" title="View Details">
-                              <i class="fas fa-eye me-1"></i>
+                              class="btn btn-sm btn-outline-primary" title="View Details">
+                              <i class="fas fa-eye gap"></i>
                             </a>
                             <!-- Delete Button (trigger modal) -->
                             <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
                               data-bs-target="#deleteModal<?= $row['concernID'] ?>">
-                              <i class="fas fa-trash"></i>
+                              <i class="fas fa-times"></i>
                             </button>
+                            <!-- Delete Confirmation Modal -->
+                            <div class="modal fade" id="deleteModal<?= $row['concernID'] ?>" tabindex="-1"
+                              aria-labelledby="deleteModalLabel<?= $row['concernID'] ?>" aria-hidden="true">
+                              <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel<?= $row['concernID'] ?>">
+                                      <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                                    </h5>
+                                    <button type="button" class="btn-close"
+                                      data-bs-dismiss="modal"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                    Are you sure you want to delete this complaint?
+                                    <br>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="?page=complaints&delete=<?= $row['concernID'] ?>" class="btn btn-danger">
+                                      <i class="fas fa-trash-alt me-1"></i> Delete
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </td>
                         </tr>
                       <?php endwhile; ?>
@@ -417,7 +490,8 @@ function getBorderClass($status)
               </div>
 
               <!-- Add Complaint Modal -->
-              <div class="modal fade" id="addComplaintModal" tabindex="-1" aria-labelledby="addComplaintLabel" aria-hidden="true">
+              <div class="modal fade" id="addComplaintModal" tabindex="-1" aria-labelledby="addComplaintLabel"
+                aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                   <div class="modal-content">
 
@@ -425,15 +499,15 @@ function getBorderClass($status)
                       <h5 class="modal-title text-white fw-semibold" id="addComplaintLabel">
                         <i class="fas fa-plus me-2"></i>Add Complaint
                       </h5>
-                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                     </div>
 
                     <form method="POST" enctype="multipart/form-data">
                       <div class="modal-body">
                         <div class="row g-3">
-
                           <!-- Type of Complaint -->
-                          <div class="col-12">
+                          <div class="col-6">
                             <label class="form-label fw-semibold">Type of Complaint</label>
                             <select name="complaintTitle" class="form-select" id="complaintTitle" required>
                               <option value="Noise Complaints">Noise Complaints</option>
@@ -441,8 +515,10 @@ function getBorderClass($status)
                               <option value="Neighborhood Quarrels">Neighborhood Quarrels</option>
                               <option value="Animal-Related Complaints">Animal-Related Complaints</option>
                               <option value="Youth-Related Issues">Youth-Related Issues</option>
-                              <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit Concerns</option>
-                              <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints</option>
+                              <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit
+                                Concerns</option>
+                              <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints
+                              </option>
                               <option value="Alcohol-Related Disturbances">Alcohol-Related Disturbances</option>
                               <option value="Traffic and Parking Issues">Traffic and Parking Issues</option>
                               <option value="Physical Assault and Threats">Physical Assault and Threats</option>
@@ -450,14 +526,22 @@ function getBorderClass($status)
                               <option value="Business-Related Conflicts">Business-Related Conflicts</option>
                               <option value="Curfew Violations">Curfew Violations</option>
                               <option value="Smoking and Littering Violations">Smoking and Littering Violations</option>
-                              <option value="Illegal Structures and Encroachments">Illegal Structures and Encroachments</option>
+                              <option value="Illegal Structures and Encroachments">Illegal Structures and Encroachments
+                              </option>
                               <option value="Physical Abuse">Physical Abuse</option>
                               <option value="Sexual Abuse">Sexual Abuse</option>
-                              <option value="Psychological Abuse/Emotional Abuse">Psychological Abuse/Emotional Abuse</option>
+                              <option value="Psychological Abuse/Emotional Abuse">Psychological Abuse/Emotional Abuse
+                              </option>
                               <option value="Economic Abuse">Economic Abuse</option>
                               <option value="Neglect">Neglect</option>
                               <option value="Other">Other</option>
                             </select>
+                          </div>
+
+                          <!-- Evidence Upload -->
+                          <div class="col-6">
+                            <label class="form-label fw-semibold">Evidence (Photo)</label>
+                            <input type="file" name="evidence" class="form-control" accept="image/*">
                           </div>
 
                           <div class="col-12 d-none" id="otherComplaintDiv">
@@ -475,12 +559,6 @@ function getBorderClass($status)
                             <label class="form-label fw-semibold">Contact Number</label>
                             <input type="text" name="phoneNumber" class="form-control" required pattern="^09\d{9}$"
                               title="Please enter a valid PH mobile number (e.g. 09123456789)">
-                          </div>
-
-                          <!-- Address -->
-                          <div class="col-12">
-                            <label class="form-label fw-semibold">Address</label>
-                            <input type="text" name="complaintAddress" class="form-control" required>
                           </div>
 
                           <!-- Victim Info -->
@@ -517,12 +595,22 @@ function getBorderClass($status)
                             <textarea name="actionTaken" class="form-control" rows="3"></textarea>
                           </div>
 
-                          <!-- Evidence Upload -->
-                          <div class="col-12">
-                            <label class="form-label fw-semibold">Evidence (Photo)</label>
-                            <input type="file" name="evidence" class="form-control" accept="image/*">
+                          <!-- Address -->
+                          <div class="col-6">
+                            <label class="form-label fw-semibold">Address</label>
+                            <input type="text" name="complaintAddress" class="form-control" required>
                           </div>
 
+                          <!-- Map -->
+                          <div class="col-6">
+                            <div class="card rounded-5 border-1" style="border-color: #19AFA5;">
+                              <div class="rounded-5" style="position: relative; height: 288px; overflow: hidden;">
+                                <div id="map" name="map" style="height: 100%;"></div>
+                              </div>
+                            </div>
+                            <input type="hidden" name="latitude" id="lat">
+                            <input type="hidden" name="longitude" id="lng">
+                          </div>
                         </div>
                       </div>
 
@@ -541,8 +629,9 @@ function getBorderClass($status)
     </div>
   </div>
 
+
   <script>
-    document.getElementById("complaintTitle").addEventListener("change", function() {
+    document.getElementById("complaintTitle").addEventListener("change", function () {
       const otherDiv = document.getElementById("otherComplaintDiv");
       if (this.value === "Other") {
         otherDiv.classList.remove("d-none");
@@ -550,6 +639,15 @@ function getBorderClass($status)
         otherDiv.classList.add("d-none");
       }
     });
+  </script>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Initialize map
+    const map = L.map('map').setView([14.5995, 120.9842], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
   </script>
 
   <!-- Bootstrap bundle already included below -->
