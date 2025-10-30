@@ -1,24 +1,27 @@
 var editButton = document.getElementById('editButton');
 var cancelButton = document.getElementById('cancelButton');
 var saveButton = document.getElementById('saveButton');
-var inputs = document.querySelectorAll('.form-control, .form-select, textarea');
+var inputs = document.querySelectorAll('.form-control, .form-select, textarea, .form-check-input');
 var addButton = document.getElementById('addButton');
 var deleteButton = document.getElementById('deleteButton');
 var fileInput = document.getElementById('profilePictureInput');
 var preview = document.getElementById('profilePreview');
+var sameAsCurrent = document.getElementById('sameAsCurrent');
 
 var isEdit = false;
 var originalPreviewSrc = preview ? preview.src : null;
 var originalValues = [];
+var originalSameAsCurrentChecked = sameAsCurrent.checked;
 
 editButton.addEventListener('click', function () {
     isEdit = true;
     originalValues = [];
+    originalSameAsCurrentChecked = sameAsCurrent.checked;
     inputs.forEach(function (input) {
         originalValues.push(input.value);
         input.removeAttribute('disabled');
     });
-
+    sameAsCurrent.disabled = false;
     editButton.classList.add('d-none');
     cancelButton.classList.remove('d-none');
     saveButton.classList.remove('d-none');
@@ -33,11 +36,12 @@ cancelButton.addEventListener('click', function () {
         input.value = originalValues[index];
         input.setAttribute('disabled', true);
     });
-
+    sameAsCurrent.disabled = true;
+    sameAsCurrent.checked = originalSameAsCurrentChecked;
     editButton.classList.remove('d-none');
     cancelButton.classList.add('d-none');
     saveButton.classList.add('d-none');
-    
+
     if (addButton) addButton.classList.add('d-none');
     if (deleteButton) deleteButton.classList.add('d-none');
 
@@ -48,6 +52,14 @@ cancelButton.addEventListener('click', function () {
     if (fileInput) {
         fileInput.value = "";
     }
+});
+
+saveButton.addEventListener('click', function () {
+    sameAsCurrent.disabled = true;
+    localStorage.setItem('sameAsCurrentChecked', sameAsCurrent.checked);
+    editButton.classList.remove('d-none');
+    cancelButton.classList.add('d-none');
+    saveButton.classList.add('d-none');
 });
 
 if (fileInput && preview) {
@@ -89,8 +101,8 @@ function updateResidencyType() {
     };
 
     let residencyType = "";
-
-    const isSameAddress = Object.keys(address).every(key => address[key] === permanentAddress[key]);
+    
+    var isSameAddress = Object.keys(address).every(key => address[key] === permanentAddress[key]);
 
     if (age === 0 || lengthOfStay === 0) {
         residencyType = "";
@@ -120,6 +132,46 @@ updateResidencyType();
     document.getElementById(id).addEventListener("input", updateResidencyType);
 });
 
+sameAsCurrent.addEventListener('change', function () {
+    var currentFields = {
+        blockLotNo: document.getElementById("blockLotNo").value,
+        phase: document.getElementById("phase").value,
+        subdivision: document.getElementById("subdivision").value,
+        purok: document.getElementById("purok").value,
+        street: document.getElementById("street").value,
+        barangay: document.getElementById("barangay").value,
+        city: document.getElementById("city").value,
+        province: document.getElementById("province").value
+    };
+
+    var permanentFields = {
+        blockLotNo: document.getElementById("permanentBlockLotNo"),
+        phase: document.getElementById("permanentPhase"),
+        subdivision: document.getElementById("permanentSubdivisionName"),
+        purok: document.getElementById("permanentPurok"),
+        street: document.getElementById("permanentStreet"),
+        barangay: document.getElementById("permanentBarangay"),
+        city: document.getElementById("permanentCity"),
+        province: document.getElementById("permanentProvince")
+    };
+
+    Object.values(permanentFields).forEach(f => f.removeAttribute('disabled'));
+
+    if (this.checked) {
+        for (var key in permanentFields) {
+            permanentFields[key].value = currentFields[key];
+        }
+    } else {
+        for (var key in permanentFields) {
+            permanentFields[key].value = '';
+        }
+    }
+
+    if (!isEdit) {
+        Object.values(permanentFields).forEach(f => f.setAttribute('disabled', true));
+    }
+});
+
 let data = {};
 let selectedProvince = '';
 let selectedMunicipality = '';
@@ -129,30 +181,29 @@ let selectedPermanentMunicipality = '';
 fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019v2.json")
     .then(response => response.json())
     .then(jsonData => {
-    data = jsonData;
+        data = jsonData;
 
-    const provinceDatalist = document.getElementById('provincesList');
+        const provinceDatalist = document.getElementById('provincesList');
+        const permanentProvinceDatalist = document.getElementById('permanentProvincesList');
 
-    const permanentProvinceDatalist = document.getElementById('permanentProvincesList');
-
-    const provinceNames = [];
-    for (const regionCode in data) {
-        const provinces = data[regionCode].province_list;
-        for (const provinceName in provinces) {
-            provinceNames.push(provinceName);
+        const provinceNames = [];
+        for (const regionCode in data) {
+            const provinces = data[regionCode].province_list;
+            for (const provinceName in provinces) {
+                provinceNames.push(provinceName);
+            }
         }
-    }
 
-    provinceNames.sort().forEach(provinceName => {
-        let opt1 = document.createElement('option');
-        opt1.value = provinceName;
-        provinceDatalist.appendChild(opt1);
+        provinceNames.sort().forEach(provinceName => {
+            let opt1 = document.createElement('option');
+            opt1.value = provinceName;
+            provinceDatalist.appendChild(opt1);
 
-        let opt2 = document.createElement('option');
-        opt2.value = provinceName;
-        permanentProvinceDatalist.appendChild(opt2);
+            let opt2 = document.createElement('option');
+            opt2.value = provinceName;
+            permanentProvinceDatalist.appendChild(opt2);
+        });
     });
-});
 
 document.getElementById('province').addEventListener('input', function () {
     selectedProvince = this.value;
