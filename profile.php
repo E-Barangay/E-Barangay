@@ -141,6 +141,8 @@ if (isset($_POST['saveButton'])) {
         }
     }
 
+    $_SESSION['success'] = 'profileUpdated';
+
     header("Location: profile.php");
     exit();
 }
@@ -189,12 +191,16 @@ if (isset($_POST['confirmButton'])) {
             <div class="row">
                 <div class="col">
 
+                    <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
+                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
+                        <?php unset($_SESSION['success']); ?>
+                    <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
                         <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
-                    <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
-                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
+                    <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'profileUpdated'): ?>
+                        <div class="alert alert-success text-center mb-4">Your profile has been successfully updated.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
@@ -206,7 +212,7 @@ if (isset($_POST['confirmButton'])) {
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
 
-                    <div class="card profileCard p-4 p-md-3 p-lg-5" style="width:100%; height: 100%;">
+                    <div class="card profileCard p-4 p-md-3 p-lg-5">
                         <div class="row pb-2 pb-sm-3">
                             <div class="col-lg-11 col-md-10 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
 
@@ -285,19 +291,19 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-4 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="firstNameInput" name="firstName" value="<?php echo $firstName ?>" placeholder="First Name" disabled>
+                                    <input type="text" class="form-control" id="firstNameInput" name="firstName" value="<?php echo $firstName ?>" placeholder="First Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="firstNameInput">First Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" value="<?php echo $middleName ?>" placeholder="Middle Name" disabled>
+                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" value="<?php echo $middleName ?>" placeholder="Middle Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="middleNameInput">Middle Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lastNameInput" name="lastName" value="<?php echo $lastName ?>" placeholder="Last Name" disabled>
+                                    <input type="text" class="form-control" id="lastNameInput" name="lastName" value="<?php echo $lastName ?>" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="lastNameInput">Last Name</label>
                                 </div>
                             </div>
@@ -382,21 +388,21 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="citizenship" name="citizenship" value="<?php echo $citizenship ?>" placeholder="Citizenship" disabled>
+                                    <input type="text" class="form-control" id="citizenship" name="citizenship" value="<?php echo $citizenship ?>" placeholder="Citizenship" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-7 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="occupation" name="occupation" value="<?php echo $occupation ?>" placeholder="Occupation" disabled>
+                                    <input type="text" class="form-control" id="occupation" name="occupation" value="<?php echo $occupation ?>" placeholder="Occupation" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?php echo !empty($lengthOfStay) ? (int)$lengthOfStay . ((int)$lengthOfStay == 1 ? ' year' : ' years') : ''; ?>" placeholder="Length Of Stay (in years)" disabled>
+                                    <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?php echo !empty($lengthOfStay) ? (int)$lengthOfStay . ((int)$lengthOfStay == 1 ? ' year' : ' years') : ''; ?>" placeholder="Length Of Stay (in years)" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" disabled>
                                     <label for="lengthOfStay">Length Of Stay (in years)</label>
                                 </div>
                             </div>
@@ -405,6 +411,7 @@ if (isset($_POST['confirmButton'])) {
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" readonly disabled>
                                     <label for="residencyType">Type of Residency</label>
+                                    <input type="hidden" id="residencyTypeHidden" name="residencyType">
                                 </div>
                             </div>
 
@@ -427,7 +434,7 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>" placeholder="Phone Number" disabled>
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>" placeholder="Phone Number" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)"  oninput="this.value = this.value.replace(/[^0-9]/g, '');" disabled>
                                     <label for="phoneNumber">Phone Number</label>
                                 </div>
                             </div>
@@ -482,8 +489,8 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot No." disabled>
-                                    <label for="blockLotNo">Block & Lot No.</label>
+                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot/House No." disabled>
+                                    <label for="blockLotNo">Block & Lot/House No.</label>
                                 </div>
                             </div>
 
@@ -515,6 +522,13 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-12 mb-3">
                                 <div class="permanentAddressInfo">
                                     Permanent Address
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sameAsCurrent" disabled>
+                                    <label class="form-check-label" for="sameAsCurrent">Use current address as the permanent address</label>
                                 </div>
                             </div>
 
@@ -551,8 +565,8 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>" placeholder="Block & Lot No." disabled>
-                                    <label for="permanentBlockLotNo">Block & Lot No.</label>
+                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>" placeholder="Block & Lot/House No." disabled>
+                                    <label for="permanentBlockLotNo">Block & Lot/House No.</label>
                                 </div>
                             </div>
 

@@ -116,10 +116,6 @@ if (isset($_POST['next'])) {
             } catch (Exception $e) {
                 echo "Email failed. Error: {$mail->ErrorInfo}";
             }
-
-            $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode', verificationCodeExpiry = '$verificationCodeExpiry' WHERE email = '$email'";
-            executeQuery($verificationCodeInsertion);
-
         } elseif ($user['isNew'] === 'No' && isset($_SESSION['resetMode']) && $_SESSION['resetMode'] === true) {
             $_SESSION['email'] = $email;
 
@@ -211,11 +207,7 @@ if (isset($_POST['next'])) {
                 $mail->send();
             } catch (Exception $e) {
                 echo "Email failed. Error: {$mail->ErrorInfo}";
-            }
-
-            $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode', verificationCodeExpiry = '$verificationCodeExpiry' WHERE email = '$email'";
-            executeQuery($verificationCodeInsertion);
-        
+            }        
         } else {
             $_SESSION['email'] = $email;
             
@@ -326,23 +318,20 @@ if (isset($_POST['resend'])) {
     } catch (Exception $e) {
         echo "Email failed. Error: {$mail->ErrorInfo}";
     }
-
-    $verificationCodeInsertion = "UPDATE users SET verificationCode = '$verificationCode', verificationCodeExpiry = '$verificationCodeExpiry' WHERE email = '$email'";
-    executeQuery($verificationCodeInsertion);
 }
 
 if (isset($_POST['verify'])) {
     $email = $_SESSION['email'];
     $verificationCode = $_POST['verificationCode'];
 
-    $verificationCodeCheckQuery = "SELECT * FROM users WHERE email = '$email'";
-    $verificationCodeCheckResult = executeQuery($verificationCodeCheckQuery);
-    $verificationCodeRow = mysqli_fetch_assoc($verificationCodeCheckResult);
+    $verifyUserQuery = "SELECT * FROM users WHERE email = '$email'";
+    $verifyUserResult = executeQuery($verifyUserQuery);
+    $verifyUserRow = mysqli_fetch_assoc($verifyUserResult);
 
-    if ($verificationCode === $verificationCodeRow['verificationCode']) {
+    if (trim((string)$verificationCode) === trim((string)$_SESSION['verificationCode'])) {
         $currentTime = date('Y-m-d H:i:s');
-        if ($currentTime <= $verificationCodeRow['verificationCodeExpiry']) {
-            if ($verificationCodeRow['isNew'] === 'No') {
+        if ($currentTime <= $_SESSION['verificationCodeExpiry']) {
+            if ($verifyUserRow['isNew'] === 'No') {
                 unset($_SESSION['resetMode']);
                 $_SESSION['email'] = $email;
 
