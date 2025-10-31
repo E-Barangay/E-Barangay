@@ -131,7 +131,7 @@ if (isset($_GET['page'])) {
                 <div class="contentCard card m-1 p-2">
                     <div class="row  px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
 
-                        <?php include("reportContent/" . $page . ".php"); ?>
+                        <?php include("contents/complaintContent/" . $page . ".php"); ?>
 
                     </div>
                 </div>
