@@ -1,11 +1,10 @@
 <?php
 include_once __DIR__ . "/../../../sharedAssets/connect.php";
 
-// Get date filters
 $from = isset($_GET['from']) ? trim($_GET['from']) : null;
 $to   = isset($_GET['to']) ? trim($_GET['to']) : null;
+$type = isset($_GET['type']) ? trim($_GET['type']) : null; // <--- added
 
-// Validate date format (YYYY-MM-DD)
 function valid_date($date) {
     if (!$date) return false;
     $check = DateTime::createFromFormat('Y-m-d', $date);
@@ -15,35 +14,29 @@ function valid_date($date) {
 if (!valid_date($from)) $from = null;
 if (!valid_date($to)) $to = null;
 
-// Query setup
-if ($from && $to) {
-    $servicesQuery = "
-        SELECT 
-            documentID,
-            documentName,
-            documentStatus,
-            DATE(requestDate) AS requestDate
-        FROM documents
-        INNER JOIN documenttypes ON documents.documentTypeID = documenttypes.documentTypeID
-        WHERE DATE(requestDate) BETWEEN '$from' AND '$to'
-        ORDER BY requestDate DESC
-    ";
-} else {
-    $servicesQuery = "
-        SELECT 
-            documentID,
-            documentName,
-            documentStatus,
-            DATE(requestDate) AS requestDate
-        FROM documents
-        INNER JOIN documenttypes ON documents.documentTypeID = documenttypes.documentTypeID
-        ORDER BY requestDate DESC
-    ";
+$whereClauses = [];
+if ($from && $to) $whereClauses[] = "DATE(requestDate) BETWEEN '$from' AND '$to'";
+if ($type) $whereClauses[] = "documenttypes.documentName = '" . $conn->real_escape_string($type) . "'";
+
+$whereSQL = "";
+if (!empty($whereClauses)) {
+    $whereSQL = "WHERE " . implode(" AND ", $whereClauses);
 }
+
+$servicesQuery  = "
+    SELECT 
+        documentID,
+        documentName,
+        documentStatus,
+        DATE(requestDate) AS requestDate
+    FROM documents
+    INNER JOIN documenttypes ON documents.documentTypeID = documenttypes.documentTypeID
+    $whereSQL
+    ORDER BY requestDate DESC
+";
 
 $servicesResults = $conn->query($servicesQuery);
 
-// Collect results
 $servicesData = [];
 if ($servicesResults) {
     while ($row = $servicesResults->fetch_assoc()) {
@@ -59,11 +52,11 @@ if ($servicesResults) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      padding: 20px;
-      font-size: 13px;
-    }
+body {
+  font-family: 'Poppins', sans-serif;
+  padding: 20px;
+  font-size: 13px;
+}
     table {
       font-size: 12px;
     }
@@ -79,9 +72,12 @@ if ($servicesResults) {
     <div>
       <h4>Barangay Services Report</h4>
       <?php if ($from && $to): ?>
-        <div><small>Period: <?php echo htmlspecialchars($from) . " to " . htmlspecialchars($to); ?></small></div>
+        <div><small>Period: <?= htmlspecialchars($from) ?> to <?= htmlspecialchars($to) ?></small></div>
       <?php else: ?>
         <div><small>Period: All</small></div>
+      <?php endif; ?>
+      <?php if ($type): ?>
+        <div><small>Type: <?= htmlspecialchars($type) ?></small></div>
       <?php endif; ?>
     </div>
     <div class="no-print">
@@ -99,14 +95,18 @@ if ($servicesResults) {
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($servicesData as $row): ?>
-        <tr>
-          <td><?php echo htmlspecialchars($row['documentID']); ?></td>
-          <td><?php echo htmlspecialchars($row['documentName']); ?></td>
-          <td><?php echo htmlspecialchars($row['documentStatus']); ?></td>
-          <td><?php echo htmlspecialchars($row['requestDate']); ?></td>
-        </tr>
-      <?php endforeach; ?>
+      <?php if (count($servicesData) > 0): ?>
+        <?php foreach ($servicesData as $row): ?>
+          <tr>
+            <td><?= htmlspecialchars($row['documentID']) ?></td>
+            <td><?= htmlspecialchars($row['documentName']) ?></td>
+            <td><?= htmlspecialchars($row['documentStatus']) ?></td>
+            <td><?= htmlspecialchars($row['requestDate']) ?></td>
+          </tr>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <tr><td colspan="4" class="text-center text-muted">No records found</td></tr>
+      <?php endif; ?>
     </tbody>
   </table>
 </body>
