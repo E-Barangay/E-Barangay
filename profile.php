@@ -45,12 +45,13 @@ if (!empty($birthDate)) {
     $age = $ageYears . ' ' . ($ageYears <= 1 ? 'year' : 'years') . ' old';
 }
 
-function formatAddress($value) {
+function formatAddress($value)
+{
     return ucwords(strtolower($value));
 }
 
 $blockLotNo = $userDataRow['blockLotNo'];
-$phase = $userDataRow['phase']; 
+$phase = $userDataRow['phase'];
 $subdivisionName = $userDataRow['subdivisionName'];
 $purok = $userDataRow['purok'];
 $streetName = $userDataRow['streetName'];
@@ -59,7 +60,7 @@ $cityName = formatAddress($userDataRow['cityName']);
 $provinceName = formatAddress($userDataRow['provinceName']);
 
 $permanentBlockLotNo = $userDataRow['permanentBlockLotNo'];
-$permanentPhase = $userDataRow['permanentPhase']; 
+$permanentPhase = $userDataRow['permanentPhase'];
 $permanentSubdivisionName = $userDataRow['permanentSubdivisionName'];
 $permanentPurok = $userDataRow['permanentPurok'];
 $permanentStreetName = $userDataRow['permanentStreetName'];
@@ -93,7 +94,7 @@ if (isset($_POST['saveButton'])) {
     $email = $_POST['email'];
 
     $blockLotNo = $_POST['blockLotNo'];
-    $phase = $_POST['phase']; 
+    $phase = $_POST['phase'];
     $subdivisionName = $_POST['subdivisionName'];
     $purok = $_POST['purok'];
     $streetName = $_POST['streetName'];
@@ -102,7 +103,7 @@ if (isset($_POST['saveButton'])) {
     $provinceName = strtoupper($_POST['provinceName']);
 
     $permanentBlockLotNo = $_POST['permanentBlockLotNo'];
-    $permanentPhase = $_POST['permanentPhase']; 
+    $permanentPhase = $_POST['permanentPhase'];
     $permanentSubdivisionName = $_POST['permanentSubdivisionName'];
     $permanentPurok = $_POST['permanentPurok'];
     $permanentStreetName = $_POST['permanentStreetName'];
@@ -169,7 +170,8 @@ if (isset($_POST['confirmButton'])) {
     <link rel="icon" href="assets/images/logoSanAntonio.png">
 
     <!-- Style Sheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="assets/css/navbar/style.css">
     <link rel="stylesheet" href="assets/css/profile/style.css">
@@ -179,24 +181,26 @@ if (isset($_POST['confirmButton'])) {
 <body data-bs-theme="light">
 
     <?php
-        if (isset($_SESSION['userID'])) {
-            include("sharedAssets/navbarLoggedIn.php");
-        } else {
-            include("sharedAssets/navbar.php");
-        }
+    if (isset($_SESSION['userID'])) {
+        include("sharedAssets/navbarLoggedIn.php");
+    } else {
+        include("sharedAssets/navbar.php");
+    }
     ?>
-                    
+
     <form method="POST" enctype="multipart/form-data">
         <div class="container pt-3">
             <div class="row">
                 <div class="col">
 
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
-                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
+                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details
+                            below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
-                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details below so you can enjoy all the services we offer.</div>
+                        <div class="alert alert-success text-center mb-4">Welcome! Kindly fill out your profile details
+                            below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'profileUpdated'): ?>
@@ -204,53 +208,66 @@ if (isset($_POST['confirmButton'])) {
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
-                        <div class="alert alert-warning text-center mb-4">Please complete your profile information below to proceed with your document request.</div>
+                        <div class="alert alert-warning text-center mb-4">Please complete your profile information below to
+                            proceed with your document request.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation2'): ?>
-                        <div class="alert alert-warning text-center mb-4">Please complete your profile information below to proceed with your complaint.</div>
+                        <div class="alert alert-warning text-center mb-4">Please complete your profile information below to
+                            proceed with your complaint.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
 
                     <div class="card profileCard p-4 p-md-3 p-lg-5">
                         <div class="row pb-2 pb-sm-3">
-                            <div class="col-lg-11 col-md-10 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+                            <div
+                                class="col-lg-11 col-md-10 col-12 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
 
                                 <div class="profile">
-                                    
+
                                     <?php if (empty($userDataRow['profilePicture'])) { ?>
 
-                                        <img src="uploads/profiles/defaultProfile.png" class="profilePicture" id="profilePreview" alt="Profile Picture">
+                                        <img src="uploads/profiles/defaultProfile.png" class="profilePicture"
+                                            id="profilePreview" alt="Profile Picture">
 
-                                        <label for="profilePictureInput" class="btn btn-primary addButton d-none" id="addButton">
+                                        <label for="profilePictureInput" class="btn btn-primary addButton d-none"
+                                            id="addButton">
                                             <i class="fa-solid fa-plus" style="font-size:15px; color:white;"></i>
                                         </label>
 
                                     <?php } else { ?>
 
-                                        <img src="uploads/profiles/<?php echo $userDataRow['profilePicture'] ?>" class="profilePicture" id="profilePreview" alt="Profile Picture">
+                                        <img src="uploads/profiles/<?php echo $userDataRow['profilePicture'] ?>"
+                                            class="profilePicture" id="profilePreview" alt="Profile Picture">
 
-                                        <button class="btn btn-danger deleteButton d-none" type="button" id="deleteButton" data-bs-toggle="modal" data-bs-target="#removeProfileModal">
+                                        <button class="btn btn-danger deleteButton d-none" type="button" id="deleteButton"
+                                            data-bs-toggle="modal" data-bs-target="#removeProfileModal">
                                             <i class="fa-solid fa-trash" style="font-size: 15px; color: white;"></i>
                                         </button>
 
-                                        <div class="modal fade" id="removeProfileModal" tabindex="-1" aria-labelledby="removeProfileLabel" aria-hidden="true">
+                                        <div class="modal fade" id="removeProfileModal" tabindex="-1"
+                                            aria-labelledby="removeProfileLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
 
-                                                    <div class="modal-header" style="background-color: #19AFA5; color: white;">
-                                                        <h1 class="modal-title fs-5" id="removeProfileLabel">Remove Profile Picture</h1>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <div class="modal-header"
+                                                        style="background-color: #19AFA5; color: white;">
+                                                        <h1 class="modal-title fs-5" id="removeProfileLabel">Remove Profile
+                                                            Picture</h1>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
 
                                                     <div class="modal-body">
-                                                        Are you sure you want to remove your profile picture?  
+                                                        Are you sure you want to remove your profile picture?
                                                         You can upload a new one later.
                                                     </div>
 
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-primary confirmButton" name="confirmButton">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary confirmButton"
+                                                            name="confirmButton">
                                                             Confirm
                                                         </button>
                                                     </div>
@@ -262,22 +279,26 @@ if (isset($_POST['confirmButton'])) {
 
                                 </div>
 
-                                <input type="file" name="profilePicture" class="form-control d-none" id="profilePictureInput" accept="image/*">
+                                <input type="file" name="profilePicture" class="form-control d-none"
+                                    id="profilePictureInput" accept="image/*">
 
-                                <div class="d-flex flex-column pt-3 pt-md-0">          
+                                <div class="d-flex flex-column pt-3 pt-md-0">
                                     <span class="fullName">
                                         <?php
-                                            $middleInitial = !empty($middleName) ? strtoupper($middleName[0]) . "." : ""; 
-                                            echo $firstName . " " . $middleInitial . " " . $lastName; 
+                                        $middleInitial = !empty($middleName) ? strtoupper($middleName[0]) . "." : "";
+                                        echo $firstName . " " . $middleInitial . " " . $lastName;
                                         ?>
                                     </span>
                                     <span class="email text-muted"><?php echo $email ?></span>
                                 </div>
                             </div>
-                            <div class="col-lg-1 col-md-2 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
+                            <div
+                                class="col-lg-1 col-md-2 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
                                 <button class="btn btn-primary editButton" id="editButton" type="button">Edit</button>
-                                <button class="btn btn-secondary cancelButton d-none me-2" id="cancelButton" type="button">Cancel</button>
-                                <button class="btn btn-primary saveButton d-none" id="saveButton" type="submit" name="saveButton">Save</button>
+                                <button class="btn btn-secondary cancelButton d-none me-2" id="cancelButton"
+                                    type="button">Cancel</button>
+                                <button class="btn btn-primary saveButton d-none" id="saveButton" type="submit"
+                                    name="saveButton">Save</button>
                             </div>
                         </div>
 
@@ -291,19 +312,26 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-4 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="firstNameInput" name="firstName" value="<?php echo $firstName ?>" placeholder="First Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text" class="form-control" id="firstNameInput" name="firstName"
+                                        value="<?php echo $firstName ?>" placeholder="First Name" pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="firstNameInput">First Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" value="<?php echo $middleName ?>" placeholder="Middle Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text" class="form-control" id="middleNameInput" name="middleName"
+                                        value="<?php echo $middleName ?>" placeholder="Middle Name"
+                                        pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="middleNameInput">Middle Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lastNameInput" name="lastName" value="<?php echo $lastName ?>" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text" class="form-control" id="lastNameInput" name="lastName"
+                                        value="<?php echo $lastName ?>" placeholder="Last Name" pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="lastNameInput">Last Name</label>
                                 </div>
                             </div>
@@ -311,12 +339,15 @@ if (isset($_POST['confirmButton'])) {
                                 <div class="form-floating">
                                     <select class="form-select" id="suffix" name="suffix" disabled>
                                         <option value="" <?php echo empty($suffix) ? 'selected' : ''; ?>>Suffix</option>
-                                        <option value="Jr." <?php echo ($suffix === 'Jr.') ? 'selected' : ''; ?>>Jr.</option>
-                                        <option value="Sr." <?php echo ($suffix === 'Sr.') ? 'selected' : ''; ?>>Sr.</option>
-                                        <option value="II" <?php echo ($suffix === 'II')  ? 'selected' : ''; ?>>II</option>
-                                        <option value="III" <?php echo ($suffix === 'III') ? 'selected' : ''; ?>>III</option>
-                                        <option value="IV" <?php echo ($suffix === 'IV')  ? 'selected' : ''; ?>>IV</option>
-                                        <option value="V" <?php echo ($suffix === 'V')  ? 'selected' : ''; ?>>V</option>
+                                        <option value="Jr." <?php echo ($suffix === 'Jr.') ? 'selected' : ''; ?>>Jr.
+                                        </option>
+                                        <option value="Sr." <?php echo ($suffix === 'Sr.') ? 'selected' : ''; ?>>Sr.
+                                        </option>
+                                        <option value="II" <?php echo ($suffix === 'II') ? 'selected' : ''; ?>>II</option>
+                                        <option value="III" <?php echo ($suffix === 'III') ? 'selected' : ''; ?>>III
+                                        </option>
+                                        <option value="IV" <?php echo ($suffix === 'IV') ? 'selected' : ''; ?>>IV</option>
+                                        <option value="V" <?php echo ($suffix === 'V') ? 'selected' : ''; ?>>V</option>
                                     </select>
                                     <label for="suffix">Suffix</label>
                                 </div>
@@ -326,31 +357,37 @@ if (isset($_POST['confirmButton'])) {
                                 <div class="form-floating">
                                     <select class="form-select" id="gender" name="gender" disabled>
                                         <option value="" <?php echo empty($gender) ? 'selected' : ''; ?>>Gender</option>
-                                        <option value="Male" <?php echo ($gender === 'Male')   ? 'selected' : ''; ?>>Male</option>
-                                        <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
-                                        <option value="Other" <?php echo ($gender === 'Other')  ? 'selected' : ''; ?>>Others</option>
+                                        <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male
+                                        </option>
+                                        <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>
+                                            Female</option>
+                                        <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>
+                                            Others</option>
                                     </select>
                                     <label for="gender">Gender</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-5 col-6 mb-3"> 
-                                <div class="form-floating"> 
-                                    <input type="date" class="form-control" id="birthDate" name="birthDate" value="<?php echo $birthDate?>" placeholder="Date of Birth" disabled> 
+                            <div class="col-lg-3 col-md-5 col-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="birthDate" name="birthDate"
+                                        value="<?php echo $birthDate ?>" placeholder="Date of Birth" disabled>
                                     <label for="birthDate">Date of Birth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="age" name="age" value="<?php echo $age ?>" placeholder="Age" readonly disabled>
+                                    <input type="text" class="form-control" id="age" name="age"
+                                        value="<?php echo $age ?>" placeholder="Age" readonly disabled>
                                     <label for="age">Age</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="birthPlace" name="birthPlace" value="<?php echo $birthPlace ?>" placeholder="Place of Birth" disabled>
+                                    <input type="text" class="form-control" id="birthPlace" name="birthPlace"
+                                        value="<?php echo $birthPlace ?>" placeholder="Place of Birth" disabled>
                                     <label for="birthPlace">Place of Birth</label>
                                 </div>
                             </div>
@@ -358,15 +395,24 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-2 col-md-3 col-6 mb-3">
                                 <div class="form-floating">
                                     <select class="form-select" id="bloodType" name="bloodType" disabled>
-                                        <option value="" <?php echo empty($bloodType) ? 'selected' : ''; ?>>Blood Type</option>
-                                        <option value="A+" <?php echo ($bloodType === 'A+')   ? 'selected' : ''; ?>>A+</option>
-                                        <option value="A-" <?php echo ($bloodType === 'A-') ? 'selected' : ''; ?>>A-</option>
-                                        <option value="B+" <?php echo ($bloodType === 'B+')  ? 'selected' : ''; ?>>B+</option>
-                                        <option value="B-" <?php echo ($bloodType === 'B-') ? 'selected' : ''; ?>>B-</option>
-                                        <option value="AB+" <?php echo ($bloodType === 'AB+')  ? 'selected' : ''; ?>>AB+</option>
-                                        <option value="AB-" <?php echo ($bloodType === 'AB-')  ? 'selected' : ''; ?>>AB-</option>
-                                        <option value="O+" <?php echo ($bloodType === 'O+') ? 'selected' : ''; ?>>O+</option>
-                                        <option value="O-" <?php echo ($bloodType === 'O-')  ? 'selected' : ''; ?>>O-</option>
+                                        <option value="" <?php echo empty($bloodType) ? 'selected' : ''; ?>>Blood Type
+                                        </option>
+                                        <option value="A+" <?php echo ($bloodType === 'A+') ? 'selected' : ''; ?>>A+
+                                        </option>
+                                        <option value="A-" <?php echo ($bloodType === 'A-') ? 'selected' : ''; ?>>A-
+                                        </option>
+                                        <option value="B+" <?php echo ($bloodType === 'B+') ? 'selected' : ''; ?>>B+
+                                        </option>
+                                        <option value="B-" <?php echo ($bloodType === 'B-') ? 'selected' : ''; ?>>B-
+                                        </option>
+                                        <option value="AB+" <?php echo ($bloodType === 'AB+') ? 'selected' : ''; ?>>AB+
+                                        </option>
+                                        <option value="AB-" <?php echo ($bloodType === 'AB-') ? 'selected' : ''; ?>>AB-
+                                        </option>
+                                        <option value="O+" <?php echo ($bloodType === 'O+') ? 'selected' : ''; ?>>O+
+                                        </option>
+                                        <option value="O-" <?php echo ($bloodType === 'O-') ? 'selected' : ''; ?>>O-
+                                        </option>
                                     </select>
                                     <label for="bloodType">Blood Type</label>
                                 </div>
@@ -375,12 +421,13 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
                                     <select class="form-select" id="civilStatus" name="civilStatus" disabled>
-                                        <option value="" <?php echo empty($civilStatus) ? 'selected' : ''; ?>>Civil Status</option>
-                                        <option value="Single" <?php echo ($civilStatus === 'Single')   ? 'selected' : ''; ?>>Single</option>
+                                        <option value="" <?php echo empty($civilStatus) ? 'selected' : ''; ?>>Civil
+                                            Status</option>
+                                        <option value="Single" <?php echo ($civilStatus === 'Single') ? 'selected' : ''; ?>>Single</option>
                                         <option value="Married" <?php echo ($civilStatus === 'Married') ? 'selected' : ''; ?>>Married</option>
-                                        <option value="Divorced" <?php echo ($civilStatus === 'Divorced')  ? 'selected' : ''; ?>>Divorced</option>
+                                        <option value="Divorced" <?php echo ($civilStatus === 'Divorced') ? 'selected' : ''; ?>>Divorced</option>
                                         <option value="Widowed" <?php echo ($civilStatus === 'Widowed') ? 'selected' : ''; ?>>Widowed</option>
-                                        <option value="Separated" <?php echo ($civilStatus === 'Separated')  ? 'selected' : ''; ?>>Separated</option>
+                                        <option value="Separated" <?php echo ($civilStatus === 'Separated') ? 'selected' : ''; ?>>Separated</option>
                                     </select>
                                     <label for="civilStatus">Civil Status</label>
                                 </div>
@@ -388,28 +435,39 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="citizenship" name="citizenship" value="<?php echo $citizenship ?>" placeholder="Citizenship" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text" class="form-control" id="citizenship" name="citizenship"
+                                        value="<?php echo $citizenship ?>" placeholder="Citizenship"
+                                        pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-7 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="occupation" name="occupation" value="<?php echo $occupation ?>" placeholder="Occupation" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text" class="form-control" id="occupation" name="occupation"
+                                        value="<?php echo $occupation ?>" placeholder="Occupation" pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?php echo !empty($lengthOfStay) ? (int)$lengthOfStay . ((int)$lengthOfStay == 1 ? ' year' : ' years') : ''; ?>" placeholder="Length Of Stay (in years)" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" disabled>
+                                    <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay"
+                                        value="<?php echo !empty($lengthOfStay) ? (int) $lengthOfStay . ((int) $lengthOfStay == 1 ? ' year' : ' years') : ''; ?>"
+                                        placeholder="Length Of Stay (in years)"
+                                        oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" min="0"
+                                        onkeydown="return !['e','E','-','+','.',','].includes(event.key)" disabled>
                                     <label for="lengthOfStay">Length Of Stay (in years)</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" readonly disabled>
+                                    <input type="text" class="form-control" id="residencyType" name="residencyType"
+                                        value="<?php echo $residencyType ?>" placeholder="Type of Residency" readonly
+                                        disabled>
                                     <label for="residencyType">Type of Residency</label>
                                     <input type="hidden" id="residencyTypeHidden" name="residencyType">
                                 </div>
@@ -417,7 +475,9 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-7 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="remarks" name="remarks" value="<?php echo $remarks ?>" placeholder="Type of Residency" readonly disabled>
+                                    <input type="text" class="form-control" id="remarks" name="remarks"
+                                        value="<?php echo $remarks ?>" placeholder="Type of Residency" readonly
+                                        disabled>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
@@ -434,14 +494,19 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>" placeholder="Phone Number" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)"  oninput="this.value = this.value.replace(/[^0-9]/g, '');" disabled>
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                                        value="<?php echo $phoneNumber ?>" placeholder="Phone Number"
+                                        inputmode="numeric" pattern="^09\d{9}$" maxlength="11"
+                                        title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)"
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" disabled>
                                     <label for="phoneNumber">Phone Number</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control" id="email" name="email" value="<?php echo $email ?>" placeholder="Email Address" disabled>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        value="<?php echo $email ?>" placeholder="Email Address" disabled>
                                     <label for="email">Email Address</label>
                                 </div>
                             </div>
@@ -458,63 +523,82 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" list="provincesList" id="province" name="provinceName" value="<?php echo $provinceName ?>" placeholder="Province" disabled>
+                                    <select class="form-select" id="province" name="provinceName"
+                                        data-saved="<?php echo $provinceName; ?>" disabled>
+                                        <option value="<?php echo $provinceName; ?>" selected>
+                                            <?php echo $provinceName ? $provinceName : 'Select Province'; ?>
+                                        </option>
+                                    </select>
                                     <label for="province">Province</label>
-                                    <datalist id="provincesList"></datalist>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" list="citiesList" id="city" name="cityName" value="<?php echo $cityName ?>" placeholder="City" disabled>
+                                    <select class="form-select" id="city" name="cityName"
+                                        data-saved="<?php echo $cityName; ?>" disabled>
+                                        <option value="<?php echo $cityName; ?>" selected>
+                                            <?php echo $cityName ? $cityName : 'Select City'; ?>
+                                        </option>
+                                    </select>
                                     <label for="city">City</label>
-                                    <datalist id="citiesList"></datalist>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" list="barangaysList" id="barangay" name="barangayName" value="<?php echo $barangayName ?>" placeholder="Barangay" disabled>
+                                    <select class="form-select" id="barangay" name="barangayName"
+                                        data-saved="<?php echo $barangayName; ?>" disabled>
+                                        <option value="<?php echo $barangayName; ?>" selected>
+                                            <?php echo $barangayName ? $barangayName : 'Select Barangay'; ?>
+                                        </option>
+                                    </select>
                                     <label for="barangay">Barangay</label>
-                                    <datalist id="barangaysList"></datalist>
                                 </div>
                             </div>
 
+
+
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="street" name="streetName" value="<?php echo $streetName ?>" placeholder="Street" disabled>
+                                    <input type="text" class="form-control" id="street" name="streetName"
+                                        value="<?php echo $streetName ?>" placeholder="Street" disabled>
                                     <label for="street">Street</label>
                                 </div>
-                            </div>                            
+                            </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot/House No." disabled>
+                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo"
+                                        value="<?php echo $blockLotNo ?>" placeholder="Block & Lot/House No." disabled>
                                     <label for="blockLotNo">Block & Lot/House No.</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="phase" name="phase" value="<?php echo $phase ?>" placeholder="Phase" disabled>
+                                    <input type="text" class="form-control" id="phase" name="phase"
+                                        value="<?php echo $phase ?>" placeholder="Phase" disabled>
                                     <label for="phase">Phase</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="subdivision" name="subdivisionName" value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
+                                    <input type="text" class="form-control" id="subdivision" name="subdivisionName"
+                                        value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
                                     <label for="subdivision">Subdivision</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="purok" name="purok" value="<?php echo $purok ?>" placeholder="Purok" disabled>
+                                    <input type="text" class="form-control" id="purok" name="purok"
+                                        value="<?php echo $purok ?>" placeholder="Purok" disabled>
                                     <label for="purok">Purok</label>
                                 </div>
                             </div>
-                        
+
                         </div>
 
                         <div class="row">
@@ -528,69 +612,91 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-12 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="sameAsCurrent" disabled>
-                                    <label class="form-check-label" for="sameAsCurrent">Use current address as the permanent address</label>
+                                    <label class="form-check-label" for="sameAsCurrent">Use current address as the
+                                        permanent address</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" list="permanentProvincesList" id="permanentProvince" name="permanentProvinceName" value="<?php echo $permanentProvinceName ?>" placeholder="Province" disabled>
+                                    <select class="form-select" id="permanentProvince" name="permanentProvinceName"
+                                        data-saved="<?php echo $permanentProvinceName; ?>" disabled>
+                                        <option value="<?php echo $permanentProvinceName; ?>" selected>
+                                            <?php echo $permanentProvinceName ? $permanentProvinceName : 'Select Province'; ?>
+                                        </option>
+                                    </select>
                                     <label for="permanentProvince">Province</label>
-                                    <datalist id="permanentProvincesList"></datalist>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" list="permanentCitiesList" id="permanentCity" name="permanentCityName" value="<?php echo $permanentCityName ?>" placeholder="City" disabled>
+                                    <select class="form-select" id="permanentCity" name="permanentCityName"
+                                        data-saved="<?php echo $permanentCityName; ?>" disabled>
+                                        <option value="<?php echo $permanentCityName; ?>" selected>
+                                            <?php echo $permanentCityName ? $permanentCityName : 'Select City'; ?>
+                                        </option>
+                                    </select>
                                     <label for="permanentCity">City</label>
-                                    <datalist id="permanentCitiesList"></datalist>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" list="permanentBarangaysList" id="permanentBarangay" name="permanentBarangayName" value="<?php echo $permanentBarangayName ?>" placeholder="Barangay" disabled>
+                                    <select class="form-select" id="permanentBarangay" name="permanentBarangayName"
+                                        data-saved="<?php echo $permanentBarangayName; ?>" disabled>
+                                        <option value="<?php echo $permanentBarangayName; ?>" selected>
+                                            <?php echo $permanentBarangayName ? $permanentBarangayName : 'Select Barangay'; ?>
+                                        </option>
+                                    </select>
                                     <label for="permanentBarangay">Barangay</label>
-                                    <datalist id="permanentBarangaysList"></datalist>
                                 </div>
                             </div>
 
+
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreetName" value="<?php echo $permanentStreetName ?>" placeholder="Street" disabled>
+                                    <input type="text" class="form-control" id="permanentStreet"
+                                        name="permanentStreetName" value="<?php echo $permanentStreetName ?>"
+                                        placeholder="Street" disabled>
                                     <label for="permanentStreet">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>" placeholder="Block & Lot/House No." disabled>
+                                    <input type="text" class="form-control" id="permanentBlockLotNo"
+                                        name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>"
+                                        placeholder="Block & Lot/House No." disabled>
                                     <label for="permanentBlockLotNo">Block & Lot/House No.</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase" value="<?php echo $permanentPhase ?>" placeholder="Phase" disabled>
+                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase"
+                                        value="<?php echo $permanentPhase ?>" placeholder="Phase" disabled>
                                     <label for="permanentPhase">Phase</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentSubdivisionName" name="permanentSubdivisionName" value="<?php echo $permanentSubdivisionName ?>" placeholder="Subdivision" disabled>
+                                    <input type="text" class="form-control" id="permanentSubdivisionName"
+                                        name="permanentSubdivisionName" value="<?php echo $permanentSubdivisionName ?>"
+                                        placeholder="Subdivision" disabled>
                                     <label for="permanentSubdivisionName">Subdivision</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>" placeholder="Purok" disabled>
+                                    <input type="text" class="form-control" id="permanentPurok" name="permanentPurok"
+                                        value="<?php echo $permanentPurok ?>" placeholder="Purok" disabled>
                                     <label for="permanentPurok">Purok</label>
                                 </div>
                             </div>
-                        
+
                         </div>
 
                     </div>
