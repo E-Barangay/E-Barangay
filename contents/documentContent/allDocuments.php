@@ -197,9 +197,14 @@ if(mysqli_num_rows($documentsResult) > 0)   {
 
                                 <p class="note mb-3">Please enter the number of children you have.</p>
 
-                                <div class="form-floating">
+                                <div class="form-floating mb-3">
                                     <input type="number" class="form-control" id="childNo" name="childNo" placeholder="Number of Children (e.g., 2)" min="0" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                                     <label for="childNo">Number of Children (e.g., 2)</label>
+                                </div>
+
+                                 <div class="form-floating">
+                                    <input type="number" class="form-control" id="soloParentSinceDate" name="soloParentSinceDate" placeholder="Solo Parent Since (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                                    <label for="soloParentSinceDate">Solo Parent Since (e.g., 2003)</label>
                                 </div>
 
                             <?php } else { ?>

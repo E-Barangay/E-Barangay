@@ -93,8 +93,9 @@ if (isset($_POST['proceedButton'])) {
     $_SESSION['spouseName'] = $_POST['spouseName'] ?? '';
     $_SESSION['marriageYear'] = $_POST['marriageYear'] ?? '';
     $_SESSION['childNo'] = $_POST['childNo'] ?? '';
+    $_SESSION['soloParentSinceDate'] = $_POST['soloParentSinceDate'] ?? '';
     
-    header("Location: documents/documentView.php?documentTypeID=$documentTypeID");
+    header("Location: documents/viewDocument.php?documentTypeID=$documentTypeID");
     exit();
 }
 

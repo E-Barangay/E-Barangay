@@ -72,10 +72,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
 
     case '10': // Certificate of Number of Children
       $childNo = $_POST['childNo'] ?? '';
+      $soloParentSinceDate = $_POST['soloParentSinceDate'] ?? '';
 
       $purpose = json_encode([
         'type' => 'Certificate of Number of Children',
-        'numberOfChildren' => $childNo
+        'numberOfChildren' => $childNo,
+        'soloParentSinceDate' => $soloParentSinceDate,
       ]);
       break;
 
@@ -84,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       break;
   }
 
-  $insertQuery = "INSERT INTO documents (documentTypeID, userID, purpose, documentStatus, requestDate) 
-                  VALUES (?, ?, ?, 'Pending', NOW())";
+  $insertQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, spouseName, marriageYear, childNo, soloParentSinceDate, documentStatus, requestDate) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())";
   $stmt = $pdo->prepare($insertQuery);
-  $stmt->execute([$documentTypeID, $userID, $purpose]);
+  $stmt->execute([$documentTypeID, $userID, $purpose, $businessName, $businessAddress, $businessNature, $controlNo, $ownership, $spouseName, $marriageYear, $childNo, $soloParentSinceDate]);
 
   echo "<script>window.location.href = 'index.php?page=document';</script>";
   exit();
@@ -667,12 +669,20 @@ $docTypesResults = executeQuery($docTypesQuery);
               <div class="document-form-section" data-doc-type="children" style="display: none;">
                 <p class="note mb-3">Please enter the number of children you have.</p>
 
-                <div class="form-floating">
+                <div class="form-floating mb-3">
                   <input type="number" class="form-control" id="childNo" name="childNo"
                     placeholder="Number of Children (e.g., 2)" min="0"
                     oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);"
                     onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                   <label for="childNo">Number of Children (e.g., 2)</label>
+                </div>
+
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="soloParentSinceDate" name="soloParentSinceDate"
+                    placeholder="Solo Parent Since (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>"
+                    oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);"
+                    onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                  <label for="soloParentSinceDate">Solo Parent Since (e.g., 2003)</label>
                 </div>
               </div>
 
