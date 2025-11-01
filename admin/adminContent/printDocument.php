@@ -62,6 +62,7 @@ $userQuery = "
         documents.spouseName,
         documents.marriageYear,
         documents.childNo,
+        documents.soloParentSinceDate,
         documents.requestDate,
         documents.documentStatus,
         documentTypes.documentName
@@ -155,6 +156,7 @@ $ownership = $userRow['ownership'];
 $spouseName = $userRow['spouseName'];
 $marriageYear = $userRow['marriageYear'];
 $childNo = $userRow['childNo'];
+$soloParentSinceDate = $userRow['soloParentSinceDate'];
 
 // paths
 $sharedPath = __DIR__ . '/documents/sharedAssets/';
@@ -268,19 +270,51 @@ switch ($documentTypeID) {
     <button class="btn btn-danger" onclick="window.close()">← Back</button>
 </div>
 
-<div class="print-container">
-    <?php include $sharedPath . 'header.php'; ?>
+<?php if ($documentTypeID == 4) { ?>
+    
+    <div class="print-container d-flex flex-column px-5 py-5">
+        <?php include $sharedPath . 'header.php'; ?>
 
-    <?php
-    if ($layoutFile && file_exists($layoutPath . $layoutFile)) {
-        include $layoutPath . $layoutFile;
-    } else {
-        echo "<p style='text-align:center; margin-top:100px;'>Layout not found for this document type.</p>";
-    }
-    ?>
+        <?php
+        if ($layoutFile && file_exists($layoutPath . $layoutFile)) {
+            include $layoutPath . $layoutFile;
+        } else {
+            echo "<p style='text-align:center; margin-top:100px;'>Layout not found for this document type.</p>";
+        }
+        ?>
 
-    <?php include $sharedPath . 'footer.php'; ?>
-</div>
+        <?php include $sharedPath . 'footer.php'; ?>
+    </div>
+
+    <div class="print-container d-flex flex-column px-5 py-5">
+        <?php 
+            $customTitle = "Oath Of Undertaking"; 
+            include $sharedPath . 'header.php';
+        ?>
+
+        <?php include ("documents/documentTypes/oathOfUndertaking.php") ?>
+
+        <?php include $sharedPath . 'footer.php'; ?>
+    </div>
+
+<?php } else { ?>
+
+    <div class="print-container d-flex flex-column px-5 py-5">
+        <?php include $sharedPath . 'header.php'; ?>
+
+        <?php
+            if ($layoutFile && file_exists($layoutPath . $layoutFile)) {
+                include $layoutPath . $layoutFile;
+            } else {
+                echo "<p style='text-align:center; margin-top:100px;'>Layout not found for this document type.</p>";
+            }
+        ?>
+
+        <?php include $sharedPath . 'footer.php'; ?>
+    </div>
+
+<?php } ?>
 
 </body>
+
 </html>

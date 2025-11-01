@@ -115,6 +115,7 @@ $spouseName = $_SESSION['spouseName'] ?? '';
 $marriageYear = $_SESSION['marriageYear'] ?? '';
 $ownership = $_SESSION['ownership'] ?? '';
 $childNo = $_SESSION['childNo'] ?? '';
+$soloParentSinceDate = $_SESSION['soloParentSinceDate'] ?? '';
 
 if (isset($_POST['yes'])) {
     
@@ -125,7 +126,7 @@ if (isset($_POST['yes'])) {
     } elseif ($documentTypeID == 7) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW())";
     } elseif ($documentTypeID == 10) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, requestDate) VALUES ($documentTypeID, $userID, $childNo, NOW())";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW())";
     } else {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, requestDate) VALUES ($documentTypeID, $userID, NOW())";
     }
