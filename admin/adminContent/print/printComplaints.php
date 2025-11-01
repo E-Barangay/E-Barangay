@@ -2,19 +2,23 @@
 include_once __DIR__ . "/../../../sharedAssets/connect.php";
 
 $from = isset($_GET['from']) ? trim($_GET['from']) : null;
-$to   = isset($_GET['to']) ? trim($_GET['to']) : null;
+$to = isset($_GET['to']) ? trim($_GET['to']) : null;
 
-function valid_date($date) {
-    if (!$date) return false;
-    $check = DateTime::createFromFormat('Y-m-d', $date);
-    return $check && $check->format('Y-m-d') === $date;
+function valid_date($date)
+{
+  if (!$date)
+    return false;
+  $check = DateTime::createFromFormat('Y-m-d', $date);
+  return $check && $check->format('Y-m-d') === $date;
 }
 
-if (!valid_date($from)) $from = null;
-if (!valid_date($to)) $to = null;
+if (!valid_date($from))
+  $from = null;
+if (!valid_date($to))
+  $to = null;
 
 if ($from && $to) {
-    $complaintsQuery = "
+  $complaintsQuery = "
         SELECT 
             complaintID,
             complaintTitle,
@@ -25,7 +29,7 @@ if ($from && $to) {
         ORDER BY requestDate DESC
     ";
 } else {
-    $complaintsQuery = "
+  $complaintsQuery = "
         SELECT 
             complaintID,
             complaintTitle,
@@ -40,9 +44,9 @@ $complaintsResults = $conn->query($complaintsQuery);
 
 $complaintsData = [];
 if ($complaintsResults) {
-    while ($row = $complaintsResults->fetch_assoc()) {
-        $complaintsData[] = $row;
-    }
+  while ($row = $complaintsResults->fetch_assoc()) {
+    $complaintsData[] = $row;
+  }
 }
 
 $total = count($complaintsData);
@@ -52,30 +56,33 @@ $escalated = 0;
 $vawc = 0;
 
 foreach ($complaintsData as $row) {
-    $status = strtolower(trim($row['complaintStatus'] ?? ''));
+  $status = strtolower(trim($row['complaintStatus'] ?? ''));
 
-    if (in_array($status, ['criminal', 'civil'])) {
-        $primaryCriminal++;
-    }
+  if (in_array($status, ['criminal', 'civil'])) {
+    $primaryCriminal++;
+  }
 
-    if (in_array($status, ['withdrawn', 'repudiated', 'dismissed', 'certified', 'resolved'])) {
-        $resolved++;
-    }
+  if (in_array($status, ['withdrawn', 'repudiated', 'dismissed', 'certified', 'resolved'])) {
+    $resolved++;
+  }
 
-    if (in_array($status, ['mediation', 'conciliation', 'arbitration', 'pending'])) {
-        $escalated++;
-    }
+  if (in_array($status, ['mediation', 'conciliation', 'arbitration', 'pending'])) {
+    $escalated++;
+  }
 
-    if (strpos($status, 'vawc') !== false) {
-        $vawc++;
-    }
+  if (strpos($status, 'vawc') !== false) {
+    $vawc++;
+  }
 }
 ?>
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>Barangay Incidents Report</title>
+    <link rel="icon" href="../../../assets/images/logoSanAntonio.png">
+
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <style>
@@ -84,15 +91,18 @@ foreach ($complaintsData as $row) {
       padding: 18px;
       font-size: 13px;
     }
+
     .summary {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-bottom: 12px;
     }
+
     .summary .card {
       min-width: 120px;
     }
+
     @media print {
       .no-print {
         display: none;
@@ -100,6 +110,7 @@ foreach ($complaintsData as $row) {
     }
   </style>
 </head>
+
 <body>
   <div class="d-flex justify-content-between mb-3">
     <div>
@@ -169,4 +180,5 @@ foreach ($complaintsData as $row) {
     </tbody>
   </table>
 </body>
+
 </html>
