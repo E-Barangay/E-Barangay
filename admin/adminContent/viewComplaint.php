@@ -150,7 +150,7 @@ function getStatusBadgeClass($status)
 </head>
 
 <body>
-  <div class="container.fluid p-3 p-md-4">
+  <div class="container-fluid p-3 p-md-4">
     <form method="POST" action="">
       <input type="hidden" name="complaintID" value="<?= $complaint['complaintID'] ?>">
       <div class="row">
