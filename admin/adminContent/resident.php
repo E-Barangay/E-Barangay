@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
 
     // ===================== INSERT INTO users =====================
     $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, verificationCode) 
-                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', 1, '')";
+                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', No, '')";
 
     if (mysqli_query($conn, $insertUser)) {
         $userID = mysqli_insert_id($conn);
@@ -70,6 +70,31 @@ if (!in_array($sortBy, $allowedSort)) {
     $sortBy = 'lastName';
 }
 
+// ===================== PAGINATION =====================
+$limit = 10; // records per page
+$currentPage = isset($_GET['p']) && is_numeric($_GET['p']) ? (int) $_GET['p'] : 1;
+$offset = ($currentPage - 1) * $limit;
+
+// Count total records for pagination
+$countSql = "SELECT COUNT(*) AS total FROM userInfo ui
+             INNER JOIN users u ON ui.userID = u.userID
+             WHERE u.role = 'user'";
+
+if ($search !== '') {
+    $term = "%$search%";
+    $countSql .= " AND (
+        ui.firstName LIKE '$term' OR
+        ui.middleName LIKE '$term' OR
+        ui.lastName LIKE '$term' OR
+        ui.birthDate LIKE '$term' OR
+        ui.gender LIKE '$term'
+    )";
+}
+
+$countResult = mysqli_query($conn, $countSql);
+$totalRows = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRows / $limit);
+
 $sql = "SELECT 
     ui.userInfoID,
     ui.userID,
@@ -99,7 +124,6 @@ if ($search !== '') {
 }
 
 $sql .= " ORDER BY $sortBy $order";
-
 $result = mysqli_query($conn, $sql);
 ?>
 
@@ -134,6 +158,72 @@ $result = mysqli_query($conn, $sql);
         background-color: #279995;
         color: #fff;
     }
+
+
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #31afab;
+        border-color: #31afab;
+    }
+
+    .btn-primary:hover {
+        background-color: #2a9995;
+        border-color: #2a9995;
+    }
+
+    .modal-header {
+        background-color: #31afab;
+        color: white;
+    }
+
+    .modal-header .btn-close {
+        filter: invert(1);
+    }
+
+    .pagination .page-link {
+        color: #31afab;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #31afab;
+        border-color: #31afab;
+        color: white;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9f8f8;
+        color: #31afab;
+    }
+
+    .btn-info {
+        background-color: #31afab !important;
+        border-color: #31afab !important;
+    }
+
+    .btn-info:hover {
+        background-color: #2a9995 !important;
+        border-color: #2a9995 !important;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 0, 0, .075);
+    }
+
+    .badge {
+        font-size: 0.75em;
+    }
+
+    .bg-custom {
+        background-color: #31afab !important;
+        color: #fff;
+    }
 </style>
 
 <body>
@@ -155,54 +245,57 @@ $result = mysqli_query($conn, $sql);
                     </div>
                 </div>
 
-                <div class="p-3 p-md-3">
-                    <div class="row g-3 mb-4">
-                        <!-- Filter Form -->
-                        <div class="col-md-12">
-                            <form method="GET" action="index.php" class="row g-3">
-                                <input type="hidden" name="page" value="resident">
+                <div class="p-3 p-md-4">
+                    <form method="GET" action="index.php">
+                        <input type="hidden" name="page" value="resident">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fas fa-search text-muted"></i>
+                                            </span>
+                                            <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
+                                                class="form-control border-start-0"
+                                                placeholder="Enter name, birthdate, gender, or address">
+                                        </div>
+                                    </div>
 
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white border-end-0">
-                                            <i class="fas fa-search text-muted"></i>
-                                        </span>
-                                        <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
-                                            class="form-control border-start-0"
-                                            placeholder="Enter name, birthdate, gender, or address">
+                                    <div class="col-md-3">
+                                        <select name="sortBy" class="form-select">
+                                            <option value="lastName" <?= $sortBy == 'lastName' ? 'selected' : '' ?>>Last
+                                                Name
+                                            </option>
+                                            <option value="firstName" <?= $sortBy == 'firstName' ? 'selected' : '' ?>>First
+                                                Name</option>
+                                            <option value="birthDate" <?= $sortBy == 'birthDate' ? 'selected' : '' ?>>Birth
+                                                Date</option>
+                                            <option value="gender" <?= $sortBy == 'gender' ? 'selected' : '' ?>>Gender
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <select name="order" class="form-select">
+                                            <option value="ASC" <?= $order == 'ASC' ? 'selected' : '' ?>>Ascending</option>
+                                            <option value="DESC" <?= $order == 'DESC' ? 'selected' : '' ?>>Descending
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-custom w-100">
+                                            <i class="fas fa-filter me-2"></i>Filter
+                                        </button>
                                     </div>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <select name="sortBy" class="form-select">
-                                        <option value="lastName" <?= $sortBy == 'lastName' ? 'selected' : '' ?>>Last Name
-                                        </option>
-                                        <option value="firstName" <?= $sortBy == 'firstName' ? 'selected' : '' ?>>First
-                                            Name</option>
-                                        <option value="birthDate" <?= $sortBy == 'birthDate' ? 'selected' : '' ?>>Birth
-                                            Date</option>
-                                        <option value="gender" <?= $sortBy == 'gender' ? 'selected' : '' ?>>Gender</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <select name="order" class="form-select">
-                                        <option value="ASC" <?= $order == 'ASC' ? 'selected' : '' ?>>Ascending</option>
-                                        <option value="DESC" <?= $order == 'DESC' ? 'selected' : '' ?>>Descending</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <button type="submit" class="btn btn-custom w-100">
-                                        <i class="fas fa-filter me-2"></i>Filter
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                    </form>
 
                     <div class="card shadow-sm">
-                        <div class="card-body p-2">
+                        <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
@@ -229,12 +322,9 @@ $result = mysqli_query($conn, $sql);
                                                     </td>
                                                     <td>
                                                         <a href="adminContent/viewResident.php?userID=<?= $row['userID'] ?: 0 ?>"
-                                                            class="btn btn-sm btn-success">
-                                                            <i class="fas fa-eye me-1"></i>
-                                                        </a>
-                                                        <button class="btn btn-sm btn-danger">
-                                                            <i class="fas fa-trash me-1"></i>
-                                                        </button>
+                                                            class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye gap"></i>
+                                                        </a>\
                                                     </td>
                                                 </tr>
                                             <?php endwhile; ?>
@@ -545,7 +635,7 @@ $result = mysqli_query($conn, $sql);
                             </div>
                         </div>
 
-                        <!-- <div class="card-footer bg-light">
+                        <div class="card-footer bg-light">
                             <div class="row align-items-center">
                                 <div class="col-12 col-md-6">
                                     <div class="text-center text-md-start">
@@ -588,7 +678,7 @@ $result = mysqli_query($conn, $sql);
                                     </nav>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -615,7 +705,7 @@ $result = mysqli_query($conn, $sql);
         </script>
     <?php endif; ?> -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
                 const alerts = document.querySelectorAll('.alert');
                 alerts.forEach(alert => alert.remove());
@@ -638,17 +728,17 @@ $result = mysqli_query($conn, $sql);
             return age;
         }
 
-        birthDateInput.addEventListener('change', function() {
+        birthDateInput.addEventListener('change', function () {
             ageInput.value = calculateAge(this.value);
         });
 
         // Optional: Update age as user types manually in birthdate
-        birthDateInput.addEventListener('input', function() {
+        birthDateInput.addEventListener('input', function () {
             ageInput.value = calculateAge(this.value);
         });
     </script>
     <script>
-        document.getElementById('sameAsCurrent').addEventListener('change', function() {
+        document.getElementById('sameAsCurrent').addEventListener('change', function () {
             const isChecked = this.checked;
 
             const fields = ['blockLotNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName'];
