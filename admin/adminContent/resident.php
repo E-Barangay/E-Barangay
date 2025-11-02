@@ -18,8 +18,9 @@ $modalNotifType = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
 
     // ===================== INSERT INTO users =====================
-    $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, verificationCode) 
-                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', No, '')";
+    $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, isRestricted) 
+               VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', 'No', 'No')";
+
 
     if (mysqli_query($conn, $insertUser)) {
         $userID = mysqli_insert_id($conn);
@@ -28,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
         $insertResident = "INSERT INTO userInfo
             (userID, firstName, middleName, lastName, gender, birthDate, age, birthPlace, bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType)
             VALUES
-            ($userID, '{$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}')";
+            ($userID, ' {$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}')";
 
         if (mysqli_query($conn, $insertResident)) {
             $userInfoID = mysqli_insert_id($conn);
@@ -60,10 +61,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
     }
 }
 
+// ===================== HANDLE RESTRICT USER =====================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['newStatus'])) {
+    $userID = $_POST['userID'];
+    $status = $_POST['newStatus'];
+
+    $query = "UPDATE users SET isRestricted = '$status' WHERE userID = '$userID'";
+
+    if (mysqli_query($conn, $query)) {
+        echo "success";
+    } else {
+        echo "error";
+    }
+}
+
+
 // ===================== GET RESIDENTS =====================
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $sortBy = isset($_GET['sortBy']) ? $_GET['sortBy'] : 'lastName';
 $order = isset($_GET['order']) && strtoupper($_GET['order']) === 'DESC' ? 'DESC' : 'ASC';
+$filter = isset($_GET['filter']) ? $_GET['filter'] : '';
 
 $allowedSort = ['lastName', 'firstName', 'birthDate', 'gender'];
 if (!in_array($sortBy, $allowedSort)) {
@@ -91,6 +108,12 @@ if ($search !== '') {
     )";
 }
 
+if ($filter === 'restricted') {
+    $countSql .= " AND u.isRestricted = 'Yes'";
+} elseif ($filter === 'not_restricted') {
+    $countSql .= " AND (u.isRestricted = 'No' OR u.isRestricted IS NULL)";
+}
+
 $countResult = mysqli_query($conn, $countSql);
 $totalRows = mysqli_fetch_assoc($countResult)['total'];
 $totalPages = ceil($totalRows / $limit);
@@ -105,7 +128,8 @@ $sql = "SELECT
     ui.gender,
     ui.birthDate,
     a.cityName,
-    a.provinceName
+    a.provinceName,
+    u.isRestricted
 FROM userInfo ui
 INNER JOIN users u ON ui.userID = u.userID
 LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
@@ -121,6 +145,12 @@ if ($search !== '') {
         ui.gender LIKE '$term' OR
         CONCAT_WS(' ', a.blockLotNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE '$term'
     )";
+}
+
+if ($filter === 'restricted') {
+    $sql .= " AND u.isRestricted = 'Yes'";
+} elseif ($filter === 'not_restricted') {
+    $sql .= " AND (u.isRestricted = 'No' OR u.isRestricted IS NULL)";
 }
 
 $sql .= " ORDER BY $sortBy $order";
@@ -262,7 +292,7 @@ $result = mysqli_query($conn, $sql);
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <select name="sortBy" class="form-select">
                                             <option value="lastName" <?= $sortBy == 'lastName' ? 'selected' : '' ?>>Last
                                                 Name
@@ -276,10 +306,20 @@ $result = mysqli_query($conn, $sql);
                                         </select>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <select name="order" class="form-select">
                                             <option value="ASC" <?= $order == 'ASC' ? 'selected' : '' ?>>Ascending</option>
                                             <option value="DESC" <?= $order == 'DESC' ? 'selected' : '' ?>>Descending
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <select name="filter" class="form-select">
+                                            <option value="" <?= empty($_GET['filter']) ? 'selected' : '' ?>>All Users
+                                            </option>
+                                            <option value="restricted" <?= (isset($_GET['filter']) && $_GET['filter'] == 'restricted') ? 'selected' : '' ?>>Restricted</option>
+                                            <option value="not_restricted" <?= (isset($_GET['filter']) && $_GET['filter'] == 'not_restricted') ? 'selected' : '' ?>>Not Restricted
                                             </option>
                                         </select>
                                     </div>
@@ -306,6 +346,7 @@ $result = mysqli_query($conn, $sql);
                                             <th>Birth Date</th>
                                             <th>Gender</th>
                                             <th>Address</th>
+                                            <th>Restricted</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -319,12 +360,57 @@ $result = mysqli_query($conn, $sql);
                                                     <td><?= htmlspecialchars($row['birthDate']); ?></td>
                                                     <td><?= htmlspecialchars($row['gender']); ?></td>
                                                     <td><?= htmlspecialchars($row['cityName'] . ', ' . $row['provinceName']); ?>
+                                                    <td><?= htmlspecialchars($row['isRestricted']); ?>
                                                     </td>
                                                     <td>
                                                         <a href="adminContent/viewResident.php?userID=<?= $row['userID'] ?: 0 ?>"
                                                             class="btn btn-sm btn-outline-primary">
                                                             <i class="fas fa-eye gap"></i>
-                                                        </a>\
+                                                        </a>
+                                                        <!-- Toggle Restrict Button -->
+                                                        <button
+                                                            class="btn btn-sm <?= ($row['isRestricted'] === 'Yes') ? 'btn-success' : 'btn-danger' ?>"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#restrictUserModal<?= $row['userID'] ?>">
+                                                            <i
+                                                                class="fas <?= ($row['isRestricted'] === 'Yes') ? 'fa-check' : 'fa-times' ?>"></i>
+                                                        </button>
+
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="restrictUserModal<?= $row['userID'] ?>"
+                                                            tabindex="-1">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">
+                                                                            <?= ($row['isRestricted'] === 'Yes') ? 'Unrestrict User' : 'Restrict User' ?>
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        Are you sure you want to
+                                                                        <?= ($row['isRestricted'] === 'Yes') ? 'unrestrict' : 'restrict' ?>
+                                                                        this user?
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary"
+                                                                            data-bs-dismiss="modal">Cancel</button>
+
+                                                                        <!-- Fixed Form -->
+                                                                        <form method="POST" style="display:inline;">
+                                                                            <input type="hidden" name="userID"
+                                                                                value="<?= $row['userID'] ?>">
+                                                                            <input type="hidden" name="newStatus"
+                                                                                value="<?= ($row['isRestricted'] === 'Yes') ? 'No' : 'Yes' ?>">
+                                                                            <button type="submit" class="btn btn-danger">
+                                                                                Confirm
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             <?php endwhile; ?>
@@ -686,24 +772,6 @@ $result = mysqli_query($conn, $sql);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- <?php if ($showModal): ?>
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let myModalEl = document.getElementById("addResidentModal");
-                let myModal = new bootstrap.Modal(myModalEl);
-                myModal.show();
-
-                <?php if ($modalNotifType === "success"): ?>
-                    // Auto-close modal on success after 3 seconds
-                    setTimeout(() => {
-                        myModal.hide();
-                        // Optional: clear form
-                        document.getElementById("addResidentForm").reset();
-                    }, 3000);
-                <?php endif; ?>
-            });
-        </script>
-    <?php endif; ?> -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
@@ -764,6 +832,44 @@ $result = mysqli_query($conn, $sql);
             });
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.toggle-restrict-btn').forEach(button => {
+                button.addEventListener('click', function () {
+
+                    const userID = this.getAttribute('data-user-id');
+                    const currentStatus = this.getAttribute('data-status');
+                    const newStatus = currentStatus === 'Yes' ? 'No' : 'Yes';
+
+                    // Send AJAX request to update in backend
+                    fetch('restrictUserHandler.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `userID=${userID}&newStatus=${newStatus}`
+                    })
+                        .then(response => response.text())
+                        .then(result => {
+                            if (result === 'success') {
+
+                                // ✅ Update button display (icon & color)
+                                this.setAttribute('data-status', newStatus);
+
+                                if (newStatus === 'Yes') {
+                                    this.classList.remove('btn-danger');
+                                    this.classList.add('btn-success');
+                                    this.innerHTML = '<i class="fas fa-check"></i>'; // ✅ Show check
+                                } else {
+                                    this.classList.remove('btn-success');
+                                    this.classList.add('btn-danger');
+                                    this.innerHTML = '<i class="fas fa-times"></i>'; // ❌ Show cross
+                                }
+                            }
+                        });
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>

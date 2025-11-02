@@ -177,7 +177,7 @@ $result = mysqli_query($conn, $query);
                     <?php
                     if (isset($result) && mysqli_num_rows($result) > 0):
                       while ($announcement = mysqli_fetch_assoc($result)):
-                        $imagePath = "/Baranggya/E-Barangay/assets/images/announcements/" . htmlspecialchars($announcement['image']);
+                        $imagePath = "../assets/images/announcements/" . htmlspecialchars($announcement['image']);
                         ?>
                         <tr>
                           <td><?php echo htmlspecialchars($announcement['title']); ?></td>
