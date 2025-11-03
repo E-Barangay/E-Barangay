@@ -23,8 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $requestDate = date('Y-m-d H:i:s');
 
   // Default values for unused columns
-  $complaintCategoryID = 0;
-  $complaintTypeID = 0;
   $evidenceFile = "";
 
   // Handle file upload
@@ -44,13 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // ✅ Insert new complaint
   $stmt = "INSERT INTO complaints (
-    userID, complaintCategoryID, complaintTypeID, complaintTitle, complaintDescription, 
+    userID, complaintTitle, complaintDescription, 
     requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, 
     complaintVictim, complainantName, victimAge, victimRelationship, actionTaken, evidence, isDeleted
 ) VALUES (
     '1',
-    '$complaintCategoryID',
-    '$complaintTypeID',
     '$complaintTitle',
     '$complaintDescription',
     '$requestDate',
@@ -408,8 +404,7 @@ function getBorderClass($status)
                                     <h5 class="modal-title" id="deleteModalLabel<?= $row['concernID'] ?>">
                                       <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
                                     </h5>
-                                    <button type="button" class="btn-close"
-                                      data-bs-dismiss="modal"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                   </div>
                                   <div class="modal-body">
                                     Are you sure you want to delete this complaint?
@@ -499,8 +494,7 @@ function getBorderClass($status)
                       <h5 class="modal-title text-white fw-semibold" id="addComplaintLabel">
                         <i class="fas fa-plus me-2"></i>Add Complaint
                       </h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <form method="POST" enctype="multipart/form-data">
