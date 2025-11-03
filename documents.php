@@ -64,10 +64,10 @@ $permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
 
 $searchTerm = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-$documentsQuery = "SELECT * FROM documentTypes WHERE categoryID = 1";
+$documentsQuery = "SELECT * FROM documentTypes";
 
 if (!empty($searchTerm)) {
-    $documentsQuery .= " AND documentName LIKE '%$searchTerm%'";
+    $documentsQuery .= " WHERE documentName LIKE '%$searchTerm%'";
 }
 
 $documentsResult = executeQuery($documentsQuery);
@@ -174,7 +174,7 @@ if (isset($_POST['proceedButton'])) {
 
                 <div class="col-12 col-lg-9 p-0">
                     <div class="contentCard card m-1 p-2" id="contentCard">
-                        <div class="row px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
+                        <div class="row px-3 py-2" id="scrollable">
 
                             <?php include("contents/documentContent/" . $content . ".php"); ?>
 

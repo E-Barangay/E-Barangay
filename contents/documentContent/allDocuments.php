@@ -13,7 +13,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
         <div class="col-6 col-md-4 col-lg-4 p-1">
             <div class="documentCard card my-0 my-sm-2">
                 <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top"
-                    style="width: 100%; height: 500px; object-fit: cover;" alt="Document">
+                    style="width: 100%; height: 500px; object-fit: cover; pointer-events:none;" alt="Document">
                 <div class="mt-auto">
 
                     <?php 
@@ -139,7 +139,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                     <label for="ownership">Ownership</label>
                                 </div>
 
-                            <?php } elseif ($documentsRow['documentTypeID'] == 1 || $documentsRow['documentTypeID'] == 5 || $documentsRow['documentTypeID'] == 9) { ?>
+                            <?php } elseif ($documentsRow['documentTypeID'] == 1 || $documentsRow['documentTypeID'] == 5 || $documentsRow['documentTypeID'] == 8) { ?>
                                 
                                 <p class="note mb-3">Please select the purpose for your request:</p>
 
@@ -193,7 +193,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                     <label for="marriageYear">Year of Marriage (e.g., 2003)</label>
                                 </div>
 
-                            <?php } elseif ($documentsRow['documentTypeID'] == 10) { ?>
+                            <?php } elseif ($documentsRow['documentTypeID'] == 9) { ?>
 
                                 <p class="note mb-3">Please enter the number of children you have.</p>
 
