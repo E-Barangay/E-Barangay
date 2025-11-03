@@ -358,7 +358,7 @@ if (isset($_POST['setPassword'])) {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    $isWeak = !preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password);
+    $isWeak = !preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/', $password);
 
     $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
     $userCheckResult = executeQuery($userCheckQuery);
@@ -376,24 +376,22 @@ if (isset($_POST['setPassword'])) {
             } else {
                 $password = str_replace("'", "", $password);
 
-                $updatePasswordQuery = "UPDATE users SET password = '$password', isNew = 'No' WHERE email = '$email'";
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $updatePasswordQuery = "UPDATE users SET password = '$hashedPassword', isNew = 'No' WHERE email = '$email'";
                 executeQuery($updatePasswordQuery);
 
-                $loginQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-                $loginResult = executeQuery($loginQuery);
+                $userCheckResult = executeQuery($userCheckQuery);
+                $user = mysqli_fetch_assoc($userCheckResult);
 
-                if (mysqli_num_rows($loginResult) > 0) {
-                    $user = mysqli_fetch_assoc($loginResult);
-                    $_SESSION['userID'] = $user['userID'];
-                    $_SESSION['role'] = $user['role'];
+                $_SESSION['userID'] = $user['userID'];
+                $_SESSION['role'] = $user['role'];
 
-                    if ($user['role'] === 'admin') {
-                        header("Location: admin/index.php");
-                    } else {
-                        $_SESSION['success'] = 'passwordCreated';
+                if ($user['role'] === 'admin') {
+                    header("Location: admin/index.php");
+                } else {
+                    $_SESSION['success'] = 'passwordCreated';
 
-                        header("Location: profile.php");
-                    }
+                    header("Location: profile.php");
                 }
             }
         } elseif ($userRow['isNew'] === 'No') {
@@ -406,24 +404,22 @@ if (isset($_POST['setPassword'])) {
             } else {
                 $password = str_replace("'", "", $password);
 
-                $updatePasswordQuery = "UPDATE users SET password = '$password', isNew = 'No' WHERE email = '$email'";
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $updatePasswordQuery = "UPDATE users SET password = '$hashedPassword', isNew = 'No' WHERE email = '$email'";
                 executeQuery($updatePasswordQuery);
 
-                $loginQuery = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-                $loginResult = executeQuery($loginQuery);
+                $userCheckResult = executeQuery($userCheckQuery);
+                $user = mysqli_fetch_assoc($userCheckResult);
 
-                if (mysqli_num_rows($loginResult) > 0) {
-                    $user = mysqli_fetch_assoc($loginResult);
-                    $_SESSION['userID'] = $user['userID'];
-                    $_SESSION['role'] = $user['role'];
+                $_SESSION['userID'] = $user['userID'];
+                $_SESSION['role'] = $user['role'];
 
-                    if ($user['role'] === 'admin') {
-                        header("Location: admin/index.php");
-                    } else {
-                        $_SESSION['success'] = 'passwordResetted';
+                if ($user['role'] === 'admin') {
+                    header("Location: admin/index.php");
+                } else {
+                    $_SESSION['success'] = 'passwordResetted';
 
-                        header("Location: index.php");
-                    }
+                    header("Location: index.php");
                 }
             }
         }
@@ -435,8 +431,6 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    $isWeak = !preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password);
-
     $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
     $userCheckResult = executeQuery($userCheckQuery);
 
@@ -444,7 +438,7 @@ if (isset($_POST['login'])) {
         $userRow = mysqli_fetch_assoc($userCheckResult);
 
         if ($userRow['isNew'] === 'No') {
-            if ($password === $userRow['password']) {
+            if (password_verify($password, $userRow['password'])) {
                 $_SESSION['userID'] = $userRow['userID'];
                 $_SESSION['role'] = $userRow['role'];
 
