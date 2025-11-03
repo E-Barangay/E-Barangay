@@ -7,7 +7,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong>, <?php echo $age . " years old, a " . $residencyType . " resident of this barangay is known to me to be a person of good moral character and law - abiding citizen." ?></p>
+                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong>, <?php echo $age . " years old, a "?> <strong><?php echo $residencyType ?></strong> resident of this barangay is known to me to be a person of good moral character and law - abiding citizen.</p>
             </div>
         </div>
         <div class="row">

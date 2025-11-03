@@ -7,12 +7,12 @@
         </div>
         <div class="row">
             <div class="col">
-                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong>, <?php echo $age .  " years old, " . $residencyType . " of Barangay San Antonio, Santo Tomas, Batangas is a Solo Parent "?>since <strong><?php echo $soloParentSinceDate ?></strong>.</p>
+                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong>, <?php echo $age .  " years old, " . $residencyType . " of Barangay San Antonio, Santo Tomas, Batangas is a "?> <strong>Solo Parent</strong> since <strong><?php echo $soloParentSinceDate ?></strong>.</p>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <p style="text-indent: 48px; text-align: justify;">This is to certify that furthermore that <?php echo ($gender === "Male" ? 'he' : 'she') . " is living with " . ($gender === "Male" ? 'his' : 'her') ?> <strong><?php echo $childNo . ($childNo == 1 ? ' child' : ' children') ?></strong> who <?php echo ($childNo == 1 ? 'depend' : 'depends') . " on " . ($gender === "Male" ? 'his' : 'her') . " support."; ?></p>
+                <p style="text-indent: 48px; text-align: justify;">This is to certify that furthermore that <?php echo ($gender === "Male" ? 'he' : 'she') . " is living with " . ($gender === "Male" ? 'his' : 'her') ?> <strong><?php echo $childNo . ($childNo == 1 ? ' child' : ' children') ?></strong>, who <?php echo ($childNo == 1 ? 'depend' : 'depends') . " on " . ($gender === "Male" ? 'his' : 'her') . " support."; ?></p>
             </div>
         </div>
         <div class="row">

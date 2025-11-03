@@ -34,10 +34,10 @@ if (isset($_GET['documentTypeID'])) {
         case "7":
             $document = "jointCohabitation";
             break;
-        case "9":
+        case "8":
             $document = "residency";
             break;
-        case "10":
+        case "9":
             $document = "soloParent";
             break;
         default:
@@ -121,11 +121,11 @@ if (isset($_POST['yes'])) {
     
     if ($documentTypeID == 2) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW())";
-    } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 9) {
+    } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 8) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate) VALUES ($documentTypeID, $userID, '$purpose', NOW())";
     } elseif ($documentTypeID == 7) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW())";
-    } elseif ($documentTypeID == 10) {
+    } elseif ($documentTypeID == 9) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW())";
     } else {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, requestDate) VALUES ($documentTypeID, $userID, NOW())";
@@ -174,9 +174,9 @@ if (isset($_POST['yes'])) {
 <body data-bs-theme="light">
     
     <form method="POST">
-        <div class="container py-4">
+        <div class="container d-flex justify-content-center align-items-center py-4" style="min-height:100vh;">
             <div class="row">
-                <div class="col">
+                <div class="col my-auto">
                     
                     <?php include("sharedAssets/header.php") ?>
 

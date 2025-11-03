@@ -6,7 +6,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . ", resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for " . $purpose . " located at the " . $barangayName . ", " . $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " . $provinceName ?></p>
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong> , resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for <strong><?php echo $purpose ?></strong> located at the <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " . $provinceName ?></p>
         </div>
     </div>
     <div class="row">
@@ -21,7 +21,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">Issued this <?php echo date("jS") ?> day of <?php echo date("F, Y") ?> at the office of the Barangay Chairman, Barangay San Antonio, Santo Tomas City, Batangas.</p>
+            <p style="text-indent: 48px; text-align: justify;">Issued this <strong><?php echo date("jS") ?> day of <?php echo date("F, Y") ?></strong> at the office of the Barangay Chairman, Barangay San Antonio, Santo Tomas City, Batangas.</p>
         </div>
     </div>
 </div>

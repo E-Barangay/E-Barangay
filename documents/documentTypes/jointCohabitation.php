@@ -6,7 +6,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that <?php echo $fullName . " & " . $spouseName .  ", Legal Age, " . $civilStatus . ", " . $citizenship . " and a " . $residencyType . " resident of " . $barangayName . ", " . $cityName . ", " . $provinceName . ", that they are living together as spouses without the benefit of a valid marriage since year " . $marriageYear . " up to present."?></p>
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong> & <strong><?php echo $spouseName ?></strong>, Legal Age, <?php echo $civilStatus . ", " . $citizenship . " and a " ?> <strong><?php echo $residencyType ?></strong> resident of <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " . $streetName . ", ". $barangayName . ", " . $cityName . ", " . $provinceName . ", that they are living together as spouses without the benefit of a valid marriage since "?><strong>Year <?php echo $marriageYear ?> up to present</strong>.</p>
         </div>
     </div>
     <div class="row">
@@ -16,7 +16,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">Issued this <?php echo date("jS") ?> day of <?php echo date("F, Y") ?> at the office of the Barangay Chairman, Barangay San Antonio, Santo Tomas City Batangas.</p>
+            <p style="text-indent: 48px; text-align: justify;">Issued this <strong><?php echo date("jS") ?> day of <?php echo date("F, Y") ?></strong> at the office of the Barangay Chairman, Barangay San Antonio, Santo Tomas City Batangas.</p>
         </div>
     </div>
 </div>
