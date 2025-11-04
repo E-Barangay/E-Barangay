@@ -22,12 +22,14 @@ if (isset($_POST["register"])) {
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
 
+    $isWeak = !preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]|_).{8,}$/', $password);
+
     $checkEmailQuery = "SELECT * FROM users WHERE email = '$email'";
     $checkEmailResult = executeQuery($checkEmailQuery);
     
     if (mysqli_num_rows($checkEmailResult) > 0) {
         $_SESSION['warning'] = 'emailExists';
-    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*\W).{8,}$/', $password)) {
+    } elseif ($isWeak) {
         $_SESSION['alert'] = 'weakPassword';
     } elseif ($password !== $confirmPassword) {
         $_SESSION['alert'] = 'mismatchPassword';
@@ -247,7 +249,8 @@ if (isset($_POST['verify'])) {
         $currentTime = date('Y-m-d H:i:s');
         if ($currentTime <= $_SESSION['verificationCodeExpiry']) {
 
-            $insertAccountQuery = "INSERT INTO users (email, phoneNumber, password) VALUES('$email', '$phoneNumber', '$password')";
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $insertAccountQuery = "INSERT INTO users (email, phoneNumber, password) VALUES('$email', '$phoneNumber', '$hashedPassword')";
             $insertAccountResult = executeQuery($insertAccountQuery);
 
             if ($insertAccountResult) {
@@ -255,6 +258,16 @@ if (isset($_POST['verify'])) {
 
                 $insertUserQuery = "INSERT INTO userInfo (userID, firstName, middleName, lastName) VALUES('$userID', '$firstName', '$middleName', '$lastName')";
                 $insertUserResult = executeQuery($insertUserQuery);
+
+                if ($insertUserResult) {
+                    $userInfoID = mysqli_insert_id($conn);
+
+                    $insertUserAddressQuery = "INSERT INTO addresses (userInfoID, blockLotNo, phase, subdivisionName, purok, streetName, barangayName, cityName, provinceName) VALUES('$userInfoID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                    $insertUserAddressResult = executeQuery($insertUserAddressQuery);
+
+                    $insertUserPermanentAddressQuery = "INSERT INTO permanentAddresses (userInfoID, permanentBlockLotNo, permanentPhase, permanentSubdivisionName, permanentPurok, permanentStreetName, permanentBarangayName, permanentCityName, permanentProvinceName) VALUES('$userInfoID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                    $insertUserPermanentAddressResult = executeQuery($insertUserPermanentAddressQuery);
+                }
 
                 $_SESSION['userID'] = $userID;
 
@@ -409,7 +422,7 @@ if (isset($_POST['verify'])) {
 
                         <?php } elseif ($signUpStep == "verification") { ?>
 
-                           <div class="col">
+                            <div class="col">
                                 <div class="form-floating">
                                     <input type="number" class="form-control" value="<?php echo isset($_POST['verificationCode']) ? htmlspecialchars($_POST['verificationCode']) : ''; ?>" id="verificationInput" name="verificationCode" placeholder="Enter 6-digit verification code" inputmode="numeric" pattern="[0-9]*" oninput="if(this.value.length > 6) this.value = this.value.slice(0, 6);" min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                                     <label for="verificationInput">Enter 6-digit verification code</label>
@@ -423,10 +436,56 @@ if (isset($_POST['verify'])) {
                     <?php if ($signUpStep == "data") { ?>
                     
                         <div class="row">
+
+                            <div class="col-12 mb-3 text-start">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                    <label class="form-check-label" for="termsCheck">
+                                        I agree to the <a data-bs-toggle="modal" data-bs-target="#termsModal" style="color: #19AFA5; text-decoration: none;">Terms and Conditions</a>.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                                    <div class="modal-content border-0 shadow-lg">
+                                    
+                                        <div class="modal-header border-0" style="background-color: #19AFA5; color: white;">
+                                            <div class="d-flex align-items-center">
+                                                <img src="assets/images/logoSantoTomas.png" alt="Barangay Logo" style="width: 40px; height: 40px; margin-right: 10px;">
+                                                <h5 class="modal-title mb-0" id="termsModalLabel">Terms and Conditions</h5>
+                                            </div>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+
+                                    
+                                        <div class="modal-body px-4 py-3" style="background-color: #f8f9fa; color: #333; font-size: 15px; line-height: 1.7;">
+                                            <h5 class="fw-semibold text-center mb-3">Welcome to <span style="color: #19AFA5; white-space: nowrap;">San Antonio e-Desk</span></h5>
+                                            <p class="text-center">Please review the following terms before proceeding with your registration.</p>
+                                            <hr>
+                                            <ul style="list-style-type: disc; padding-left: 20px;">
+                                                <li>Your personal information will be used solely for official barangay transactions and records.</li>
+                                                <li>Do not share your account credentials with anyone to protect your privacy.</li>
+                                                <li>Any unauthorized or fraudulent use of the platform is prohibited and may lead to account suspension.</li>
+                                                <li>The barangay reserves the right to modify these terms as necessary, with notice to users.</li>
+                                                <li>For any inquiries, contact us at <a href="mailto:sanantonioputol@gmail.com" style="color: #19AFA5; text-decoration: none;">sanantonioputol@gmail.com</a>.</li>
+                                            </ul>
+                                            <hr>
+                                            <p class="text-center fw-semibold mb-0">By continuing registration, you confirm that you have read and agree to these terms.</p>
+                                        </div>
+
+                                        <div class="modal-footer border-0 justify-content-center" style="background-color: #f8f9fa;">
+                                            <button type="button" class="btn px-4" style="background-color: #19AFA5; color: white; border-radius: 12px;" data-bs-dismiss="modal">I Understand</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col text-center">
                                 <button class="btn btn-primary registerButton mb-3" type="submit" name="register">Register</button>
                                 <span class="pt-2" style="color: black;">Already have an account?</span> <a href="login.php" style="color: #19AFA5;">Login</a>
                             </div>
+
                         </div>
 
                     <?php } elseif ($signUpStep == "verification") { ?>

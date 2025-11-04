@@ -358,7 +358,7 @@ if (isset($_POST['setPassword'])) {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-    $isWeak = !preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]).{8,}$/', $password);
+    $isWeak = !preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]|_).{8,}$/', $password);
 
     $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
     $userCheckResult = executeQuery($userCheckQuery);
