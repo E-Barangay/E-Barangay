@@ -54,8 +54,23 @@ html {
 
 .form-control:focus {
     box-shadow: none !important; 
-    outline: none;     
+    outline: none;
     border: 1px solid #19AFA5;        
+}
+
+.form-check-input {  
+    border: 1px solid #19AFA5;        
+}
+
+.form-check-input:focus {
+    box-shadow: none !important;
+    outline: none;
+    border: 1px solid #19AFA5;   
+}
+
+.form-check-input:checked {
+    background-color: #19AFA5;
+    border-color: 1px solid #19AFA5;
 }
 
 .registerButton {
