@@ -23,7 +23,7 @@ editButton.addEventListener('click', function () {
     isEdit = true;
     originalValues = [];
     originalSameAsCurrentChecked = sameAsCurrent.checked;
-    
+
     // Save original address values
     originalProvinceValue = document.getElementById('province').value;
     originalCityValue = document.getElementById('city').value;
@@ -31,7 +31,7 @@ editButton.addEventListener('click', function () {
     originalPermanentProvinceValue = document.getElementById('permanentProvince').value;
     originalPermanentCityValue = document.getElementById('permanentCity').value;
     originalPermanentBarangayValue = document.getElementById('permanentBarangay').value;
-    
+
     inputs.forEach(function (input) {
         originalValues.push(input.value);
         input.removeAttribute('disabled');
@@ -67,7 +67,7 @@ cancelButton.addEventListener('click', function () {
     if (fileInput) {
         fileInput.value = "";
     }
-    
+
     // Restore original address dropdowns
     const provinceSelect = document.getElementById('province');
     const citySelect = document.getElementById('city');
@@ -75,7 +75,7 @@ cancelButton.addEventListener('click', function () {
     const permanentProvinceSelect = document.getElementById('permanentProvince');
     const permanentCitySelect = document.getElementById('permanentCity');
     const permanentBarangaySelect = document.getElementById('permanentBarangay');
-    
+
     // Restore current address
     if (originalProvinceValue) {
         provinceSelect.value = originalProvinceValue;
@@ -93,7 +93,7 @@ cancelButton.addEventListener('click', function () {
             }
         }
     }
-    
+
     // Restore permanent address
     if (originalPermanentProvinceValue) {
         permanentProvinceSelect.value = originalPermanentProvinceValue;
@@ -110,7 +110,7 @@ cancelButton.addEventListener('click', function () {
             }
         }
     }
-    
+
     // Remove any validation alerts
     const existingAlert = document.querySelector('.validation-alert');
     if (existingAlert) {
@@ -132,21 +132,21 @@ saveButton.addEventListener('click', function (e) {
     let hasError = false;
     let errorMessages = [];
 
-    // Check current address
-    if (!province || !city || !barangay) {
-        errorMessages.push('Please fill in all address fields (Province, City, Barangay).');
-        hasError = true;
-    }
+    // // Check current address
+    // if (!province || !city || !barangay) {
+    //     errorMessages.push('Please fill in all address fields (Province, City, Barangay).');
+    //     hasError = true;
+    // }
 
-    // Check permanent address
-    if (!permanentProvince || !permanentCity || !permanentBarangay) {
-        errorMessages.push('Please fill in all permanent address fields (Province, City, Barangay).');
-        hasError = true;
-    }
+    // // Check permanent address
+    // if (!permanentProvince || !permanentCity || !permanentBarangay) {
+    //     errorMessages.push('Please fill in all permanent address fields (Province, City, Barangay).');
+    //     hasError = true;
+    // }
 
     if (hasError) {
         e.preventDefault();
-        
+
         // Remove any existing alerts
         const existingAlert = document.querySelector('.validation-alert');
         if (existingAlert) {
@@ -365,7 +365,7 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
         }
 
         // ========== POPULATE CURRENT ADDRESS (SELECT DROPDOWNS) ==========
-        
+
         // Populate provinces (sorted alphabetically)
         provinceSelect.innerHTML = '<option value="">Select Province</option>';
         let savedProvinceKey = findProvinceKeyByName(savedProvince);
@@ -393,10 +393,18 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
 
         // Helper to populate cities (sorted alphabetically)
         function populateCitiesByProvinceKey(provinceKey, tryToSelectCityName) {
+            // reset UI
             citySelect.innerHTML = '<option value="">Select City</option>';
             barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-            if (!provinceKey) return;
 
+            // defensive: if no province, ensure placeholders stay
+            if (!provinceKey || provinceKey.trim() === "") {
+                citySelect.selectedIndex = 0;
+                barangaySelect.selectedIndex = 0;
+                return;
+            }
+
+            // find municipality list
             let municipality_list = null;
             for (const rc of Object.keys(jsonData)) {
                 const pList = jsonData[rc].province_list;
@@ -405,30 +413,62 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                     break;
                 }
             }
-            if (!municipality_list) return;
+            if (!municipality_list) {
+                citySelect.selectedIndex = 0;
+                return;
+            }
 
-            const matchedCityKey = tryToSelectCityName ? findCityKeyByName(provinceKey, tryToSelectCityName) : null;
-
-            // Sort cities alphabetically
+            // populate cities (sorted)
             const sortedCities = Object.keys(municipality_list).sort((a, b) => a.localeCompare(b));
-
             sortedCities.forEach(cityKey => {
                 const opt = document.createElement("option");
                 opt.value = cityKey;
                 opt.textContent = cityKey;
-                if (matchedCityKey && cityKey === matchedCityKey) opt.selected = true;
                 citySelect.appendChild(opt);
             });
+
+            // If caller provided a non-empty city name, try to select it.
+            if (tryToSelectCityName && tryToSelectCityName.toString().trim() !== "") {
+                // try matching (your findCityKeyByName will handle normalization)
+                const matched = findCityKeyByName(provinceKey, tryToSelectCityName);
+                if (matched) {
+                    citySelect.value = matched;
+                    // populate barangays for that selected city (only if matched)
+                    populateBarangaysByKeys(provinceKey, matched, '');
+                } else {
+                    // provided saved name didn't match anything: keep placeholder
+                    citySelect.selectedIndex = 0;
+                }
+            } else {
+                // no saved city - ensure placeholder remains visible (and do NOT auto-populate barangays)
+                citySelect.selectedIndex = 0;
+            }
         }
-        
+        window.populateCitiesByProvinceKey = populateCitiesByProvinceKey;
+
+
         // Make function globally accessible for cancel button
         window.populateCitiesByProvinceKey = populateCitiesByProvinceKey;
 
         // Helper to populate barangays (sorted alphabetically)
         function populateBarangaysByKeys(provinceKey, cityKey, tryToSelectBarangayName) {
-            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-            if (!provinceKey || !cityKey) return;
+            // debug log to see calls
+            console.debug("populateBarangaysByKeys called with:", { provinceKey, cityKey, tryToSelectBarangayName });
 
+            // set placeholder first
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+
+            // guard: if city not provided, force placeholder and stop
+            if (!provinceKey || !cityKey || cityKey.toString().trim() === "") {
+                // use setTimeout to ensure this runs after any other microtasks that might change selects
+                setTimeout(() => {
+                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                    barangaySelect.selectedIndex = 0;
+                }, 0);
+                return;
+            }
+
+            // find barangays array
             let barangays = null;
             for (const rc of Object.keys(jsonData)) {
                 const pList = jsonData[rc].province_list;
@@ -440,43 +480,64 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                     break;
                 }
             }
-            if (!barangays) return;
+            if (!barangays || barangays.length === 0) {
+                // ensure placeholder
+                barangaySelect.selectedIndex = 0;
+                return;
+            }
 
-            const matchedBarangay = tryToSelectBarangayName ? findBarangayByName(provinceKey, cityKey, tryToSelectBarangayName) : null;
-
-            // Sort barangays alphabetically
+            // populate sorted barangays
             const sortedBarangays = [...barangays].sort((a, b) => a.localeCompare(b));
-
             sortedBarangays.forEach(b => {
                 const opt = document.createElement("option");
                 opt.value = b;
                 opt.textContent = b;
-                if (matchedBarangay && b === matchedBarangay) opt.selected = true;
                 barangaySelect.appendChild(opt);
             });
+
+            // only select a barangay if caller provided a non-empty saved barangay name and it matches
+            if (tryToSelectBarangayName && tryToSelectBarangayName.toString().trim() !== "") {
+                const matched = findBarangayByName(provinceKey, cityKey, tryToSelectBarangayName);
+                if (matched) {
+                    barangaySelect.value = matched;
+                } else {
+                    // saved name didn't match, keep placeholder
+                    barangaySelect.selectedIndex = 0;
+                }
+            } else {
+                // no saved barangay -> keep placeholder
+                barangaySelect.selectedIndex = 0;
+            }
         }
-        
-        // Make function globally accessible for cancel button
         window.populateBarangaysByKeys = populateBarangaysByKeys;
 
         // Restore saved selections
+        // Restore saved selections (current)
         if (savedProvince && savedProvince !== '') {
             if (!savedProvinceKey) savedProvinceKey = findProvinceKeyByName(savedProvince);
 
             if (savedProvinceKey) {
                 provinceSelect.value = savedProvinceKey;
-                const cityKey = findCityKeyByName(savedProvinceKey, savedCity);
-                populateCitiesByProvinceKey(savedProvinceKey, savedCity);
-                if (cityKey) {
-                    citySelect.value = cityKey;
-                    populateBarangaysByKeys(savedProvinceKey, cityKey, savedBarangay);
-                    const matchedBarangay = findBarangayByName(savedProvinceKey, cityKey, savedBarangay);
-                    if (matchedBarangay) barangaySelect.value = matchedBarangay;
+
+                // only call populateCities if savedCity is non-empty; otherwise leave city placeholder
+                if (savedCity && savedCity.trim() !== "") {
+                    const cityKey = findCityKeyByName(savedProvinceKey, savedCity);
+                    populateCitiesByProvinceKey(savedProvinceKey, savedCity);
+                    if (cityKey) {
+                        citySelect.value = cityKey;
+                        // only populate barangays if saved barangay non-empty
+                        if (savedBarangay && savedBarangay.trim() !== "") {
+                            populateBarangaysByKeys(savedProvinceKey, cityKey, savedBarangay);
+                            const matchedBarangay = findBarangayByName(savedProvinceKey, cityKey, savedBarangay);
+                            if (matchedBarangay) barangaySelect.value = matchedBarangay;
+                        }
+                    }
                 } else {
-                    populateBarangaysByKeys(savedProvinceKey, citySelect.value || '', savedBarangay);
+                    // no saved city: ensure placeholders
+                    populateCitiesByProvinceKey(savedProvinceKey, '');
+                    citySelect.selectedIndex = 0;
+                    barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                 }
-            } else {
-                updateResidencyType();
             }
         }
 
@@ -500,7 +561,7 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
         });
 
         // ========== POPULATE PERMANENT ADDRESS (SELECT DROPDOWNS) ==========
-        
+
         // Populate permanent provinces (sorted alphabetically)
         permanentProvinceSelect.innerHTML = '<option value="">Select Province</option>';
         let savedPermanentProvinceKey = findProvinceKeyByName(savedPermanentProvince);
@@ -515,11 +576,20 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
         });
 
         // Helper to populate permanent cities (sorted alphabetically)
+        // Populate Permanent Cities safely
         function populatePermanentCitiesByProvinceKey(provinceKey, tryToSelectCityName) {
+            // Reset placeholders first
             permanentCitySelect.innerHTML = '<option value="">Select City</option>';
             permanentBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-            if (!provinceKey) return;
 
+            // Defensive: if no province selected, keep placeholders
+            if (!provinceKey || provinceKey.trim() === "") {
+                permanentCitySelect.selectedIndex = 0;
+                permanentBarangaySelect.selectedIndex = 0;
+                return;
+            }
+
+            // Find municipality list
             let municipality_list = null;
             for (const rc of Object.keys(jsonData)) {
                 const pList = jsonData[rc].province_list;
@@ -528,30 +598,52 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                     break;
                 }
             }
-            if (!municipality_list) return;
+            if (!municipality_list) {
+                permanentCitySelect.selectedIndex = 0;
+                return;
+            }
 
-            const matchedCityKey = tryToSelectCityName ? findCityKeyByName(provinceKey, tryToSelectCityName) : null;
-
-            // Sort cities alphabetically
+            // Sort and populate cities
             const sortedCities = Object.keys(municipality_list).sort((a, b) => a.localeCompare(b));
-
             sortedCities.forEach(cityKey => {
                 const opt = document.createElement("option");
                 opt.value = cityKey;
                 opt.textContent = cityKey;
-                if (matchedCityKey && cityKey === matchedCityKey) opt.selected = true;
                 permanentCitySelect.appendChild(opt);
             });
+
+            // Only select a saved city if provided
+            if (tryToSelectCityName && tryToSelectCityName.trim() !== "") {
+                const matchedCityKey = findCityKeyByName(provinceKey, tryToSelectCityName);
+                if (matchedCityKey) {
+                    permanentCitySelect.value = matchedCityKey;
+                    populatePermanentBarangaysByKeys(provinceKey, matchedCityKey, '');
+                } else {
+                    permanentCitySelect.selectedIndex = 0;
+                }
+            } else {
+                // Keep placeholders
+                permanentCitySelect.selectedIndex = 0;
+                permanentBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            }
         }
-        
-        // Make function globally accessible for cancel button
         window.populatePermanentCitiesByProvinceKey = populatePermanentCitiesByProvinceKey;
 
-        // Helper to populate permanent barangays (sorted alphabetically)
+        // Populate Permanent Barangays safely
         function populatePermanentBarangaysByKeys(provinceKey, cityKey, tryToSelectBarangayName) {
+            // Reset barangay dropdown
             permanentBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-            if (!provinceKey || !cityKey) return;
 
+            // Defensive: stop if city not chosen
+            if (!provinceKey || !cityKey || cityKey.trim() === "") {
+                setTimeout(() => {
+                    permanentBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                    permanentBarangaySelect.selectedIndex = 0;
+                }, 0);
+                return;
+            }
+
+            // Find barangays
             let barangays = null;
             for (const rc of Object.keys(jsonData)) {
                 const pList = jsonData[rc].province_list;
@@ -563,40 +655,61 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                     break;
                 }
             }
-            if (!barangays) return;
+            if (!barangays || barangays.length === 0) {
+                permanentBarangaySelect.selectedIndex = 0;
+                return;
+            }
 
-            const matchedBarangay = tryToSelectBarangayName ? findBarangayByName(provinceKey, cityKey, tryToSelectBarangayName) : null;
-
-            // Sort barangays alphabetically
+            // Sort and populate barangays
             const sortedBarangays = [...barangays].sort((a, b) => a.localeCompare(b));
-
             sortedBarangays.forEach(b => {
                 const opt = document.createElement("option");
                 opt.value = b;
                 opt.textContent = b;
-                if (matchedBarangay && b === matchedBarangay) opt.selected = true;
                 permanentBarangaySelect.appendChild(opt);
             });
+
+            // Only select saved barangay if provided
+            if (tryToSelectBarangayName && tryToSelectBarangayName.trim() !== "") {
+                const matchedBarangay = findBarangayByName(provinceKey, cityKey, tryToSelectBarangayName);
+                if (matchedBarangay) {
+                    permanentBarangaySelect.value = matchedBarangay;
+                } else {
+                    permanentBarangaySelect.selectedIndex = 0;
+                }
+            } else {
+                permanentBarangaySelect.selectedIndex = 0;
+            }
         }
-        
-        // Make function globally accessible for cancel button
         window.populatePermanentBarangaysByKeys = populatePermanentBarangaysByKeys;
 
-        // Restore saved permanent selections
-        if (savedPermanentProvince && savedPermanentProvince !== '') {
+        // Restore saved permanent selections safely
+        if (savedPermanentProvince && savedPermanentProvince.trim() !== "") {
             if (!savedPermanentProvinceKey) savedPermanentProvinceKey = findProvinceKeyByName(savedPermanentProvince);
 
             if (savedPermanentProvinceKey) {
                 permanentProvinceSelect.value = savedPermanentProvinceKey;
-                const cityKey = findCityKeyByName(savedPermanentProvinceKey, savedPermanentCity);
-                populatePermanentCitiesByProvinceKey(savedPermanentProvinceKey, savedPermanentCity);
-                if (cityKey) {
-                    permanentCitySelect.value = cityKey;
-                    populatePermanentBarangaysByKeys(savedPermanentProvinceKey, cityKey, savedPermanentBarangay);
-                    const matchedBarangay = findBarangayByName(savedPermanentProvinceKey, cityKey, savedPermanentBarangay);
-                    if (matchedBarangay) permanentBarangaySelect.value = matchedBarangay;
+
+                // Only populate cities if savedPermanentCity exists
+                if (savedPermanentCity && savedPermanentCity.trim() !== "") {
+                    populatePermanentCitiesByProvinceKey(savedPermanentProvinceKey, savedPermanentCity);
+
+                    const cityKey = findCityKeyByName(savedPermanentProvinceKey, savedPermanentCity);
+                    if (cityKey) {
+                        permanentCitySelect.value = cityKey;
+
+                        // Only populate barangays if savedPermanentBarangay exists
+                        if (savedPermanentBarangay && savedPermanentBarangay.trim() !== "") {
+                            populatePermanentBarangaysByKeys(savedPermanentProvinceKey, cityKey, savedPermanentBarangay);
+                            const matchedBarangay = findBarangayByName(savedPermanentProvinceKey, cityKey, savedPermanentBarangay);
+                            if (matchedBarangay) permanentBarangaySelect.value = matchedBarangay;
+                        }
+                    }
                 } else {
-                    populatePermanentBarangaysByKeys(savedPermanentProvinceKey, permanentCitySelect.value || '', savedPermanentBarangay);
+                    // No saved city → keep placeholders
+                    populatePermanentCitiesByProvinceKey(savedPermanentProvinceKey, '');
+                    permanentCitySelect.selectedIndex = 0;
+                    permanentBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                 }
             }
         }
@@ -635,12 +748,12 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
             const currentBarangay = barangaySelect.value;
 
             permanentProvinceSelect.value = currentProvince;
-            
+
             // Populate cities for permanent address
             if (currentProvince) {
                 populatePermanentCitiesByProvinceKey(currentProvince, '');
                 permanentCitySelect.value = currentCity;
-                
+
                 // Populate barangays for permanent address
                 if (currentCity) {
                     populatePermanentBarangaysByKeys(currentProvince, currentCity, '');
@@ -672,7 +785,7 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                     if (el.tagName === 'SELECT') {
                         el.disabled = true;
                         el.style.backgroundColor = '#e9ecef';
-                        
+
                         // Create hidden input to submit value
                         let hiddenInput = el.parentElement.querySelector('input[type="hidden"][data-sync="true"]');
                         if (!hiddenInput) {
@@ -720,7 +833,7 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                     if (el.tagName === 'SELECT') {
                         el.disabled = false;
                         el.style.backgroundColor = '';
-                        
+
                         // Remove hidden input
                         const hiddenInput = el.parentElement.querySelector('input[type="hidden"][data-sync="true"]');
                         if (hiddenInput) {
@@ -730,7 +843,7 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
                         el.removeAttribute('readonly');
                         el.style.backgroundColor = '';
                     }
-                    
+
                     // Respect edit mode
                     if (!isEdit) {
                         el.disabled = true;

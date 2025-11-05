@@ -116,7 +116,7 @@ map.on('click', function (e) {
 
     currentMarker = L.marker([lat, lng]).addTo(map);
 
-    fetch(`/E-Barangay/reportContent/proxy.php?lat=${lat}&lon=${lng}`)
+    fetch(`/E-Barangay/contents/complaintContent/proxy.php?lat=${lat}&lon=${lng}`)
         .then(response => response.json())
         .then(data => {
             var address = data.display_name;
