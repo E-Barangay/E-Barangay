@@ -16,6 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   $civilStatus = $_POST['civilStatus'];
   $citizenship = $_POST['citizenship'];
   $occupation = $_POST['occupation'];
+  $isVoter = $_POST['isVoter'];
+  $remarks = $_POST['remarks'];
+  $remarks = $_POST['residencyType'];
   $presentBlockLotNo = $_POST['presentBlockLotNo'];
   $presentStreetName = $_POST['presentStreetName'];
   $presentPhase = $_POST['presentPhase'];
@@ -38,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   WHERE userID=$userID");
 
   //Update userInfo table
-  mysqli_query($conn, "UPDATE userInfo SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix', gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace', civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation' 
+  mysqli_query($conn, "UPDATE userInfo SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix', gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace', civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation', isVoter='$isVoter', remarks='$remarks' residencyType='$residencyType'  
   WHERE userID=$userID");
 
   $getInfo = mysqli_query($conn, "SELECT userInfoID FROM userInfo WHERE userID = $userID");
@@ -79,7 +82,7 @@ if (isset($_GET['userID'])) {
   u.userID, u.phoneNumber, u.email, u.role, u.isNew,
   i.userInfoID, i.firstName, i.middleName, i.lastName, i.suffix,
   i.gender, i.age, i.birthDate, i.birthPlace, i.profilePicture,
-  i.residencyType, i.lengthOfStay, i.civilStatus, i.citizenship, i.occupation,
+  i.residencyType, i.lengthOfStay, i.civilStatus, i.citizenship, i.occupation, isVoter, remarks,
 
   -- PRESENT ADDRESS
   a.blockLotNo AS presentBlockLotNo,
@@ -300,6 +303,36 @@ WHERE u.userID = $userID";
                           <span class="view-mode"><?= $user['occupation'] ?></span>
                           <input class="form-control edit-mode d-none" type="text" name="occupation"
                             value="<?= $user['occupation'] ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="info-row">
+                        <strong class="text-muted">Registered Voter:</strong>
+                        <div class="mt-1">
+                          <span class="view-mode"><?= $user['isVoter'] ?></span>
+                          <input class="form-control edit-mode d-none" type="text" name="isVoter"
+                            value="<?= $user['isVoter'] ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="info-row">
+                        <strong class="text-muted">Status</strong>
+                        <div class="mt-1">
+                          <span class="view-mode"><?= $user['remarks'] ?></span>
+                          <input class="form-control edit-mode d-none" type="text" name="remarks"
+                            value="<?= $user['remarks'] ?>">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="info-row">
+                        <strong class="text-muted">Type</strong>
+                        <div class="mt-1">
+                          <span class="view-mode"><?= $user['residencyType'] ?></span>
+                          <input class="form-control edit-mode d-none" type="text" name="residencyType"
+                            value="<?= $user['residencyType'] ?>">
                         </div>
                       </div>
                     </div>

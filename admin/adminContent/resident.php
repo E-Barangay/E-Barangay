@@ -16,41 +16,44 @@ $modalNotif = '';
 $modalNotifType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
-
-    // ===================== INSERT INTO users =====================
     $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, isRestricted) 
-               VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', 'No', 'No')";
-
+                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', 'No', 'No')";
 
     if (mysqli_query($conn, $insertUser)) {
         $userID = mysqli_insert_id($conn);
 
-        // ===================== INSERT INTO userInfo =====================
+        // Map remarks to full text
+        if (isset($_POST['remarks'])) {
+            $remarksValue = ($_POST['remarks'] === 'Yes') ? 'Derogatory Record' : 'No Derogatory Record';
+        } else {
+            $remarksValue = 'No Derogatory Record'; // default
+        }
+
         $insertResident = "INSERT INTO userInfo
-            (userID, firstName, middleName, lastName, gender, birthDate, age, birthPlace, bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType)
-            VALUES
-            ($userID, ' {$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}')";
+                (userID, firstName, middleName, lastName, gender, birthDate, age, birthPlace, bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType, isVoter, remarks)
+                VALUES
+                ($userID, '{$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}', '{$_POST['isVoter']}', '$remarksValue')";
 
         if (mysqli_query($conn, $insertResident)) {
             $userInfoID = mysqli_insert_id($conn);
 
-            // ===================== INSERT CURRENT ADDRESS =====================
+            // Current address
             $insertAddress = "INSERT INTO addresses 
-                (userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName)
+                (userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName, purok)
                 VALUES
-                ($userInfoID, '{$_POST['blockLotNo']}', '{$_POST['streetName']}', '{$_POST['phase']}', '{$_POST['subdivisionName']}', '{$_POST['barangayName']}', '{$_POST['cityName']}', '{$_POST['provinceName']}')";
+                ($userInfoID, '{$_POST['blockLotNo']}', '{$_POST['streetName']}', '{$_POST['phase']}', '{$_POST['subdivisionName']}', '{$_POST['barangayName']}', '{$_POST['cityName']}', '{$_POST['provinceName']}', '{$_POST['purok']}')";
             mysqli_query($conn, $insertAddress);
 
-            // ===================== INSERT PERMANENT ADDRESS =====================
+            // Permanent address
             $insertPermanent = "INSERT INTO permanentAddresses
-                (userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, permanentSubdivisionName, permanentBarangayName, permanentCityName, permanentProvinceName)
+                (userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, permanentSubdivisionName, permanentBarangayName, permanentCityName, permanentProvinceName, permanentPurok)
                 VALUES
-                ($userInfoID, '{$_POST['blockLotNoPermanent']}', '{$_POST['streetNamePermanent']}', '{$_POST['phasePermanent']}', '{$_POST['subdivisionNamePermanent']}', '{$_POST['barangayNamePermanent']}', '{$_POST['cityNamePermanent']}', '{$_POST['provinceNamePermanent']}')";
+                ($userInfoID, '{$_POST['blockLotNoPermanent']}', '{$_POST['streetNamePermanent']}', '{$_POST['phasePermanent']}', '{$_POST['subdivisionNamePermanent']}', '{$_POST['barangayNamePermanent']}', '{$_POST['cityNamePermanent']}', '{$_POST['provinceNamePermanent']}', '{$_POST['purokPermanent']}')";
             mysqli_query($conn, $insertPermanent);
 
             $modalNotif = "Resident successfully added!";
             $modalNotifType = "success";
-            $_POST = []; // reset form
+            $_POST = [];
         } else {
             $modalNotif = "Error adding resident info: " . mysqli_error($conn);
             $modalNotifType = "danger";
@@ -67,57 +70,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['new
     $status = $_POST['newStatus'];
 
     $query = "UPDATE users SET isRestricted = '$status' WHERE userID = '$userID'";
-
-    if (mysqli_query($conn, $query)) {
-        echo "success";
-    } else {
-        echo "error";
-    }
+    echo mysqli_query($conn, $query) ? "success" : "error";
 }
-
 
 // ===================== GET RESIDENTS =====================
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $sortBy = isset($_GET['sortBy']) ? $_GET['sortBy'] : 'lastName';
 $order = isset($_GET['order']) && strtoupper($_GET['order']) === 'DESC' ? 'DESC' : 'ASC';
-$filter = isset($_GET['filter']) ? $_GET['filter'] : '';
+$residencyFilter = isset($_GET['residencyType']) ? $_GET['residencyType'] : '';
+$restrictedFilter = isset($_GET['restricted']) ? $_GET['restricted'] : '';
 
-$allowedSort = ['lastName', 'firstName', 'birthDate', 'gender'];
-if (!in_array($sortBy, $allowedSort)) {
-    $sortBy = 'lastName';
-}
-
-// ===================== PAGINATION =====================
-$limit = 10; // records per page
+// Pagination
+$limit = 10;
 $currentPage = isset($_GET['p']) && is_numeric($_GET['p']) ? (int) $_GET['p'] : 1;
 $offset = ($currentPage - 1) * $limit;
 
-// Count total records for pagination
-$countSql = "SELECT COUNT(*) AS total FROM userInfo ui
-             INNER JOIN users u ON ui.userID = u.userID
-             WHERE u.role = 'user'";
-
-if ($search !== '') {
-    $term = "%$search%";
-    $countSql .= " AND (
-        ui.firstName LIKE '$term' OR
-        ui.middleName LIKE '$term' OR
-        ui.lastName LIKE '$term' OR
-        ui.birthDate LIKE '$term' OR
-        ui.gender LIKE '$term'
-    )";
-}
-
-if ($filter === 'restricted') {
-    $countSql .= " AND u.isRestricted = 'Yes'";
-} elseif ($filter === 'not_restricted') {
-    $countSql .= " AND (u.isRestricted = 'No' OR u.isRestricted IS NULL)";
-}
-
-$countResult = mysqli_query($conn, $countSql);
-$totalRows = mysqli_fetch_assoc($countResult)['total'];
-$totalPages = ceil($totalRows / $limit);
-
+// Base queries
 $sql = "SELECT 
     ui.userInfoID,
     ui.userID,
@@ -127,6 +95,8 @@ $sql = "SELECT
     ui.suffix,
     ui.gender,
     ui.birthDate,
+    ui.residencyType,
+    ui.isVoter,
     a.cityName,
     a.provinceName,
     u.isRestricted
@@ -135,6 +105,11 @@ INNER JOIN users u ON ui.userID = u.userID
 LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
 WHERE u.role = 'user'";
 
+$countSql = "SELECT COUNT(*) AS total FROM userInfo ui
+             INNER JOIN users u ON ui.userID = u.userID
+             WHERE u.role = 'user'";
+
+// ===================== APPLY SEARCH =====================
 if ($search !== '') {
     $term = "%$search%";
     $sql .= " AND (
@@ -145,15 +120,39 @@ if ($search !== '') {
         ui.gender LIKE '$term' OR
         CONCAT_WS(' ', a.blockLotNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE '$term'
     )";
+    $countSql .= " AND (
+        ui.firstName LIKE '$term' OR
+        ui.middleName LIKE '$term' OR
+        ui.lastName LIKE '$term' OR
+        ui.birthDate LIKE '$term' OR
+        ui.gender LIKE '$term'
+    )";
 }
 
-if ($filter === 'restricted') {
+// ===================== APPLY RESTRICTED FILTER =====================
+if ($restrictedFilter === 'restricted') {
     $sql .= " AND u.isRestricted = 'Yes'";
-} elseif ($filter === 'not_restricted') {
+    $countSql .= " AND u.isRestricted = 'Yes'";
+} elseif ($restrictedFilter === 'not_restricted') {
     $sql .= " AND (u.isRestricted = 'No' OR u.isRestricted IS NULL)";
+    $countSql .= " AND (u.isRestricted = 'No' OR u.isRestricted IS NULL)";
 }
 
-$sql .= " ORDER BY $sortBy $order";
+// ===================== APPLY RESIDENCY FILTER =====================
+$residencyTypes = ['Bonafide', 'Migrant', 'Transient', 'Foreign'];
+if (in_array($residencyFilter, $residencyTypes)) {
+    $sql .= " AND ui.residencyType = '$residencyFilter'";
+    $countSql .= " AND ui.residencyType = '$residencyFilter'";
+}
+
+// Pagination
+$sql .= " ORDER BY $sortBy $order LIMIT $limit OFFSET $offset";
+
+// Execute queries
+$countResult = mysqli_query($conn, $countSql);
+$totalRows = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRows / $limit);
+
 $result = mysqli_query($conn, $sql);
 ?>
 
@@ -293,16 +292,26 @@ $result = mysqli_query($conn, $sql);
                                     </div>
 
                                     <div class="col-md-2">
-                                        <select name="sortBy" class="form-select">
-                                            <option value="lastName" <?= $sortBy == 'lastName' ? 'selected' : '' ?>>Last
-                                                Name
+                                        <select name="residencyType" class="form-select">
+                                            <option value="" <?= empty($_GET['residencyType']) ? 'selected' : '' ?>>All
+                                                Residents</option>
+                                            <option value="Bonafide" <?= isset($_GET['residencyType']) && $_GET['residencyType'] == 'Bonafide' ? 'selected' : '' ?>>Bonafide
                                             </option>
-                                            <option value="firstName" <?= $sortBy == 'firstName' ? 'selected' : '' ?>>First
-                                                Name</option>
-                                            <option value="birthDate" <?= $sortBy == 'birthDate' ? 'selected' : '' ?>>Birth
-                                                Date</option>
-                                            <option value="gender" <?= $sortBy == 'gender' ? 'selected' : '' ?>>Gender
+                                            <option value="Migrant" <?= isset($_GET['residencyType']) && $_GET['residencyType'] == 'Migrant' ? 'selected' : '' ?>>Migrant</option>
+                                            <option value="Transient" <?= isset($_GET['residencyType']) && $_GET['residencyType'] == 'Transient' ? 'selected' : '' ?>>Transient
                                             </option>
+                                            <option value="Foreign" <?= isset($_GET['residencyType']) && $_GET['residencyType'] == 'Foreign' ? 'selected' : '' ?>>Foreign</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <select name="restricted" class="form-select">
+                                            <option value="" <?= empty($_GET['restricted']) ? 'selected' : '' ?>>All
+                                                Users</option>
+                                            <option value="restricted" <?= isset($_GET['restricted']) && $_GET['restricted'] == 'restricted' ? 'selected' : '' ?>>Restricted
+                                            </option>
+                                            <option value="not_restricted" <?= isset($_GET['restricted']) && $_GET['restricted'] == 'not_restricted' ? 'selected' : '' ?>>Not
+                                                Restricted</option>
                                         </select>
                                     </div>
 
@@ -314,15 +323,6 @@ $result = mysqli_query($conn, $sql);
                                         </select>
                                     </div>
 
-                                    <div class="col-md-2">
-                                        <select name="filter" class="form-select">
-                                            <option value="" <?= empty($_GET['filter']) ? 'selected' : '' ?>>All Users
-                                            </option>
-                                            <option value="restricted" <?= (isset($_GET['filter']) && $_GET['filter'] == 'restricted') ? 'selected' : '' ?>>Restricted</option>
-                                            <option value="not_restricted" <?= (isset($_GET['filter']) && $_GET['filter'] == 'not_restricted') ? 'selected' : '' ?>>Not Restricted
-                                            </option>
-                                        </select>
-                                    </div>
 
                                     <div class="col-md-2">
                                         <button type="submit" class="btn btn-custom w-100">
@@ -346,6 +346,7 @@ $result = mysqli_query($conn, $sql);
                                             <th>Birth Date</th>
                                             <th>Gender</th>
                                             <th>Address</th>
+                                            <th>Residency Type</th>
                                             <th>Restricted</th>
                                             <th>Action</th>
                                         </tr>
@@ -360,6 +361,7 @@ $result = mysqli_query($conn, $sql);
                                                     <td><?= htmlspecialchars($row['birthDate']); ?></td>
                                                     <td><?= htmlspecialchars($row['gender']); ?></td>
                                                     <td><?= htmlspecialchars($row['cityName'] . ', ' . $row['provinceName']); ?>
+                                                    <td><?= htmlspecialchars($row['residencyType']); ?>
                                                     <td><?= htmlspecialchars($row['isRestricted']); ?>
                                                     </td>
                                                     <td>
@@ -490,7 +492,7 @@ $result = mysqli_query($conn, $sql);
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-3">
                                                     <label class="form-label">Birth Place</label>
                                                     <input type="text" class="form-control" name="birthPlace"
                                                         value="<?= isset($_POST['birthPlace']) ? htmlspecialchars($_POST['birthPlace']) : '' ?>">
@@ -506,6 +508,12 @@ $result = mysqli_query($conn, $sql);
                                                     <label class="form-label">Age</label>
                                                     <input type="number" id="age" class="form-control" name="age"
                                                         value="<?= isset($_POST['age']) ? htmlspecialchars($_POST['age']) : '' ?>"
+                                                        required>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Years of Stay</label>
+                                                    <input type="number" class="form-control" name="lengthOfStay"
+                                                        value="<?= isset($_POST['lengthOfStay']) ? htmlspecialchars($_POST['lengthOfStay']) : '' ?>"
                                                         required>
                                                 </div>
 
@@ -537,21 +545,27 @@ $result = mysqli_query($conn, $sql);
                                                         name="subdivisionName"
                                                         value="<?= isset($_POST['subdivisionName']) ? htmlspecialchars($_POST['subdivisionName']) : '' ?>">
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Purok</label>
+                                                    <input type="text" class="form-control" id="purok" name="purok"
+                                                        value="<?= isset($_POST['purok']) ? htmlspecialchars($_POST['purok']) : '' ?>"
+                                                        required>
+                                                </div>
+                                                <div class="col-md-3">
                                                     <label class="form-label">Barangay</label>
                                                     <input type="text" class="form-control" id="barangayName"
                                                         name="barangayName"
                                                         value="<?= isset($_POST['barangayName']) ? htmlspecialchars($_POST['barangayName']) : 'San Antonio' ?>"
                                                         required>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label class="form-label">City</label>
                                                     <input type="text" class="form-control" id="cityName"
                                                         name="cityName"
                                                         value="<?= isset($_POST['cityName']) ? htmlspecialchars($_POST['cityName']) : 'Sto. Tomas' ?>"
                                                         required>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label class="form-label">Province</label>
                                                     <input type="text" class="form-control" id="provinceName"
                                                         name="provinceName"
@@ -589,21 +603,28 @@ $result = mysqli_query($conn, $sql);
                                                         id="subdivisionNamePermanent" name="subdivisionNamePermanent"
                                                         value="<?= isset($_POST['subdivisionName']) ? htmlspecialchars($_POST['subdivisionName']) : '' ?>">
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Purok</label>
+                                                    <input type="text" class="form-control" id="purokPermanent"
+                                                        name="purokPermanent"
+                                                        value="<?= isset($_POST['purokPermanent']) ? htmlspecialchars($_POST['purokPermanent']) : '' ?>"
+                                                        required>
+                                                </div>
+                                                <div class="col-md-3">
                                                     <label class="form-label">Barangay</label>
                                                     <input type="text" class="form-control" id="barangayNamePermanent"
                                                         name="barangayNamePermanent"
                                                         value="<?= isset($_POST['barangayName']) ? htmlspecialchars($_POST['barangayName']) : 'San Antonio' ?>"
                                                         required>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label class="form-label">City</label>
                                                     <input type="text" class="form-control" id="cityNamePermanent"
                                                         name="cityNamePermanent"
                                                         value="<?= isset($_POST['cityName']) ? htmlspecialchars($_POST['cityName']) : 'Sto. Tomas' ?>"
                                                         required>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label class="form-label">Province</label>
                                                     <input type="text" class="form-control" id="provinceNamePermanent"
                                                         name="provinceNamePermanent"
@@ -683,30 +704,37 @@ $result = mysqli_query($conn, $sql);
                                                         value="<?= isset($_POST['contactNumber']) ? htmlspecialchars($_POST['contactNumber']) : '' ?>"
                                                         required>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Years of Stay</label>
-                                                    <input type="number" class="form-control" name="lengthOfStay"
-                                                        value="<?= isset($_POST['lengthOfStay']) ? htmlspecialchars($_POST['lengthOfStay']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label d-block">Voter's List</label>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="voterList"
-                                                            id="voterYes" value="Yes" <?= (isset($_POST['voterList']) && $_POST['voterList'] === 'Yes') ? 'checked' : '' ?> required>
-                                                        <label class="form-check-label" for="voterYes">Yes</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input class="form-check-input" type="radio" name="voterList"
-                                                            id="voterNo" value="No" <?= (isset($_POST['voterList']) && $_POST['voterList'] === 'No') ? 'checked' : '' ?> required>
-                                                        <label class="form-check-label" for="voterNo">No</label>
-                                                    </div>
-                                                </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">Email</label>
                                                     <input type="email" class="form-control" name="email"
                                                         value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
                                                         required>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label d-block">Voter's List</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="isVoter"
+                                                            id="voterYes" value="Yes" <?= (isset($_POST['isVoter']) && $_POST['isVoter'] === 'Yes') ? 'checked' : '' ?> required>
+                                                        <label class="form-check-label" for="voterYes">Yes</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="isVoter"
+                                                            id="voterNo" value="No" <?= (isset($_POST['isVoter']) && $_POST['isVoter'] === 'No') ? 'checked' : '' ?> required>
+                                                        <label class="form-check-label" for="voterNo">No</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label d-block">Derogatory Record</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="remarks"
+                                                            id="remarksYes" value="Yes" <?= (isset($_POST['remarks']) && $_POST['remarks'] === 'Yes') ? 'checked' : '' ?> required>
+                                                        <label class="form-check-label" for="remarksYes">Yes</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="remarks"
+                                                            id="remarksNo" value="No" <?= (isset($_POST['remarks']) && $_POST['remarks'] === 'No') ? 'checked' : '' ?> required>
+                                                        <label class="form-check-label" for="remarksNo">No</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </form>
@@ -809,7 +837,7 @@ $result = mysqli_query($conn, $sql);
         document.getElementById('sameAsCurrent').addEventListener('change', function () {
             const isChecked = this.checked;
 
-            const fields = ['blockLotNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName'];
+            const fields = ['blockLotNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName', 'purok'];
 
             fields.forEach(field => {
                 const current = document.getElementById(field);
