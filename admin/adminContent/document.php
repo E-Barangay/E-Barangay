@@ -35,23 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       $controlNo = $_POST['controlNo'] ?? '';
       $businessPurpose = $_POST['purpose'] ?? '';
       $ownership = $_POST['ownership'] ?? '';
-
-      $purpose = json_encode([
-        'type' => 'Business Clearance',
-        'businessName' => $businessName,
-        'businessAddress' => $businessAddress,
-        'ownerName' => $ownerName,
-        'ownerAddress' => $ownerAddress,
-        'businessNature' => $businessNature,
-        'controlNo' => $controlNo,
-        'purpose' => $businessPurpose,
-        'ownership' => $ownership
-      ]);
+      $purpose = $_POST['ownership'] ?? '';
       break;
 
-    case '1': // Barangay Clearance
+    case '1': // Barangay Clearance, Good Health, Residency
     case '5':
-    case '9':
+    case '8':
       $purpose = $_POST['purpose'] ?? '';
       break;
 
@@ -59,26 +48,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       $purpose = $_POST['purpose'] ?? '';
       break;
 
-    case '7': // Marriage Certificate
+    case '7': // Joint Cohabitation
       $spouseName = $_POST['spouseName'] ?? '';
       $marriageYear = $_POST['marriageYear'] ?? '';
-
-      $purpose = json_encode([
-        'type' => 'Marriage Certificate',
-        'spouseName' => $spouseName,
-        'marriageYear' => $marriageYear
-      ]);
+      $purpose = 'General Request';
       break;
 
-    case '10': // Certificate of Number of Children
+    case '10': // Solo Parent
       $childNo = $_POST['childNo'] ?? '';
       $soloParentSinceDate = $_POST['soloParentSinceDate'] ?? '';
-
-      $purpose = json_encode([
-        'type' => 'Certificate of Number of Children',
-        'numberOfChildren' => $childNo,
-        'soloParentSinceDate' => $soloParentSinceDate,
-      ]);
+      $purpose = 'General Request';
       break;
 
     default:
@@ -280,7 +259,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                     </div>
                   </div>
 
-                  <div class="col-lg-2 col-md-6">
+                  <div class="col-lg-3 col-md-6">
                     <select class="form-select" name="doctype">
                       <option value="All" <?= $docTypeFilter === '' || $docTypeFilter === 'All' ? 'selected' : '' ?>>All
                         Document Types</option>
@@ -305,7 +284,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                     </select>
                   </div>
 
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-2 col-md-6">
                     <input type="date" class="form-control" name="date" value="<?= htmlspecialchars($dateFilter) ?>">
                   </div>
 
@@ -324,10 +303,10 @@ $docTypesResults = executeQuery($docTypesQuery);
               <div class="table-responsive">
                 <table class="table table-hover mb-0">
                   <thead class="table-light">
-                    <tr>
-                      <th>Date Submitted</th>
-                      <th>Document Type</th>
+                    <tr class="align-middle">
                       <th>Requester Name</th>
+                      <th>Document Type</th>
+                      <th>Date Submitted</th>
                       <th>Purpose</th>
                       <th>Contact</th>
                       <th>Status</th>
@@ -345,11 +324,10 @@ $docTypesResults = executeQuery($docTypesQuery);
                           default => 'bg-secondary'
                         };
                         ?>
-                        <tr>
-                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
-                          <td><span class="badge bg-info text-white"><?= htmlspecialchars($row['documentName']) ?></span>
-                          </td>
+                        <tr class="align-middle">
                           <td><?= htmlspecialchars($row['fullname']) ?></td>
+                          <td><span><?= htmlspecialchars($row['documentName']) ?></span></td>
+                          <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
                           <td><?= htmlspecialchars($row['purpose']) ?></td>
                           <td><?= htmlspecialchars($row['phoneNumber']) ?></td>
                           <td><span class="badge rounded-pill <?= $badgeClass ?>"><?= $row['documentStatus'] ?></span></td>
@@ -501,9 +479,13 @@ $docTypesResults = executeQuery($docTypesQuery);
                     $fullname = htmlspecialchars(trim("{$user['firstName']} {$user['middleName']} {$user['lastName']}"));
                     $email = htmlspecialchars($user['email']);
                     $birthDate = htmlspecialchars($user['birthDate']);
+
+                    $barangayName = ucwords(strtolower($user['barangayName']));
+                    $cityName = ucwords(strtolower($user['cityName']));
+                    $provinceName = ucwords(strtolower($user['provinceName']));
+
+                    $ownerAddress = trim("{$user['blockLotNo']} {$user['streetName']} {$user['streetName']} {$barangayName} {$cityName} {$provinceName}");
                     ?>
-                    <?php
-                    $ownerAddress = trim("{$user['blockLotNo']} {$user['streetName']} {$user['barangayName']} {$user['cityName']} {$user['provinceName']}"); ?>
                     <option
                       value="<?= $user['userID'] ?> | <?= $fullname ?> | <?= $email ?> | <?= $birthDate ?> | <?= $ownerAddress ?>">
                     </option>
@@ -516,6 +498,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                   <p><strong>Name:</strong> <span id="infoName"></span></p>
                   <p><strong>Email:</strong> <span id="infoEmail"></span></p>
                   <p><strong>Birthdate:</strong> <span id="infoBirthdate"></span></p>
+                  <p><strong>Address:</strong> <span id="infoAddress"></span></p>
                 </div>
               </div>
 
@@ -733,8 +716,8 @@ $docTypesResults = executeQuery($docTypesQuery);
         if (selectedType === '2') {
           activeSection = document.querySelector('[data-doc-type="business"]');
         }
-        // Barangay Clearance (IDs = 1, 5, 9)
-        else if (['1', '5', '9'].includes(selectedType)) {
+        // Barangay Clearance (IDs = 1, 5, 8)
+        else if (['1', '5', '8'].includes(selectedType)) {
           activeSection = document.querySelector('[data-doc-type="clearance"]');
         }
         // Construction Clearance (ID = 3)
@@ -745,8 +728,8 @@ $docTypesResults = executeQuery($docTypesQuery);
         else if (selectedType === '7') {
           activeSection = document.querySelector('[data-doc-type="marriage"]');
         }
-        // Certificate of Number of Children (ID = 10)
-        else if (selectedType === '10') {
+        // Certificate of Number of Children (ID = 9)
+        else if (selectedType === '9') {
           activeSection = document.querySelector('[data-doc-type="children"]');
         }
         // Default case
@@ -778,6 +761,7 @@ $docTypesResults = executeQuery($docTypesQuery);
           document.getElementById('infoName').textContent = parts[1].trim();
           document.getElementById('infoEmail').textContent = parts[2].trim();
           document.getElementById('infoBirthdate').textContent = parts[3].trim();
+          document.getElementById('infoAddress').textContent = parts[4].trim();
 
           const ownerAddress = parts[4].trim();
           const ownerAddressField = document.getElementById('ownerAddress');
