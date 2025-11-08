@@ -74,6 +74,12 @@ $userInfoIDRow = mysqli_fetch_assoc($userInfoIDResult);
 
 $userInfoID = $userInfoIDRow['userInfoID'];
 
+$studentLevel = $userDataRow['studentLevel'] ?? '';
+$shsTrack = $userDataRow['shsTrack'] ?? '';
+$collegeCourse = $userDataRow['collegeCourse'] ?? '';
+$collegeYear = $userDataRow['collegeYear'] ?? '';
+$work = $userDataRow['work'] ?? '';
+
 if (isset($_POST['saveButton'])) {
     $firstName = $_POST['firstName'];
     $middleName = $_POST['middleName'];
@@ -111,10 +117,57 @@ if (isset($_POST['saveButton'])) {
     $permanentCityName = strtoupper($_POST['permanentCityName']);
     $permanentProvinceName = strtoupper($_POST['permanentProvinceName']);
 
-    $updateUserInfoQuery = "UPDATE userInfo SET firstName = '$firstName', middleName = '$middleName', lastName = '$lastName', 
-                        suffix = '$suffix', gender = '$gender', birthDate = '$birthDate', age = '$age', birthPlace = '$birthPlace',
-                        bloodType = '$bloodType', civilStatus = '$civilStatus', citizenship = '$citizenship', occupation = '$occupation',
-                        lengthOfStay = '$lengthOfStay', residencyType = '$residencyType', remarks = '$remarks' WHERE userID = $userID;";
+    $work = NULL;
+    $studentLevel = NULL;
+    $shsTrack = NULL;
+    $collegeCourse = NULL;
+    $collegeYear = NULL;
+
+    if ($occupation === 'Employed') {
+        $work = isset($_POST['work']) && !empty($_POST['work'])
+            ? mysqli_real_escape_string($conn, $_POST['work'])
+            : NULL;
+    } else if ($occupation === 'Student') {
+        $studentLevel = isset($_POST['studentLevel']) && !empty($_POST['studentLevel'])
+            ? mysqli_real_escape_string($conn, $_POST['studentLevel'])
+            : NULL;
+
+        if ($studentLevel === 'Senior High School') {
+            $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
+                ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
+                : NULL;
+        } else if ($studentLevel === 'College') {
+            $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
+                ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
+                : NULL;
+            $collegeYear = isset($_POST['collegeYear']) && !empty($_POST['collegeYear'])
+                ? (int) $_POST['collegeYear']
+                : NULL;
+        }
+    }
+ 
+    $updateUserInfoQuery = "UPDATE userInfo SET 
+                        firstName = '$firstName', 
+                        middleName = '$middleName', 
+                        lastName = '$lastName', 
+                        suffix = '$suffix', 
+                        gender = '$gender', 
+                        birthDate = '$birthDate', 
+                        age = '$age', 
+                        birthPlace = '$birthPlace',
+                        bloodType = '$bloodType', 
+                        civilStatus = '$civilStatus', 
+                        citizenship = '$citizenship', 
+                        occupation = '$occupation',
+                        work = " . ($work !== NULL ? "'$work'" : "NULL") . ",
+                        studentLevel = " . ($studentLevel !== NULL ? "'$studentLevel'" : "NULL") . ",
+                        shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
+                        collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
+                        collegeYear = " . ($collegeYear !== NULL ? $collegeYear : "NULL") . ",
+                        lengthOfStay = '$lengthOfStay', 
+                        residencyType = '$residencyType', 
+                        remarks = '$remarks'
+                        WHERE userID = $userID;";
     $updateUserInfoResult = executeQuery($updateUserInfoQuery);
 
     $updateUserContactQuery = "UPDATE users SET phoneNumber = '$phoneNumber', email = '$email' WHERE userID = $userID;";
@@ -433,7 +486,7 @@ if (isset($_POST['confirmButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-3 col-md-5 col-6 mb-3">
+                            <!-- <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="citizenship" name="citizenship"
                                         value="<?php echo $citizenship ?>" placeholder="Citizenship"
@@ -441,14 +494,109 @@ if (isset($_POST['confirmButton'])) {
                                         oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
+                            </div> -->
+
+                            <div class="col-lg-3 col-md-5 col-6 mb-3">
+                                <div class="form-floating">
+                                    <select class="form-control" id="citizenship" name="citizenship" disabled>
+                                        <option value="" disabled <?php echo ($citizenship == '') ? 'selected' : ''; ?>>
+                                            Select Citizenship</option>
+                                        <option value="Filipino" <?php echo ($citizenship == 'Filipino') ? 'selected' : ''; ?>>Filipino</option>
+                                        <option value="American" <?php echo ($citizenship == 'American') ? 'selected' : ''; ?>>American</option>
+                                        <option value="Canadian" <?php echo ($citizenship == 'Canadian') ? 'selected' : ''; ?>>Canadian</option>
+                                        <option value="Chinese" <?php echo ($citizenship == 'Chinese') ? 'selected' : ''; ?>>Chinese</option>
+                                        <option value="Japanese" <?php echo ($citizenship == 'Japanese') ? 'selected' : ''; ?>>Japanese</option>
+                                        <option value="Korean" <?php echo ($citizenship == 'Korean') ? 'selected' : ''; ?>>Korean</option>
+                                        <option value="Indian" <?php echo ($citizenship == 'Indian') ? 'selected' : ''; ?>>Indian</option>
+                                        <option value="Indonesian" <?php echo ($citizenship == 'Indonesian') ? 'selected' : ''; ?>>Indonesian</option>
+                                        <option value="Malaysian" <?php echo ($citizenship == 'Malaysian') ? 'selected' : ''; ?>>Malaysian</option>
+                                        <option value="Singaporean" <?php echo ($citizenship == 'Singaporean') ? 'selected' : ''; ?>>Singaporean</option>
+                                        <option value="Thai" <?php echo ($citizenship == 'Thai') ? 'selected' : ''; ?>>
+                                            Thai</option>
+                                        <option value="Vietnamese" <?php echo ($citizenship == 'Vietnamese') ? 'selected' : ''; ?>>Vietnamese</option>
+                                        <option value="British" <?php echo ($citizenship == 'British') ? 'selected' : ''; ?>>British</option>
+                                        <option value="Australian" <?php echo ($citizenship == 'Australian') ? 'selected' : ''; ?>>Australian</option>
+                                        <option value="French" <?php echo ($citizenship == 'French') ? 'selected' : ''; ?>>French</option>
+                                        <option value="German" <?php echo ($citizenship == 'German') ? 'selected' : ''; ?>>German</option>
+                                        <option value="Italian" <?php echo ($citizenship == 'Italian') ? 'selected' : ''; ?>>Italian</option>
+                                        <option value="Spanish" <?php echo ($citizenship == 'Spanish') ? 'selected' : ''; ?>>Spanish</option>
+                                        <option value="Others" <?php echo ($citizenship == 'Others') ? 'selected' : ''; ?>>Others</option>
+                                    </select>
+                                    <label for="citizenship">Citizenship</label>
+                                </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-7 col-6 mb-3">
+                            <div class="col-lg-4 col-md-6 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="occupation" name="occupation"
-                                        value="<?php echo $occupation ?>" placeholder="Occupation" pattern="[A-Za-z\s]+"
-                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <select class="form-control" id="occupation" name="occupation" disabled>
+                                        <option value="" disabled <?php echo empty($occupation) ? 'selected' : ''; ?>>
+                                            Select Occupation</option>
+                                        <option value="Student" <?php echo ($occupation == 'Student') ? 'selected' : ''; ?>>Student</option>
+                                        <option value="Employed" <?php echo ($occupation == 'Employed') ? 'selected' : ''; ?>>Employed</option>
+                                        <option value="Unemployed" <?php echo ($occupation == 'Unemployed') ? 'selected' : ''; ?>>Unemployed</option>
+                                    </select>
                                     <label for="occupation">Occupation</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="employedDiv" style="display:none;">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="work" name="work"
+                                        placeholder="work" value="<?php echo isset($work) ? $work : ''; ?>"
+                                        disabled>
+                                    <label for="work">Type Of Work</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="studentLevelDiv" style="display:none;">
+                                <div class="form-floating">
+                                    <select class="form-control" id="studentLevel" name="studentLevel" disabled>
+                                        <option value="" disabled <?php echo empty($studentLevel) ? 'selected' : ''; ?>>
+                                            Select Level</option>
+                                        <option value="Elementary" <?php echo (isset($studentLevel) && $studentLevel == 'Elementary') ? 'selected' : ''; ?>>Elementary</option>
+                                        <option value="High School" <?php echo (isset($studentLevel) && $studentLevel == 'High School') ? 'selected' : ''; ?>>High School</option>
+                                        <option value="Senior High School" <?php echo (isset($studentLevel) && $studentLevel == 'Senior High School') ? 'selected' : ''; ?>>Senior High
+                                            School</option>
+                                        <option value="College" <?php echo (isset($studentLevel) && $studentLevel == 'College') ? 'selected' : ''; ?>>College</option>
+                                    </select>
+                                    <label for="studentLevel">Student Level</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="shsTrackDiv" style="display:none;">
+                                <div class="form-floating">
+                                    <select class="form-control" id="shsTrack" name="shsTrack" disabled>
+                                        <option value="" disabled <?php echo empty($shsTrack) ? 'selected' : ''; ?>>
+                                            Select Track</option>
+                                        <option value="STEM" <?php echo (isset($shsTrack) && $shsTrack == 'STEM') ? 'selected' : ''; ?>>STEM</option>
+                                        <option value="ABM" <?php echo (isset($shsTrack) && $shsTrack == 'ABM') ? 'selected' : ''; ?>>ABM</option>
+                                        <option value="HUMMS" <?php echo (isset($shsTrack) && $shsTrack == 'HUMMS') ? 'selected' : ''; ?>>HUMMS</option>
+                                        <option value="ICT" <?php echo (isset($shsTrack) && $shsTrack == 'ICT') ? 'selected' : ''; ?>>ICT</option>
+                                        <option value="GAS" <?php echo (isset($shsTrack) && $shsTrack == 'GAS') ? 'selected' : ''; ?>>GAS</option>
+                                    </select>
+                                    <label for="shsTrack">Senior High Track</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="collegeCourseDiv" style="display:none;">
+                                <div class="form-floating">
+                                    <select class="form-control" id="collegeCourse" name="collegeCourse" disabled>
+                                        <option value="" disabled <?php echo empty($collegeCourse) ? 'selected' : ''; ?>>Select Course</option>
+                                        <option value="BSIT" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSIT') ? 'selected' : ''; ?>>BSIT</option>
+                                        <option value="BSECE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSECE') ? 'selected' : ''; ?>>BSECE</option>
+                                        <option value="BSEE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSEE') ? 'selected' : ''; ?>>BSEE</option>
+                                        <option value="BSBA" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSBA') ? 'selected' : ''; ?>>BSBA</option>
+                                    </select>
+                                    <label for="collegeCourse">College Course</label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="collegeYearDiv" style="display:none;">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="collegeYear" name="collegeYear"
+                                        min="1" max="5" placeholder="Year Level"
+                                        value="<?php echo isset($collegeYear) ? $collegeYear : ''; ?>" disabled>
+                                    <label for="collegeYear">College Year Level</label>
                                 </div>
                             </div>
 

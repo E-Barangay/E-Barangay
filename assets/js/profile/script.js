@@ -111,6 +111,9 @@ cancelButton.addEventListener('click', function () {
         }
     }
 
+    // Restore occupation fields visibility based on original values
+    updateOccupationFields();
+
     // Remove any validation alerts
     const existingAlert = document.querySelector('.validation-alert');
     if (existingAlert) {
@@ -857,3 +860,75 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
     .catch(error => {
         console.error('Error loading JSON:', error);
     });
+
+
+
+document.getElementById('lengthOfStay').addEventListener('input', function() {
+    const lengthInput = parseInt(this.value.replace(/\D/g, '')) || 0; 
+    const age = parseInt(document.getElementById('age').value) || 0;
+
+    if (lengthInput > age) {
+        this.value = age;
+    }
+});
+
+
+// ========== OCCUPATION FIELDS ==========
+const occupation = document.getElementById('occupation');
+const employedDiv = document.getElementById('employedDiv');
+const studentLevelDiv = document.getElementById('studentLevelDiv');
+const shsTrackDiv = document.getElementById('shsTrackDiv');
+const collegeCourseDiv = document.getElementById('collegeCourseDiv');
+const collegeYearDiv = document.getElementById('collegeYearDiv');
+const studentLevel = document.getElementById('studentLevel');
+
+// Function to update occupation-related fields visibility
+function updateOccupationFields() {
+    const occupationValue = occupation.value;
+    const studentLevelValue = studentLevel.value;
+    
+    // Reset all fields first
+    employedDiv.style.display = 'none';
+    studentLevelDiv.style.display = 'none';
+    shsTrackDiv.style.display = 'none';
+    collegeCourseDiv.style.display = 'none';
+    collegeYearDiv.style.display = 'none';
+    
+    // Show fields based on occupation
+    if (occupationValue === 'Employed') {
+        employedDiv.style.display = 'block';
+    } else if (occupationValue === 'Student') {
+        studentLevelDiv.style.display = 'block';
+        
+        // Show nested student fields
+        if (studentLevelValue === 'Senior High School') {
+            shsTrackDiv.style.display = 'block';
+        } else if (studentLevelValue === 'College') {
+            collegeCourseDiv.style.display = 'block';
+            collegeYearDiv.style.display = 'block';
+        }
+    }
+}
+
+// Initial load - check if there are saved values
+updateOccupationFields();
+
+occupation.addEventListener('change', function() {
+    // Clear nested values when changing occupation
+    if (this.value !== 'Student') {
+        studentLevel.value = '';
+    }
+    updateOccupationFields();
+});
+
+studentLevel.addEventListener('change', function() {
+    // Clear nested values when changing student level
+    if (this.value !== 'Senior High School') {
+        document.getElementById('shsTrack').value = '';
+    }
+    if (this.value !== 'College') {
+        document.getElementById('collegeCourse').value = '';
+        document.getElementById('collegeYear').value = '';
+    }
+    updateOccupationFields();
+});
