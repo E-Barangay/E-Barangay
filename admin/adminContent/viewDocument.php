@@ -82,13 +82,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_status'])) {
   $newStatus = $_POST['new_status'];
 
   if ($newStatus === 'Approved') {
-    $updateQuery = "UPDATE documents 
-                    SET documentStatus = '$newStatus', approvalDate = NOW()
-                    WHERE documentID = '$documentID'";
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', approvalDate = NOW(), cancelledDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  } elseif ($newStatus === 'Cancelled') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', cancelledDate = NOW(), approvalDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  } elseif ($newStatus === 'Denied') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', deniedDate = NOW(), approvalDate = NULL, cancelledDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  } elseif ($newStatus === 'Archived') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', archiveDate = NOW(), approvalDate = NULL, cancelledDate = NULL, deniedDate = NULL WHERE documentID = '$documentID'";
   } else {
-    $updateQuery = "UPDATE documents 
-                    SET documentStatus = '$newStatus', approvalDate = NULL
-                    WHERE documentID = '$documentID'";
+    $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', approvalDate = NULL, cancelledDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
   }
 
   $updateResult = executeQuery($updateQuery);
@@ -101,15 +103,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_status'])) {
 $documentQuery = "SELECT 
     d.documentID, 
     d.purpose, 
-    d.documentStatus, 
+    d.documentStatus,
     d.requestDate,
     d.approvalDate,
+    d.cancelledDate,
+    d.deniedDate,
+    d.archiveDate,
     d.documentTypeID,
     d.businessName,
     d.businessAddress,
     d.businessNature,
     d.controlNo,
     d.ownership,
+    d.spouseName,
+    d.marriageYear,
+    d.childNo,
+    d.soloParentSinceDate,
     dt.documentName,
     dt.documentImage,
     CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS fullname,
@@ -293,12 +302,166 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-4">
-                      <div class="info-row">
-                        <strong>Purpose:</strong>
-                        <div class="mt-1"><?= htmlspecialchars($document['purpose']) ?></div>
+                    <?php if ($documentTypeID == 2) { ?>
+                        
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Business Name:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['businessName']) ?></span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                      
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Business Address:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['businessAddress']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Owner's Name:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['fullname']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Owner's Address:</strong>
+                          <div class="mt-1">
+                            <span>
+                              <?php
+                                $addressParts = array_filter([
+                                  ucwords(strtolower($document['permanentHouseNo'])),
+                                  ucwords(strtolower($document['permanentPurok'])),
+                                  ucwords(strtolower($document['permanentSubdivisionName'])),
+                                  ucwords(strtolower($document['permanentPhase'])),
+                                  ucwords(strtolower($document['permanentStreetName'])),
+                                  ucwords(strtolower($document['permanentBarangayName'])),
+                                  ucwords(strtolower($document['permanentCityName'])),
+                                  ucwords(strtolower($document['permanentProvinceName']))
+                                ]);
+                                echo htmlspecialchars(implode(' ', $addressParts));
+                              ?>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Nature of Business:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['businessNature']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Control No:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['controlNo']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Purpose:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['purpose']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Ownership:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['ownership']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                    <?php } elseif ($documentTypeID == 1 || $documentTypeID == 5 || $documentTypeID == 8 ) { ?>
+                      
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Purpose:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['purpose']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                    <?php } elseif ($documentTypeID == 3) { ?>
+                      
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Purpose:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['purpose']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                    <?php } elseif ($documentTypeID == 7) { ?>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Spouse Name:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['spouseName']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Year of Marriage:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['marriageYear']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                    <?php } elseif ($documentTypeID == 9) { ?>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Number of Children:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['childNo']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Solo Parent Since:</strong>
+                          <div class="mt-1">
+                            <span><?= htmlspecialchars($document['soloParentSinceDate']) ?></span>
+                          </div>
+                        </div>
+                      </div>
+                    
+                    <?php } else { ?>
+
+                      <div class="col-md-4">
+                        <div class="info-row">
+                          <strong>Purpose:</strong>
+                          <div class="mt-1">General Request</div>
+                        </div>
+                      </div>
+
+                    <?php } ?>
                     <div class="col-md-4">
                       <div class="info-row">
                         <strong>Requester's Full Name:</strong>
@@ -414,48 +577,94 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                       </div>
                     <?php endif; ?>
                     <?php if ($document['barangayName'] || $document['cityName']): ?>
-                      <div class="col-6">
-                        <div class="info-row">
-                          <strong>Address:</strong>
-                          <div class="mt-1">
-                            <?php
-                            $addressParts = array_filter([
-                              ucwords(strtolower($document['houseNo'])),
-                              ucwords(strtolower($document['purok'])),
-                              ucwords(strtolower($document['subdivisionName'])),
-                              ucwords(strtolower($document['phase'])),
-                              ucwords(strtolower($document['streetName'])),
-                              ucwords(strtolower($document['barangayName'])),
-                              ucwords(strtolower($document['cityName'])),
-                              ucwords(strtolower($document['provinceName']))
-                            ]);
-                            echo htmlspecialchars(implode(' ', $addressParts));
-                            ?>
+                      <?php if ($documentTypeID == 2 || $documentTypeID == 7 || $documentTypeID == 9) { ?>
+                        <div class="col-4">
+                          <div class="info-row">
+                            <strong>Address:</strong>
+                            <div class="mt-1">
+                              <?php
+                              $addressParts = array_filter([
+                                ucwords(strtolower($document['houseNo'])),
+                                ucwords(strtolower($document['purok'])),
+                                ucwords(strtolower($document['subdivisionName'])),
+                                ucwords(strtolower($document['phase'])),
+                                ucwords(strtolower($document['streetName'])),
+                                ucwords(strtolower($document['barangayName'])),
+                                ucwords(strtolower($document['cityName'])),
+                                ucwords(strtolower($document['provinceName']))
+                              ]);
+                              echo htmlspecialchars(implode(' ', $addressParts));
+                              ?>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      <?php } else { ?>
+                        <div class="col-6">
+                          <div class="info-row">
+                            <strong>Address:</strong>
+                            <div class="mt-1">
+                              <?php
+                              $addressParts = array_filter([
+                                ucwords(strtolower($document['houseNo'])),
+                                ucwords(strtolower($document['purok'])),
+                                ucwords(strtolower($document['subdivisionName'])),
+                                ucwords(strtolower($document['phase'])),
+                                ucwords(strtolower($document['streetName'])),
+                                ucwords(strtolower($document['barangayName'])),
+                                ucwords(strtolower($document['cityName'])),
+                                ucwords(strtolower($document['provinceName']))
+                              ]);
+                              echo htmlspecialchars(implode(' ', $addressParts));
+                              ?>
+                            </div>
+                          </div>
+                        </div>
+                      <?php } ?>
                     <?php endif; ?>
                     <?php if ($document['barangayName'] || $document['cityName']): ?>
-                      <div class="col-6">
-                        <div class="info-row">
-                          <strong>Permanent Address:</strong>
-                          <div class="mt-1">
-                            <?php
-                            $addressParts = array_filter([
-                              ucwords(strtolower($document['permanentHouseNo'])),
-                              ucwords(strtolower($document['permanentPurok'])),
-                              ucwords(strtolower($document['permanentSubdivisionName'])),
-                              ucwords(strtolower($document['permanentPhase'])),
-                              ucwords(strtolower($document['permanentStreetName'])),
-                              ucwords(strtolower($document['permanentBarangayName'])),
-                              ucwords(strtolower($document['permanentCityName'])),
-                              ucwords(strtolower($document['permanentProvinceName']))
-                            ]);
-                            echo htmlspecialchars(implode(' ', $addressParts));
-                            ?>
+                      <?php if ($documentTypeID == 2 || $documentTypeID == 7 || $documentTypeID == 9) { ?>
+                        <div class="col-4">
+                          <div class="info-row">
+                            <strong>Permanent Address:</strong>
+                            <div class="mt-1">
+                              <?php
+                              $addressParts = array_filter([
+                                ucwords(strtolower($document['permanentHouseNo'])),
+                                ucwords(strtolower($document['permanentPurok'])),
+                                ucwords(strtolower($document['permanentSubdivisionName'])),
+                                ucwords(strtolower($document['permanentPhase'])),
+                                ucwords(strtolower($document['permanentStreetName'])),
+                                ucwords(strtolower($document['permanentBarangayName'])),
+                                ucwords(strtolower($document['permanentCityName'])),
+                                ucwords(strtolower($document['permanentProvinceName']))
+                              ]);
+                              echo htmlspecialchars(implode(' ', $addressParts));
+                              ?>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      <?php } else { ?>
+                        <div class="col-6">
+                          <div class="info-row">
+                            <strong>Permanent Address:</strong>
+                            <div class="mt-1">
+                              <?php
+                              $addressParts = array_filter([
+                                ucwords(strtolower($document['permanentHouseNo'])),
+                                ucwords(strtolower($document['permanentPurok'])),
+                                ucwords(strtolower($document['permanentSubdivisionName'])),
+                                ucwords(strtolower($document['permanentPhase'])),
+                                ucwords(strtolower($document['permanentStreetName'])),
+                                ucwords(strtolower($document['permanentBarangayName'])),
+                                ucwords(strtolower($document['permanentCityName'])),
+                                ucwords(strtolower($document['permanentProvinceName']))
+                              ]);
+                              echo htmlspecialchars(implode(' ', $addressParts));
+                              ?>
+                            </div>
+                          </div>
+                        </div>
+                      <?php } ?>
                     <?php endif; ?>
                   </div>
                 </div>
@@ -514,15 +723,14 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
 
                         <div class="col-md-4">
                           <label class="form-label"><strong>Nature of Business:</strong></label>
-                          <select class="form-select" id="businessNature" name="businessNature" required>\
-                            <option value="" disabled <?= $document['businessNature'] ? '' : 'selected' ?>>Choose Nature of Business</option>
-                            <option value="Sari-Sari Store">Sari-Sari Store</option>
-                            <option value="Food & Beverage">Food & Beverage</option>
-                            <option value="Retail">Retail</option>
-                            <option value="Services">Services</option>
-                            <option value="Agriculture">Agriculture</option>
-                            <option value="Manufacturing">Manufacturing</option>
-                            <option value="Transportation">Transportation</option>
+                          <select class="form-select" id="businessNature" name="businessNature" required>
+                            <option value="Sari-Sari Store" <?= $document['businessNature'] === 'Sari-Sari Store' ? 'selected' : '' ?>>Sari-Sari Store</option>
+                            <option value="Food & Beverage" <?= $document['businessNature'] === 'Food & Beverage' ? 'selected' : '' ?>>Food & Beverage</option>
+                            <option value="Retail" <?= $document['businessNature'] === 'Retail' ? 'selected' : '' ?>>Retail</option>
+                            <option value="Services" <?= $document['businessNature'] === 'Services' ? 'selected' : '' ?>>Services</option>
+                            <option value="Agriculture" <?= $document['businessNature'] === 'Agriculture' ? 'selected' : '' ?>>Agriculture</option>
+                            <option value="Manufacturing" <?= $document['businessNature'] === 'Manufacturing' ? 'selected' : '' ?>>Manufacturing</option>
+                            <option value="Transportation" <?= $document['businessNature'] === 'Transportation' ? 'selected' : '' ?>>Transportation</option>
                           </select>
                         </div>
 
@@ -534,22 +742,20 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                         <div class="col-md-4">
                           <label class="form-label"><strong>Purpose:</strong></label>
                           <select class="form-select" id="businessClearancePurpose" name="purpose" required>
-                            <option value="" disabled <?= $document['purpose'] ? '' : 'selected' ?>>Choose Purpose</option>
-                            <option value="New">New</option>
-                            <option value="Renewal">Renewal</option>
-                            <option value="Closure">Closure</option>
-                            <option value="Expansion">Expansion</option>
+                            <option value="New" <?= $document['purpose'] === 'New' ? 'selected' : '' ?>>New</option>
+                            <option value="Renewal" <?= $document['purpose'] === 'Renewal' ? 'selected' : '' ?>>Renewal</option>
+                            <option value="Closure" <?= $document['purpose'] === 'Closure' ? 'selected' : '' ?>>Closure</option>
+                            <option value="Expansion" <?= $document['purpose'] === 'Expansion' ? 'selected' : '' ?>>Expansion</option>
                           </select>
                         </div>
 
                         <div class="col-md-4">
                           <label class="form-label"><strong>Ownership:</strong></label>
                           <select class="form-select" id="ownership" name="ownership" required>
-                            <option value="" disabled <?= $document['ownership'] ? '' : 'selected' ?>>Choose Ownership</option>
-                            <option value="Sole Proprietorship">Sole Proprietorship</option>
-                            <option value="Partnership">Partnership</option>
-                            <option value="Corporation">Corporation</option>
-                            <option value="Cooperative">Cooperative</option>
+                            <option value="Sole Proprietorship" <?= $document['ownership'] === 'Sole Proprietorship' ? 'selected' : '' ?>>Sole Proprietorship</option>
+                            <option value="Partnership" <?= $document['ownership'] === 'Partnership' ? 'selected' : '' ?>>Partnership</option>
+                            <option value="Corporation" <?= $document['ownership'] === 'Corporation' ? 'selected' : '' ?>>Corporation</option>
+                            <option value="Cooperative" <?= $document['ownership'] === 'Cooperative' ? 'selected' : '' ?>>Cooperative</option>
                           </select>
                         </div>
 
@@ -558,19 +764,18 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                         <div class="col-md-4">
                           <label class="form-label"><strong>Purpose:</strong></label>
                           <select class="form-select selectPurpose" id="purpose" name="purpose" required>
-                            <option value="" disabled <?= $document['purpose'] ? '' : 'selected' ?>>Choose Purpose</option>
-                            <option value="Employment">Employment</option>
-                            <option value="Job Requirement / Local Employment">Job Requirement / Local Employment</option>
-                            <option value="Overseas Employment (OFW)">Overseas Employment (OFW)</option>
-                            <option value="School Requirement / Enrollment">School Requirement / Enrollment</option>
-                            <option value="Scholarship Application">Scholarship Application</option>
-                            <option value="Medical Assistance">Medical Assistance</option>
-                            <option value="Hospital Requirement">Hospital Requirement</option>
-                            <option value="Legal Requirement / Court Use">Legal Requirement / Court Use</option>
-                            <option value="NBI / Police Clearance">NBI / Police Clearance</option>
-                            <option value="Passport Application / Renewal">Passport Application / Renewal</option>
-                            <option value="Driver's License">Driver's License</option>
-                            <option value="Loan Application">Loan Application</option>
+                            <option value="Employment" <?= $document['purpose'] === 'Employment' ? 'selected' : '' ?>>Employment</option>
+                            <option value="Job Requirement / Local Employment" <?= $document['purpose'] === 'Job Requirement / Local Employment' ? 'selected' : '' ?>>Job Requirement / Local Employment</option>
+                            <option value="Overseas Employment (OFW)" <?= $document['purpose'] === 'Overseas Employment (OFW)' ? 'selected' : '' ?>>Overseas Employment (OFW)</option>
+                            <option value="School Requirement / Enrollment" <?= $document['purpose'] === 'School Requirement / Enrollment' ? 'selected' : '' ?>>School Requirement / Enrollment</option>
+                            <option value="Scholarship Application" <?= $document['purpose'] === 'Scholarship Application' ? 'selected' : '' ?>>Scholarship Application</option>
+                            <option value="Medical Assistance" <?= $document['purpose'] === 'Medical Assistance' ? 'selected' : '' ?>>Medical Assistance</option>
+                            <option value="Hospital Requirement" <?= $document['purpose'] === 'Hospital Requirement' ? 'selected' : '' ?>>Hospital Requirement</option>
+                            <option value="Legal Requirement / Court Use" <?= $document['purpose'] === 'Legal Requirement / Court Use' ? 'selected' : '' ?>>Legal Requirement / Court Use</option>
+                            <option value="NBI / Police Clearance" <?= $document['purpose'] === 'NBI / Police Clearance' ? 'selected' : '' ?>>NBI / Police Clearance</option>
+                            <option value="Passport Application / Renewal" <?= $document['purpose'] === 'Passport Application / Renewal' ? 'selected' : '' ?>>Passport Application / Renewal</option>
+                            <option value="Driver's License" <?= $document['purpose'] === "Driver's License" ? 'selected' : '' ?>>Driver's License</option>
+                            <option value="Loan Application" <?= $document['purpose'] === 'Loan Application' ? 'selected' : '' ?>>Loan Application</option>
                           </select>
                         </div>
 
@@ -579,13 +784,12 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                         <div class="col-md-4">
                           <label class="form-label"><strong>Purpose:</strong></label>
                           <select class="form-select" id="constructionClearancePurpose" name="purpose" required>
-                            <option value="" selected disabled>Choose Purpose</option>
-                            <option value="New Construction">New Construction</option>
-                            <option value="House Renovation">House Renovation</option>
-                            <option value="Extension / Expansion">Extension / Expansion</option>
-                            <option value="Fence Construction">Fence Construction</option>
-                            <option value="Demolition">Demolition</option>
-                            <option value="Repair / Maintenance">Repair / Maintenance</option>
+                            <option value="New Construction" <?= $document['purpose'] === 'New Construction' ? 'selected' : '' ?>>New Construction</option>
+                            <option value="House Renovation" <?= $document['purpose'] === 'House Renovation' ? 'selected' : '' ?>>House Renovation</option>
+                            <option value="Extension / Expansion" <?= $document['purpose'] === 'Extension / Expansion' ? 'selected' : '' ?>>Extension / Expansion</option>
+                            <option value="Fence Construction" <?= $document['purpose'] === 'Fence Construction' ? 'selected' : '' ?>>Fence Construction</option>
+                            <option value="Demolition" <?= $document['purpose'] === 'Demolition' ? 'selected' : '' ?>>Demolition</option>
+                            <option value="Repair / Maintenance" <?= $document['purpose'] === 'Repair / Maintenance' ? 'selected' : '' ?>>Repair / Maintenance</option>
                           </select>
                         </div>
 
@@ -593,24 +797,24 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
 
                         <div class="col-md-4">
                           <label class="form-label"><strong>Spouse Name:</strong></label>
-                          <input type="text" class="form-control" id="spouseName" name="spouseName" placeholder="Spouse Name" required>
+                          <input type="text" class="form-control" id="spouseName" value="<?= htmlspecialchars($document['spouseName']) ?>" name="spouseName" placeholder="Spouse Name" required>
                         </div>
 
                         <div class="col-md-4">
                           <label class="form-label"><strong>Year of Marriage:</strong></label>
-                          <input type="number" class="form-control" id="marriageYear" name="marriageYear" placeholder="Year of Marriage (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                          <input type="number" class="form-control" id="marriageYear" name="marriageYear" value="<?= htmlspecialchars($document['marriageYear']) ?>" placeholder="Year of Marriage (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                         </div>
 
                       <?php } elseif ($documentTypeID == 9) { ?>
 
                         <div class="col-md-4">
                           <label class="form-label"><strong>Number of Children:</strong></label>
-                          <input type="number" class="form-control" id="childNo" name="childNo" placeholder="Number of Children (e.g., 2)" min="0" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                          <input type="number" class="form-control" id="childNo" name="childNo" value="<?= htmlspecialchars($document['childNo']) ?>" placeholder="Number of Children (e.g., 2)" min="0" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                         </div>
 
                         <div class="col-md-4">
                           <label class="form-label"><strong>Solo Parent Since:</strong></label>
-                          <input type="number" class="form-control" id="soloParentSinceDate" name="soloParentSinceDate" placeholder="Solo Parent Since (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
+                          <input type="number" class="form-control" id="soloParentSinceDate" name="soloParentSinceDate" value="<?= htmlspecialchars($document['soloParentSinceDate']) ?>" placeholder="Solo Parent Since (e.g., 2003)" min="1900" max="<?php echo date('Y'); ?>" oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" required>
                         </div>
                       
                       <?php } else { ?>
@@ -739,7 +943,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                         </div>
                       <?php endif; ?>
                       <?php if ($document['barangayName'] || $document['cityName']): ?>
-                        <?php if ($documentTypeID == 2) { ?>
+                        <?php if ($documentTypeID == 2 || $documentTypeID == 7 || $documentTypeID == 9) { ?>
                           <div class="col-4">
                             <div class="info-row">
                               <strong>Address:</strong>
@@ -784,7 +988,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                         <?php } ?>
                       <?php endif; ?>
                       <?php if ($document['barangayName'] || $document['cityName']): ?>
-                        <?php if ($documentTypeID == 2) { ?>
+                        <?php if ($documentTypeID == 2 || $documentTypeID == 7 || $documentTypeID == 9) { ?>
                           <div class="col-4">
                             <div class="info-row">
                               <strong>Permanent Address:</strong>
@@ -859,6 +1063,8 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                     'Pending' => 'bg-warning text-dark',
                     'Approved' => 'bg-success',
                     'Denied' => 'bg-danger',
+                    'Cancelled' => 'bg-secondary',
+                    'Archived' => 'bg-dark text-white',
                     default => 'bg-secondary'
                   };
                   ?>
@@ -877,6 +1083,10 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                       </option>
                       <option value="Denied" <?= $document['documentStatus'] === 'Denied' ? 'selected' : '' ?>>Denied
                       </option>
+                      <option value="Cancelled" <?= $document['documentStatus'] === 'Cancelled' ? 'selected' : '' ?>>Cancelled
+                      </option>
+                      <option value="Archived" <?= $document['documentStatus'] === 'Archived' ? 'selected' : '' ?>>Archived
+                      </option>
                     </select>
                   </div>
                   <div class="d-flex justify-content-end gap-2">
@@ -894,6 +1104,27 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                       <small class="text-muted">
                         <i class="fas fa-calendar-check me-1"></i>
                         Approved on <?= date('M d, Y', strtotime($document['approvalDate'])) ?>
+                      </small>
+                    </div>
+                  <?php elseif ($document['documentStatus'] === 'Cancelled' && $document['cancelledDate']): ?>
+                    <div class="mt-3 pt-3 border-top text-center">
+                      <small class="text-muted">
+                        <i class="fas fa-times-circle me-1"></i>
+                        Cancelled on <?= date('M d, Y', strtotime($document['cancelledDate'])) ?>
+                      </small>
+                    </div>
+                  <?php elseif ($document['documentStatus'] === 'Denied' && $document['deniedDate']): ?>
+                    <div class="mt-3 pt-3 border-top text-center">
+                      <small class="text-muted">
+                        <i class="fas fa-ban me-1"></i>
+                        Denied on <?= date('M d, Y', strtotime($document['deniedDate'])) ?>
+                      </small>
+                    </div>
+                  <?php elseif ($document['documentStatus'] === 'Archived' && $document['archiveDate']): ?>
+                    <div class="mt-3 pt-3 border-top text-center">
+                      <small class="text-muted">
+                        <i class="fas fa-archive me-1"></i>
+                        Archived on <?= date('M d, Y', strtotime($document['archiveDate'])) ?>
                       </small>
                     </div>
                   <?php endif; ?>
