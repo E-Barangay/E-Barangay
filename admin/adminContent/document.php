@@ -4,7 +4,23 @@ include_once __DIR__ . '/../../sharedAssets/connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_POST['documentID'])) {
   $documentID = $_POST['documentID'];
-  $newStatus = $_POST['action'] === 'done' ? 'Approved' : 'Denied';
+
+  switch ($_POST['action']) {
+    case 'done':
+      $newStatus = 'Approved';
+      break;
+    case 'archive':
+      $newStatus = 'Archived';
+      break;
+    case 'unarchive':
+      $newStatus = 'Pending';
+      break;
+    case 'restore':
+      $newStatus = 'Pending';
+      break;
+    default:
+      exit('Invalid action.');
+  }
 
   $updateQuery = "UPDATE documents SET documentStatus = ? WHERE documentID = ?";
   $stmt = $pdo->prepare($updateQuery);
@@ -54,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       $purpose = 'General Request';
       break;
 
-    case '10': // Solo Parent
+    case '9': // Solo Parent
       $childNo = $_POST['childNo'] ?? '';
       $soloParentSinceDate = $_POST['soloParentSinceDate'] ?? '';
       $purpose = 'General Request';
@@ -109,6 +125,8 @@ if ($search != '') {
 
 if ($statusFilter != '' && $statusFilter != 'All') {
   $documentsQuery .= " AND d.documentStatus = '$statusFilter'";
+} else {
+  $documentsQuery .= " AND d.documentStatus != 'Archived'";
 }
 
 if ($dateFilter != '') {
@@ -223,6 +241,80 @@ $docTypesResults = executeQuery($docTypesQuery);
       background-color: #2a9995 !important;
       border-color: #2a9995 !important;
     }
+
+    .viewButton {
+      background-color: transparent;
+      border-color: #19AFA5;
+      color: #19AFA5;
+    }
+
+    .viewButton:hover {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .restoreButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .restoreButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
+
+    .archiveButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .archiveButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
+
+    .unarchiveButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .unarchiveButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
+
+
+    .confirmArchiveButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .confirmArchiveButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
+
+    .confirmUnarchiveButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .confirmUnarchiveButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
+    
   </style>
 </head>
 
@@ -277,7 +369,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                     <select class="form-select" name="status">
                       <option value="All" <?= $statusFilter === '' || $statusFilter === 'All' ? 'selected' : '' ?>>All Status
                       </option>
-                      <?php foreach (['Pending', 'Approved', 'Denied'] as $status): ?>
+                      <?php foreach (['Pending', 'Approved', 'Denied', 'Cancelled', 'Archived'] as $status): ?>
                         <option value="<?= $status ?>" <?= $statusFilter === $status ? 'selected' : '' ?>><?= $status ?>
                         </option>
                       <?php endforeach; ?>
@@ -321,6 +413,8 @@ $docTypesResults = executeQuery($docTypesQuery);
                           'Pending' => 'bg-warning text-dark',
                           'Approved' => 'bg-success',
                           'Denied' => 'bg-danger',
+                          'Cancelled' => 'bg-secondary',
+                          'Archived' => 'bg-dark text-white',
                           default => 'bg-secondary'
                         };
                         ?>
@@ -334,7 +428,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                           <td>
                             <div class="d-flex gap-2 flex-wrap">
                               <a href="adminContent/viewDocument.php?id=<?= $row['documentID'] ?>"
-                                class="btn btn-sm btn-outline-primary" title="View Document">
+                                class="btn btn-sm viewButton" title="View Document">
                                 <i class="fas fa-eye"></i>
                               </a>
 
@@ -343,22 +437,21 @@ $docTypesResults = executeQuery($docTypesQuery);
                                   class="btn btn-sm btn-success" target="_blank" title="Print Document">
                                   <i class="fas fa-print"></i>
                                 </a>
-                              <?php else: ?>
-                                <!-- Deny Button -->
-                                <button class="btn btn-sm btn-danger" type="button" title="Deny" data-bs-toggle="modal"
-                                  data-bs-target="#denyDocumentModal<?= $row['documentID'] ?>">
-                                  <i class="fas fa-times"></i>
+                              <?php elseif ($row['documentStatus'] === 'Cancelled'): ?>
+                                <button class="btn btn-sm restoreButton" type="button" title="Restore Document" data-bs-toggle="modal"
+                                  data-bs-target="#restoreDocumentModal<?= $row['documentID'] ?>">
+                                  <i class="fa-solid fa-rotate-left"></i>
                                 </button>
 
-                                <div class="modal fade" id="denyDocumentModal<?= $row['documentID'] ?>" tabindex="-1">
+                                <div class="modal fade" id="restoreDocumentModal<?= $row['documentID'] ?>" tabindex="-1">
                                   <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                       <div class="modal-header">
-                                        <h5 class="modal-title">Deny Document</h5>
+                                        <h5 class="modal-title">Restore Document Request</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                       </div>
                                       <div class="modal-body">
-                                        Are you sure you want to deny this document?
+                                        Are you sure you want to restore this request?
                                       </div>
                                       <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
@@ -367,13 +460,72 @@ $docTypesResults = executeQuery($docTypesQuery);
                                         <!-- Direct form submit -->
                                         <form method="POST" style="display:inline;">
                                           <input type="hidden" name="documentID" value="<?= $row['documentID'] ?>">
-                                          <input type="hidden" name="action" value="deny">
-                                          <button type="submit" class="btn btn-danger">Confirm Deny</button>
+                                          <input type="hidden" name="action" value="restore">
+                                          <button type="submit" class="btn btn-primary confirmRestoreButton">Confirm Restore</button>
                                         </form>
                                       </div>
                                     </div>
                                   </div>
                                 </div>
+                              <?php else: ?>
+                                <?php if ($row['documentStatus'] === 'Archived'): ?>
+                                  <button class="btn btn-sm unarchiveButton" type="button" title="Unarchive Document" data-bs-toggle="modal"
+                                    data-bs-target="#unarchiveDocumentModal<?= $row['documentID'] ?>">
+                                    <i class="fa-solid fa-box-open"></i>
+                                  </button>
+
+                                  <div class="modal fade" id="unarchiveDocumentModal<?= $row['documentID'] ?>" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title">Unarchive Document</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          Are you sure you want to unarchive this document?
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                                          <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="documentID" value="<?= $row['documentID'] ?>">
+                                            <input type="hidden" name="action" value="unarchive">
+                                            <button type="submit" class="btn btn-primary confirmUnarchiveButton">Confirm Unarchive</button>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                <?php else: ?>
+                                  <button class="btn btn-sm archiveButton" type="button" title="Archive Document" data-bs-toggle="modal"
+                                    data-bs-target="#archiveDocumentModal<?= $row['documentID'] ?>">
+                                    <i class="fa-solid fa-box-archive"></i>
+                                  </button>
+
+                                  <div class="modal fade" id="archiveDocumentModal<?= $row['documentID'] ?>" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title">Archive Document</h5>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          Are you sure you want to archive this document?
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+                                          <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="documentID" value="<?= $row['documentID'] ?>">
+                                            <input type="hidden" name="action" value="archive">
+                                            <button type="submit" class="btn btn-primary confirmArchiveButton">Confirm Archive</button>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                              <?php endif; ?>
+
                               <?php endif; ?>
                             </div>
                           </td>

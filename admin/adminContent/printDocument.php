@@ -260,14 +260,26 @@ switch ($documentTypeID) {
     font-size: 12pt;
 }
 
+.printDocument {
+    background-color: #19AFA5;
+    border-color: #19AFA5;
+    color: white;
+}
+
+.printDocument:hover {
+    background-color: #11A1A1;
+    border-color: #11A1A1;
+    color: white;
+}
+
 </style>
 
 </head>
 <body onload="window.print()">
 
 <div class="buttons no-print">
-    <button class="btn btn-success" onclick="window.print()">🖨️ Print Document</button>
-    <button class="btn btn-danger" onclick="window.close()">← Back</button>
+    <button class="btn btn-primary printDocument" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Document</button>
+    <button class="btn btn-secondary backButton" onclick="window.close()"><i class="fa-solid fa-arrow-left"></i> Back</button>
 </div>
 
 <?php if ($documentTypeID == 4) { ?>
