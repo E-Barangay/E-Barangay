@@ -4,7 +4,11 @@ include("../sharedAssets/connect.php");
 
 session_start();
 
-$userID = $_SESSION['userID'];
+if (!isset($_SESSION['userID'])) {
+    header("Location: login.php");
+} else {
+    $userID = $_SESSION['userID'];
+}
 
 $document = '';
 
@@ -120,15 +124,15 @@ $soloParentSinceDate = $_SESSION['soloParentSinceDate'] ?? '';
 if (isset($_POST['yes'])) {
     
     if ($documentTypeID == 2) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW())";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 8) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate) VALUES ($documentTypeID, $userID, '$purpose', NOW())";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 7) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW())";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 9) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW())";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW(), NULL, NULL, NULL, NULL)";
     } else {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, requestDate) VALUES ($documentTypeID, $userID, NOW())";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', NOW(), NULL, NULL, NULL, NULL)";
     }
 
     $documentRequestResult = executeQuery($documentRequestQuery);

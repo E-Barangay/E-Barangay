@@ -25,7 +25,11 @@ if (isset($_GET['content'])) {
     header("Location: ?content=allDocuments");
 }
 
-$userID = $_SESSION['userID'];
+if (!isset($_SESSION['userID'])) {
+    header("Location: login.php");
+} else {
+    $userID = $_SESSION['userID'];
+}
 
 $userQuery = "SELECT * FROM users 
             LEFT JOIN userInfo ON users.userID = userInfo.userID 
@@ -96,6 +100,24 @@ if (isset($_POST['proceedButton'])) {
     $_SESSION['soloParentSinceDate'] = $_POST['soloParentSinceDate'] ?? '';
     
     header("Location: documents/viewDocument.php?documentTypeID=$documentTypeID");
+    exit();
+}
+
+if (isset($_POST['confirmCancelButton'])) {
+    $documentID = $_POST['documentID'] ?? '';
+
+    $cancelRequestQuery = "UPDATE documents SET documentStatus = 'Cancelled', cancelledDate = NOW() WHERE documentID = $documentID";
+    $cancelRequestResult = executeQuery($cancelRequestQuery);
+    
+    header("Location: documents.php?content=documentRequest");
+    exit();
+} elseif (isset($_POST['restoreRequestButton'])) {
+    $documentID = $_POST['documentID'] ?? '';
+
+    $cancelRequestQuery = "UPDATE documents SET documentStatus = 'Pending', cancelledDate = NULL WHERE documentID = $documentID";
+    $cancelRequestResult = executeQuery($cancelRequestQuery);
+    
+    header("Location: documents.php?content=documentRequest");
     exit();
 }
 
@@ -207,6 +229,76 @@ if (isset($_POST['proceedButton'])) {
                     const newContent = doc.querySelector('#contentCard').innerHTML;
                     container.innerHTML = newContent;
                 });
+        });
+
+        var documentPage = 1;
+        var documentsPerPage = <?php echo $limit; ?>;
+        var totalDocumentPages = <?php echo $pages; ?>;
+
+        function goToDocumentPage(pageNumber) {
+            if (pageNumber >= 1 && pageNumber <= totalDocumentPages) {
+                documentPage = pageNumber;
+                updateDocumentPage();
+            }
+        }
+
+        function nextDocumentPage() {
+            if (documentPage < totalDocumentPages) {
+                documentPage += 1;
+                updateDocumentPage();
+            }
+        }
+
+        function previousDocumentPage() {
+            if (documentPage > 1) {
+                documentPage -= 1;
+                updateDocumentPage();
+            }
+        }
+
+        function updateDocumentPage() {
+            var allDocumentRows = document.querySelectorAll('tbody tr');
+            var startIndex = (documentPage - 1) * documentsPerPage;
+            var endIndex = documentPage * documentsPerPage;
+
+            for (var i = 0; i < allDocumentRows.length; i++) {
+                allDocumentRows[i].style.display = 'none';
+            }
+
+            for (var i = startIndex; i < endIndex && i < allDocumentRows.length; i++) {
+                allDocumentRows[i].style.display = '';
+            }
+
+            updateDocumentPagination();
+        }
+
+        function updateDocumentPagination() {
+            var paginationItems = document.getElementById('documentPagination').getElementsByClassName('page-item');
+
+            for (var i = 0; i < paginationItems.length - 2; i++) {
+                var pageNum = i + 1;
+                if (pageNum === documentPage) {
+                    paginationItems[i + 1].classList.add('active');
+                } else {
+                    paginationItems[i + 1].classList.remove('active');
+                }
+            }
+
+            if (documentPage === 1) {
+                paginationItems[0].classList.add('disabled');
+            } else {
+                paginationItems[0].classList.remove('disabled');
+            }
+
+            if (documentPage === totalDocumentPages) {
+                paginationItems[paginationItems.length - 1].classList.add('disabled');
+            } else {
+                paginationItems[paginationItems.length - 1].classList.remove('disabled');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            updateDocumentPage();
         });
     </script>
 
