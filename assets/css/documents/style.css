@@ -157,6 +157,71 @@ input.form-control:focus {
     color: white;
 }
 
+.restoreButton {
+    background-color: transparent;
+    border-color: #19AFA5;
+    color: #19AFA5;
+}
+
+.restoreButton:hover {
+    background-color: #19AFA5;
+    border-color: #19AFA5;
+    color: white;
+}
+
+.restoreRequestButton {
+    background-color: #19AFA5;
+    border: 1px solid #19AFA5;
+    color: white;
+}
+
+.restoreRequestButton:hover {
+    background-color: #11A1A1;
+    border: 1px solid #11A1A1;
+    color: white;
+}
+
+.previousButton .page-link {
+    color: white;
+    background-color: #19AFA5; 
+    border: 1px solid #19AFA5; 
+    border-radius: 12px 0 0 12px;
+    cursor: pointer;
+}
+
+.pageNumber .page-link {
+    width: 100%;
+    color: black;
+    background-color: transparent; 
+    border: 1px solid #19AFA5;
+    box-shadow: none;
+    white-space: nowrap;
+}
+
+.pageNumber.active .page-link {
+    background-color: #19AFA5; 
+    border: 1px solid #19AFA5;
+    color: white;
+    
+}
+
+.nextButton .page-link {
+    color: white;
+    background-color: #19AFA5; 
+    border: 1px solid #19AFA5; 
+    border-radius: 0 12px 12px 0;
+    cursor: pointer;
+}
+
+.previousButton.disabled .page-link,
+.nextButton.disabled .page-link {
+    background-color: transparent;
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;  
+}
+
 #scrollable {
     scrollbar-width: none;
     -ms-overflow-style: none;
