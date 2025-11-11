@@ -63,17 +63,29 @@ if (isset($_POST['save_announcement'])) {
 
 $search = $_GET['search'] ?? '';
 $dateFilter = $_GET['date'] ?? '';
+$currentPage = isset($_GET['pg']) ? (int) $_GET['pg'] : 1;
+$recordsPerPage = 20;
+$offset = ($currentPage - 1) * $recordsPerPage;
+
 $query = "SELECT * FROM announcements WHERE 1=1";
+$countQuery = "SELECT COUNT(*) as total FROM announcements WHERE 1=1";
 
 if (!empty($search)) {
   $search = mysqli_real_escape_string($conn, $search);
   $query .= " AND (title LIKE '%$search%' OR description LIKE '%$search%')";
+  $countQuery .= " AND (title LIKE '%$search%' OR description LIKE '%$search%')";
 }
 if (!empty($dateFilter)) {
   $dateFilter = mysqli_real_escape_string($conn, $dateFilter);
   $query .= " AND DATE(dateTime) = '$dateFilter'";
+  $countQuery .= " AND DATE(dateTime) = '$dateFilter'";
 }
-$query .= " ORDER BY announcementID DESC";
+
+$countResult = mysqli_query($conn, $countQuery);
+$totalRecords = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRecords / $recordsPerPage);
+
+$query .= " ORDER BY announcementID DESC LIMIT $recordsPerPage OFFSET $offset";
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -90,6 +102,11 @@ $result = mysqli_query($conn, $query);
     rel="stylesheet" />
 </head>
 <style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+  }
+
   .btn-custom {
     background-color: #31afab;
     color: #fff;
@@ -99,9 +116,32 @@ $result = mysqli_query($conn, $query);
     background-color: #279995;
     color: #fff;
   }
+
+  .card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: none;
+  }
+
+  .pagination .page-link {
+    color: #31afab;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #31afab;
+    border-color: #31afab;
+    color: white;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #e9f8f8;
+    color: #31afab;
+  }
 </style>
 
-<body style="font-family: 'Poppins', sans-serif; background-color: rgb(233,233,233);">
+<body>
   <div class="container-fluid p-3 p-md-4">
     <?php if (!empty($successMessage)): ?>
       <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -263,9 +303,68 @@ $result = mysqli_query($conn, $query);
                 </table>
               </div>
             </div>
+
+            <?php if ($totalPages > 1): ?>
+              <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="text-muted small">
+                    Showing <?= min($offset + 1, $totalRecords) ?> to <?= min($offset + $recordsPerPage, $totalRecords) ?>
+                    of <?= $totalRecords ?> entries
+                  </div>
+                  <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                      <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                        <a class="page-link"
+                          href="?page=announcement&pg=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>">
+                          <i class="fas fa-chevron-left"></i> Back
+                        </a>
+                      </li>
+
+                      <?php
+                      $startPage = max(1, $currentPage - 2);
+                      $endPage = min($totalPages, $currentPage + 2);
+
+                      if ($startPage > 1): ?>
+                        <li class="page-item">
+                          <a class="page-link"
+                            href="?page=announcement&pg=1&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>">1</a>
+                        </li>
+                        <?php if ($startPage > 2): ?>
+                          <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <?php endif; ?>
+                      <?php endif; ?>
+
+                      <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                        <li class="page-item <?= $i == $currentPage ? 'active' : '' ?>">
+                          <a class="page-link"
+                            href="?page=announcement&pg=<?= $i ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>"><?= $i ?></a>
+                        </li>
+                      <?php endfor; ?>
+
+                      <?php if ($endPage < $totalPages): ?>
+                        <?php if ($endPage < $totalPages - 1): ?>
+                          <li class="page-item disabled"><span class="page-link">...</span></li>
+                        <?php endif; ?>
+                        <li class="page-item">
+                          <a class="page-link"
+                            href="?page=announcement&pg=<?= $totalPages ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>"><?= $totalPages ?></a>
+                        </li>
+                      <?php endif; ?>
+
+                      <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                        <a class="page-link"
+                          href="?page=announcement&pg=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>">
+                          Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            <?php endif; ?>
           </div>
 
-          <!-- Mobile VIew -->
+          <!-- Mobile View -->
           <div class="d-lg-none">
             <?php
             if (isset($result) && mysqli_num_rows($result) > 0):
@@ -338,7 +437,49 @@ $result = mysqli_query($conn, $query);
                     </div>
                   </div>
                 </div>
-              <?php endwhile; else: ?>
+              <?php endwhile;
+              
+              // Mobile Pagination
+              if ($totalPages > 1): ?>
+                <div class="card shadow-sm mt-3">
+                  <div class="card-body">
+                    <div class="text-center text-muted small mb-2">
+                      Showing <?= min($offset + 1, $totalRecords) ?> to <?= min($offset + $recordsPerPage, $totalRecords) ?>
+                      of <?= $totalRecords ?> entries
+                    </div>
+                    <nav>
+                      <ul class="pagination pagination-sm justify-content-center mb-0">
+                        <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                          <a class="page-link"
+                            href="?page=announcement&pg=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>">
+                            <i class="fas fa-chevron-left"></i>
+                          </a>
+                        </li>
+
+                        <?php
+                        $startPage = max(1, $currentPage - 1);
+                        $endPage = min($totalPages, $currentPage + 1);
+
+                        for ($i = $startPage; $i <= $endPage; $i++): ?>
+                          <li class="page-item <?= $i == $currentPage ? 'active' : '' ?>">
+                            <a class="page-link"
+                              href="?page=announcement&pg=<?= $i ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>"><?= $i ?></a>
+                          </li>
+                        <?php endfor; ?>
+
+                        <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                          <a class="page-link"
+                            href="?page=announcement&pg=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>&date=<?= urlencode($dateFilter) ?>">
+                            <i class="fas fa-chevron-right"></i>
+                          </a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              <?php endif;
+              
+            else: ?>
               <div class="text-center py-5">
                 <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
                 <p class="text-muted">No announcements found.</p>
@@ -349,6 +490,7 @@ $result = mysqli_query($conn, $query);
       </div>
     </div>
 
+    <!-- Add Announcement Modal -->
     <div class="modal fade" id="addAnnouncementModal" tabindex="-1">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -397,6 +539,7 @@ $result = mysqli_query($conn, $query);
       </div>
     </div>
 
+    <!-- Image Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -450,7 +593,7 @@ $result = mysqli_query($conn, $query);
         this.querySelector('form').reset();
       });
     </script>
-
+  </div>
 </body>
 
 </html>
