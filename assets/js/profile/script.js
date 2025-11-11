@@ -863,72 +863,169 @@ fetch("assets/json/philippine_provinces_cities_municipalities_and_barangays_2019
 
 
 
-document.getElementById('lengthOfStay').addEventListener('input', function() {
-    const lengthInput = parseInt(this.value.replace(/\D/g, '')) || 0; 
-    const age = parseInt(document.getElementById('age').value) || 0;
+const birthDateInput = document.getElementById('birthDate');
+const ageInput = document.getElementById('age');
+const ageHiddenInput = document.getElementById('ageHidden');
+const lengthOfStayInput = document.getElementById('lengthOfStay');
 
-    if (lengthInput > age) {
-        this.value = age;
+function calculateAgeFromBirthDate() {
+    // If birth date is empty/cleared
+    if (!birthDateInput.value) {
+        ageInput.value = '';
+        ageHiddenInput.value = '';
+        lengthOfStayInput.value = ''; // Clear length of stay when no birth date
+        updateResidencyType(); // Update residency type when cleared
+        return;
     }
-});
+
+    const birthDate = new Date(birthDateInput.value);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    // Update visible disabled input
+    ageInput.value = age;
+
+    // Update hidden input for backend submission
+    ageHiddenInput.value = age;
+
+    // Adjust length of stay if it exceeds age
+    validateLengthOfStay();
+
+    // Update residency type after age calculation
+    updateResidencyType();
+}
+
+function validateLengthOfStay() {
+    const ageValue = ageInput.value;
+
+    // If age is empty or blank, clear length of stay
+    if (!ageValue || ageValue === '') {
+        lengthOfStayInput.value = '';
+        updateResidencyType(); // Update residency type when cleared
+        return;
+    }
+
+    const age = parseInt(ageValue) || 0;
+    const length = parseInt(lengthOfStayInput.value) || 0;
+
+    if (length > age) {
+        lengthOfStayInput.value = age;
+    }
+
+    // Update residency type after validation
+    updateResidencyType();
+}
+
+// Trigger live calculation on birthDate input change
+birthDateInput.addEventListener('input', calculateAgeFromBirthDate);
+
+// Also listen for change event (fires when calendar button clears the date)
+birthDateInput.addEventListener('change', calculateAgeFromBirthDate);
+
+// Validate length of stay when user changes it
+lengthOfStayInput.addEventListener('input', validateLengthOfStay);
+
+// Also validate on blur (when user leaves the field)
+lengthOfStayInput.addEventListener('blur', validateLengthOfStay);
 
 
 // ========== OCCUPATION FIELDS ==========
 const occupation = document.getElementById('occupation');
 const employedDiv = document.getElementById('employedDiv');
-const studentLevelDiv = document.getElementById('studentLevelDiv');
+const educationalLevelDiv = document.getElementById('educationalLevelDiv');
 const shsTrackDiv = document.getElementById('shsTrackDiv');
 const collegeCourseDiv = document.getElementById('collegeCourseDiv');
 const collegeYearDiv = document.getElementById('collegeYearDiv');
-const studentLevel = document.getElementById('studentLevel');
+const educationalLevel = document.getElementById('educationalLevel');
+const work = document.getElementById('work');
+const shsTrack = document.getElementById('shsTrack');
+const collegeCourse = document.getElementById('collegeCourse');
+const collegeYear = document.getElementById('collegeYear');
 
 // Function to update occupation-related fields visibility
-function updateOccupationFields() {
-    const occupationValue = occupation.value;
-    const studentLevelValue = studentLevel.value;
-    
+function updateOccupationFields(occupationVal = null, educationalLevelVal = null) {
+    const occupationValue = occupationVal || occupation.value;
+    const educationalLevelValue = educationalLevelVal || educationalLevel.value;
+
     // Reset all fields first
     employedDiv.style.display = 'none';
-    studentLevelDiv.style.display = 'none';
+    selfEmployedDiv.style.display = 'none';
+    educationalLevelDiv.style.display = 'none';
     shsTrackDiv.style.display = 'none';
     collegeCourseDiv.style.display = 'none';
     collegeYearDiv.style.display = 'none';
-    
+
     // Show fields based on occupation
     if (occupationValue === 'Employed') {
         employedDiv.style.display = 'block';
-    } else if (occupationValue === 'Student') {
-        studentLevelDiv.style.display = 'block';
-        
-        // Show nested student fields
-        if (studentLevelValue === 'Senior High School') {
+    }
+    else if (occupationValue === 'Self Employed') {
+        selfEmployedDiv.style.display = 'block';
+    }
+    else if (occupationValue === 'Student') {
+        educationalLevelDiv.style.display = 'block';
+
+        if (['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate'].includes(educationalLevelValue)) {
             shsTrackDiv.style.display = 'block';
-        } else if (studentLevelValue === 'College') {
+        }
+        else if (['College', 'College Undergraduate', 'College Graduate'].includes(educationalLevelValue)) {
             collegeCourseDiv.style.display = 'block';
             collegeYearDiv.style.display = 'block';
         }
     }
 }
 
-// Initial load - check if there are saved values
-updateOccupationFields();
 
-occupation.addEventListener('change', function() {
-    // Clear nested values when changing occupation
+// Wait for DOM load
+document.addEventListener('DOMContentLoaded', function () {
+    const savedOccupation = occupation.getAttribute('data-saved');
+    const savedEducationalLevel = educationalLevel.getAttribute('data-saved');
+    updateOccupationFields(savedOccupation, savedEducationalLevel);
+});
+
+// Event listeners (same as before)
+occupation.addEventListener('change', function () {
     if (this.value !== 'Student') {
-        studentLevel.value = '';
+        educationalLevel.value = '';
+        shsTrack.value = '';
+        collegeCourse.value = '';
+        collegeYear.value = '';
     }
     updateOccupationFields();
 });
 
-studentLevel.addEventListener('change', function() {
-    // Clear nested values when changing student level
-    if (this.value !== 'Senior High School') {
-        document.getElementById('shsTrack').value = '';
+educationalLevel.addEventListener('change', function () {
+    const isNotSeniorHigh = !['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate'].includes(this.value);
+    const isNotCollege = !['College', 'College Undergraduate', 'College Graduate'].includes(this.value);
+
+    if (isNotSeniorHigh) shsTrack.value = '';
+    if (isNotCollege) {
+        collegeCourse.value = '';
+        collegeYear.value = '';
     }
-    if (this.value !== 'College') {
-        document.getElementById('collegeCourse').value = '';
-        document.getElementById('collegeYear').value = '';
-    }
+
     updateOccupationFields();
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const educationalLevelValue = "<?php echo isset($educationalLevel) ? $educationalLevel : ''; ?>";
+
+
+    const collegeCourseDiv = document.getElementById("collegeCourseDiv");
+    const collegeYearDiv = document.getElementById("collegeYearDiv");
+    const shsTrackDiv = document.getElementById("shsTrackDiv");
+
+    if (educationalLevelValue.includes("college")) {
+        collegeCourseDiv.style.display = "block";
+        collegeYearDiv.style.display = "block";
+        document.getElementById("collegeCourse").disabled = false;
+        document.getElementById("collegeYear").disabled = false;
+    } else if (educationalLevelValue.includes("senior high")) {
+        shsTrackDiv.style.display = "block";
+        document.getElementById("shsTrack").disabled = false;
+    }
 });

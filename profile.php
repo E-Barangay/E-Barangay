@@ -75,11 +75,12 @@ $userInfoIDRow = mysqli_fetch_assoc($userInfoIDResult);
 
 $userInfoID = $userInfoIDRow['userInfoID'];
 
-$studentLevel = $userDataRow['studentLevel'] ?? '';
+$educationalLevel = $userDataRow['educationalLevel'] ?? '';
 $shsTrack = $userDataRow['shsTrack'] ?? '';
 $collegeCourse = $userDataRow['collegeCourse'] ?? '';
 $collegeYear = $userDataRow['collegeYear'] ?? '';
 $work = $userDataRow['work'] ?? '';
+$company = $userDataRow['company'] ?? '';
 
 $isProfileComplete = !(
     empty($firstName)
@@ -113,6 +114,15 @@ if (isset($_POST['saveButton'])) {
     $suffix = $_POST['suffix'];
     $gender = $_POST['gender'];
     $birthDate = $_POST['birthDate'];
+
+    $age = '';
+    if (!empty($birthDate)) {
+        $birthDateTime = new DateTime($birthDate);
+        $currentDate = new DateTime();
+        $ageYears = $currentDate->diff($birthDateTime)->y;
+        $age = $ageYears . ' ' . ($ageYears <= 1 ? 'year' : 'years') . ' old';
+    }
+
     $birthPlace = $_POST['birthPlace'];
     $bloodType = $_POST['bloodType'];
     $civilStatus = $_POST['civilStatus'];
@@ -143,26 +153,74 @@ if (isset($_POST['saveButton'])) {
     $permanentCityName = strtoupper($_POST['permanentCityName']);
     $permanentProvinceName = strtoupper($_POST['permanentProvinceName']);
 
+
+    $address = [
+        'blockLotNo' => $blockLotNo,
+        'phase' => $phase,
+        'subdivisionName' => $subdivisionName,
+        'purok' => $purok,
+        'streetName' => $streetName,
+        'barangayName' => $barangayName,
+        'cityName' => $cityName,
+        'provinceName' => $provinceName
+    ];
+
+    $permanentAddress = [
+        'blockLotNo' => $permanentBlockLotNo,
+        'phase' => $permanentPhase,
+        'subdivisionName' => $permanentSubdivisionName,
+        'purok' => $permanentPurok,
+        'streetName' => $permanentStreetName,
+        'barangayName' => $permanentBarangayName,
+        'cityName' => $permanentCityName,
+        'provinceName' => $permanentProvinceName
+    ];
+
+    $isSameAddress = ($address === $permanentAddress);
+    $ageNumeric = (int) filter_var($age, FILTER_SANITIZE_NUMBER_INT);
+    $lengthOfStayNumeric = (int) $lengthOfStay;
+
+    if ($ageNumeric === 0 || $lengthOfStayNumeric === 0) {
+        $residencyType = "";
+    } else if ($isSameAddress && $lengthOfStayNumeric >= $ageNumeric) {
+        $residencyType = "Bonafide";
+    } else if ($isSameAddress && $lengthOfStayNumeric !== $ageNumeric) {
+        $residencyType = "Migrant";
+    } else if (!$isSameAddress && $lengthOfStayNumeric !== $ageNumeric) {
+        $residencyType = "Transient";
+    } else {
+        $residencyType = "Foreign";
+    }
+
     $work = NULL;
-    $studentLevel = NULL;
+    $company = NULL;
+    $educationalLevel = NULL;
     $shsTrack = NULL;
     $collegeCourse = NULL;
     $collegeYear = NULL;
 
     if ($occupation === 'Employed') {
-        $work = isset($_POST['work']) && !empty($_POST['work'])
-            ? mysqli_real_escape_string($conn, $_POST['work'])
+        // For Employed, input is company name
+        $company = isset($_POST['employedWork']) && !empty($_POST['employedWork'])
+            ? mysqli_real_escape_string($conn, $_POST['employedWork'])
+            : NULL;
+    } else if ($occupation === 'Self Employed') {
+        // For Self Employed, input is type of work
+        $work = isset($_POST['selfEmployedWork']) && !empty($_POST['selfEmployedWork'])
+            ? mysqli_real_escape_string($conn, $_POST['selfEmployedWork'])
             : NULL;
     } else if ($occupation === 'Student') {
-        $studentLevel = isset($_POST['studentLevel']) && !empty($_POST['studentLevel'])
-            ? mysqli_real_escape_string($conn, $_POST['studentLevel'])
+        $educationalLevel = isset($_POST['educationalLevel']) && !empty($_POST['educationalLevel'])
+            ? mysqli_real_escape_string($conn, $_POST['educationalLevel'])
             : NULL;
 
-        if ($studentLevel === 'Senior High School') {
+        $levelLower = strtolower($educationalLevel);
+
+        if (strpos($levelLower, 'senior high') !== false) {
             $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
                 ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
                 : NULL;
-        } else if ($studentLevel === 'College') {
+        } else if (strpos($levelLower, 'college') !== false) {
             $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
                 ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
                 : NULL;
@@ -171,29 +229,30 @@ if (isset($_POST['saveButton'])) {
                 : NULL;
         }
     }
- 
+
     $updateUserInfoQuery = "UPDATE userInfo SET 
-                        firstName = '$firstName', 
-                        middleName = '$middleName', 
-                        lastName = '$lastName', 
-                        suffix = '$suffix', 
-                        gender = '$gender', 
-                        birthDate = '$birthDate', 
-                        age = '$age', 
-                        birthPlace = '$birthPlace',
-                        bloodType = '$bloodType', 
-                        civilStatus = '$civilStatus', 
-                        citizenship = '$citizenship', 
-                        occupation = '$occupation',
-                        work = " . ($work !== NULL ? "'$work'" : "NULL") . ",
-                        studentLevel = " . ($studentLevel !== NULL ? "'$studentLevel'" : "NULL") . ",
-                        shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
-                        collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
-                        collegeYear = " . ($collegeYear !== NULL ? $collegeYear : "NULL") . ",
-                        lengthOfStay = '$lengthOfStay', 
-                        residencyType = '$residencyType', 
-                        remarks = '$remarks'
-                        WHERE userID = $userID;";
+    firstName = '$firstName', 
+    middleName = '$middleName', 
+    lastName = '$lastName', 
+    suffix = '$suffix', 
+    gender = '$gender', 
+    birthDate = '$birthDate', 
+    age = '$age', 
+    birthPlace = '$birthPlace',
+    bloodType = '$bloodType', 
+    civilStatus = '$civilStatus', 
+    citizenship = '$citizenship', 
+    occupation = '$occupation',
+    work = " . ($work !== NULL ? "'$work'" : "NULL") . ",
+    company = " . ($company !== NULL ? "'$company'" : "NULL") . ",
+    educationalLevel = " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
+    shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
+    collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
+    collegeYear = " . ($collegeYear !== NULL ? $collegeYear : "NULL") . ",
+    lengthOfStay = '$lengthOfStay', 
+    residencyType = '$residencyType', 
+    remarks = '$remarks'
+    WHERE userID = $userID;";
     $updateUserInfoResult = executeQuery($updateUserInfoQuery);
 
     $updateUserContactQuery = "UPDATE users SET phoneNumber = '$phoneNumber', email = '$email' WHERE userID = $userID;";
@@ -306,7 +365,8 @@ if (isset($_POST['confirmButton'])) {
 
                                     <?php if (empty($userDataRow['profilePicture'])) { ?>
 
-                                        <img src="uploads/profiles/defaultProfile.png" class="profilePicture <?php echo ($incomplete && empty($profilePicture)) ? 'border border-warning' : ''; ?>"
+                                        <img src="uploads/profiles/defaultProfile.png"
+                                            class="profilePicture <?php echo ($incomplete && empty($profilePicture)) ? 'border border-warning' : ''; ?>"
                                             id="profilePreview" alt="Profile Picture">
 
                                         <label for="profilePictureInput" class="btn btn-primary addButton d-none"
@@ -358,7 +418,8 @@ if (isset($_POST['confirmButton'])) {
 
                                 </div>
 
-                                <input type="file" name="profilePicture" class="form-control d-none" id="profilePictureInput" accept="image/*">
+                                <input type="file" name="profilePicture" class="form-control d-none"
+                                    id="profilePictureInput" accept="image/*">
 
                                 <div class="d-flex flex-column pt-3 pt-md-0">
                                     <span class="fullName">
@@ -370,10 +431,13 @@ if (isset($_POST['confirmButton'])) {
                                     <span class="email text-muted"><?php echo $email ?></span>
                                 </div>
                             </div>
-                            <div class="col-lg-1 col-md-2 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
+                            <div
+                                class="col-lg-1 col-md-2 col-12 d-flex justify-content-center justify-content-md-end align-items-center pt-3 pt-md-0">
                                 <button class="btn btn-primary editButton" id="editButton" type="button">Edit</button>
-                                <button class="btn btn-secondary cancelButton d-none me-2" id="cancelButton" type="button">Cancel</button>
-                                <button class="btn btn-primary saveButton d-none" id="saveButton" type="submit" name="saveButton">Save</button>
+                                <button class="btn btn-secondary cancelButton d-none me-2" id="cancelButton"
+                                    type="button">Cancel</button>
+                                <button class="btn btn-primary saveButton d-none" id="saveButton" type="submit"
+                                    name="saveButton">Save</button>
                             </div>
                         </div>
 
@@ -387,19 +451,30 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-4 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($firstName)) ? 'border border-warning' : ''; ?>" id="firstNameInput" name="firstName" value="<?php echo $firstName ?>" placeholder="First Name" pattern="[A-Za-z\s]+" oninput="this.value=this.value.replace(/[^A-Za-z\s]/g,'')" disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($firstName)) ? 'border border-warning' : ''; ?>"
+                                        id="firstNameInput" name="firstName" value="<?php echo $firstName ?>"
+                                        placeholder="First Name" pattern="[A-Za-z\s]+"
+                                        oninput="this.value=this.value.replace(/[^A-Za-z\s]/g,'')" disabled>
                                     <label for="firstNameInput">First Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="middleNameInput" name="middleName" value="<?php echo $middleName ?>" placeholder="Middle Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text" class="form-control" id="middleNameInput" name="middleName"
+                                        value="<?php echo $middleName ?>" placeholder="Middle Name"
+                                        pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="middleNameInput">Middle Name</label>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-3 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($lastName)) ? 'border border-warning' : ''; ?>" id="lastNameInput" name="lastName" value="<?php echo $lastName ?>" placeholder="Last Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($lastName)) ? 'border border-warning' : ''; ?>"
+                                        id="lastNameInput" name="lastName" value="<?php echo $lastName ?>"
+                                        placeholder="Last Name" pattern="[A-Za-z\s]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" disabled>
                                     <label for="lastNameInput">Last Name</label>
                                 </div>
                             </div>
@@ -407,10 +482,13 @@ if (isset($_POST['confirmButton'])) {
                                 <div class="form-floating">
                                     <select class="form-select" id="suffix" name="suffix" disabled>
                                         <option value="" <?php echo empty($suffix) ? 'selected' : ''; ?>>Suffix</option>
-                                        <option value="Jr." <?php echo ($suffix === 'Jr.') ? 'selected' : ''; ?>>Jr.</option>
-                                        <option value="Sr." <?php echo ($suffix === 'Sr.') ? 'selected' : ''; ?>>Sr.</option>
+                                        <option value="Jr." <?php echo ($suffix === 'Jr.') ? 'selected' : ''; ?>>Jr.
+                                        </option>
+                                        <option value="Sr." <?php echo ($suffix === 'Sr.') ? 'selected' : ''; ?>>Sr.
+                                        </option>
                                         <option value="II" <?php echo ($suffix === 'II') ? 'selected' : ''; ?>>II</option>
-                                        <option value="III" <?php echo ($suffix === 'III') ? 'selected' : ''; ?>>III</option>
+                                        <option value="III" <?php echo ($suffix === 'III') ? 'selected' : ''; ?>>III
+                                        </option>
                                         <option value="IV" <?php echo ($suffix === 'IV') ? 'selected' : ''; ?>>IV</option>
                                         <option value="V" <?php echo ($suffix === 'V') ? 'selected' : ''; ?>>V</option>
                                     </select>
@@ -420,11 +498,17 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-2 col-md-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($gender)) ? 'border border-warning' : ''; ?>" id="gender" name="gender" disabled>
-                                        <option value="" disabled <?php echo empty($gender) ? 'selected' : ''; ?>>Choose Gender</option>
-                                        <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male</option>
-                                        <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
-                                        <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>Others</option>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($gender)) ? 'border border-warning' : ''; ?>"
+                                        id="gender" name="gender" disabled>
+                                        <option value="" disabled <?php echo empty($gender) ? 'selected' : ''; ?>>Choose
+                                            Gender</option>
+                                        <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male
+                                        </option>
+                                        <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>
+                                            Female</option>
+                                        <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>
+                                            Others</option>
                                     </select>
                                     <label for="gender">Gender</label>
                                 </div>
@@ -432,21 +516,29 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="date" class="form-control <?php echo ($incomplete && empty($birthDate)) ? 'border border-warning' : ''; ?>" id="birthDate" name="birthDate"value="<?php echo $birthDate ?>" placeholder="Date of Birth" disabled>
+                                    <input type="date"
+                                        class="form-control <?php echo ($incomplete && empty($birthDate)) ? 'border border-warning' : ''; ?>"
+                                        id="birthDate" name="birthDate" value="<?php echo $birthDate ?>"
+                                        placeholder="Date of Birth" disabled>
                                     <label for="birthDate">Date of Birth</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-2 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="age" name="age"value="<?php echo $age ?>" placeholder="Age" readonly disabled>
+                                    <input type="text" class="form-control" id="age" name="age"
+                                        value="<?php echo $age ?>" placeholder="Age" readonly disabled>
+                                    <input type="hidden" name="age" id="ageHidden" value="<?php echo $age ?>">
                                     <label for="age">Age</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($birthPlace)) ? 'border border-warning' : ''; ?>" id="birthPlace" name="birthPlace"value="<?php echo $birthPlace ?>" placeholder="Place of Birth" disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($birthPlace)) ? 'border border-warning' : ''; ?>"
+                                        id="birthPlace" name="birthPlace" value="<?php echo $birthPlace ?>"
+                                        placeholder="Place of Birth" disabled>
                                     <label for="birthPlace">Place of Birth</label>
                                 </div>
                             </div>
@@ -454,15 +546,24 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-2 col-md-3 col-6 mb-3">
                                 <div class="form-floating">
                                     <select class="form-select" id="bloodType" name="bloodType" disabled>
-                                        <option value="" disabled <?php echo empty($bloodType) ? 'selected' : ''; ?>>Choose Blood Type</option>
-                                        <option value="A+" <?php echo ($bloodType === 'A+') ? 'selected' : ''; ?>>A+</option>
-                                        <option value="A-" <?php echo ($bloodType === 'A-') ? 'selected' : ''; ?>>A-</option>
-                                        <option value="B+" <?php echo ($bloodType === 'B+') ? 'selected' : ''; ?>>B+</option>
-                                        <option value="B-" <?php echo ($bloodType === 'B-') ? 'selected' : ''; ?>>B-</option>
-                                        <option value="AB+" <?php echo ($bloodType === 'AB+') ? 'selected' : ''; ?>>AB+</option>
-                                        <option value="AB-" <?php echo ($bloodType === 'AB-') ? 'selected' : ''; ?>>AB-</option>
-                                        <option value="O+" <?php echo ($bloodType === 'O+') ? 'selected' : ''; ?>>O+</option>
-                                        <option value="O-" <?php echo ($bloodType === 'O-') ? 'selected' : ''; ?>>O-</option>
+                                        <option value="" disabled <?php echo empty($bloodType) ? 'selected' : ''; ?>>
+                                            Choose Blood Type</option>
+                                        <option value="A+" <?php echo ($bloodType === 'A+') ? 'selected' : ''; ?>>A+
+                                        </option>
+                                        <option value="A-" <?php echo ($bloodType === 'A-') ? 'selected' : ''; ?>>A-
+                                        </option>
+                                        <option value="B+" <?php echo ($bloodType === 'B+') ? 'selected' : ''; ?>>B+
+                                        </option>
+                                        <option value="B-" <?php echo ($bloodType === 'B-') ? 'selected' : ''; ?>>B-
+                                        </option>
+                                        <option value="AB+" <?php echo ($bloodType === 'AB+') ? 'selected' : ''; ?>>AB+
+                                        </option>
+                                        <option value="AB-" <?php echo ($bloodType === 'AB-') ? 'selected' : ''; ?>>AB-
+                                        </option>
+                                        <option value="O+" <?php echo ($bloodType === 'O+') ? 'selected' : ''; ?>>O+
+                                        </option>
+                                        <option value="O-" <?php echo ($bloodType === 'O-') ? 'selected' : ''; ?>>O-
+                                        </option>
                                     </select>
                                     <label for="bloodType">Blood Type</label>
                                 </div>
@@ -470,8 +571,11 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-4 col-6 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($civilStatus)) ? 'border border-warning' : ''; ?>" id="civilStatus" name="civilStatus" disabled>
-                                        <option value="" disabled <?php echo empty($civilStatus) ? 'selected' : ''; ?>>Choose Civil Status</option>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($civilStatus)) ? 'border border-warning' : ''; ?>"
+                                        id="civilStatus" name="civilStatus" disabled>
+                                        <option value="" disabled <?php echo empty($civilStatus) ? 'selected' : ''; ?>>
+                                            Choose Civil Status</option>
                                         <option value="Single" <?php echo ($civilStatus === 'Single') ? 'selected' : ''; ?>>Single</option>
                                         <option value="Married" <?php echo ($civilStatus === 'Married') ? 'selected' : ''; ?>>Married</option>
                                         <option value="Divorced" <?php echo ($civilStatus === 'Divorced') ? 'selected' : ''; ?>>Divorced</option>
@@ -484,8 +588,11 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-control <?php echo ($incomplete && empty($citizenship)) ? 'border border-warning' : ''; ?>" id="citizenship" name="citizenship" disabled>
-                                        <option value="" disabled <?php echo ($citizenship == '') ? 'selected' : ''; ?>>Select Citizenship</option>
+                                    <select
+                                        class="form-control <?php echo ($incomplete && empty($citizenship)) ? 'border border-warning' : ''; ?>"
+                                        id="citizenship" name="citizenship" disabled>
+                                        <option value="" disabled <?php echo ($citizenship == '') ? 'selected' : ''; ?>>
+                                            Select Citizenship</option>
                                         <option value="Filipino" <?php echo ($citizenship == 'Filipino') ? 'selected' : ''; ?>>Filipino</option>
                                         <option value="American" <?php echo ($citizenship == 'American') ? 'selected' : ''; ?>>American</option>
                                         <option value="Canadian" <?php echo ($citizenship == 'Canadian') ? 'selected' : ''; ?>>Canadian</option>
@@ -496,7 +603,8 @@ if (isset($_POST['confirmButton'])) {
                                         <option value="Indonesian" <?php echo ($citizenship == 'Indonesian') ? 'selected' : ''; ?>>Indonesian</option>
                                         <option value="Malaysian" <?php echo ($citizenship == 'Malaysian') ? 'selected' : ''; ?>>Malaysian</option>
                                         <option value="Singaporean" <?php echo ($citizenship == 'Singaporean') ? 'selected' : ''; ?>>Singaporean</option>
-                                        <option value="Thai" <?php echo ($citizenship == 'Thai') ? 'selected' : ''; ?>>Thai</option>
+                                        <option value="Thai" <?php echo ($citizenship == 'Thai') ? 'selected' : ''; ?>>
+                                            Thai</option>
                                         <option value="Vietnamese" <?php echo ($citizenship == 'Vietnamese') ? 'selected' : ''; ?>>Vietnamese</option>
                                         <option value="British" <?php echo ($citizenship == 'British') ? 'selected' : ''; ?>>British</option>
                                         <option value="Australian" <?php echo ($citizenship == 'Australian') ? 'selected' : ''; ?>>Australian</option>
@@ -513,9 +621,11 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-4 col-md-6 col-6 mb-3">
                                 <div class="form-floating">
                                     <select class="form-select" id="occupation" name="occupation" disabled>
-                                        <option value="" disabled <?php echo empty($occupation) ? 'selected' : ''; ?>>Select Occupation</option>
+                                        <option value="" disabled <?php echo empty($occupation) ? 'selected' : ''; ?>>
+                                            Select Occupation</option>
                                         <option value="Student" <?php echo ($occupation == 'Student') ? 'selected' : ''; ?>>Student</option>
                                         <option value="Employed" <?php echo ($occupation == 'Employed') ? 'selected' : ''; ?>>Employed</option>
+                                        <option value="Self Employed" <?php echo ($occupation == 'Self Employed') ? 'selected' : ''; ?>>Self Employed</option>
                                         <option value="Unemployed" <?php echo ($occupation == 'Unemployed') ? 'selected' : ''; ?>>Unemployed</option>
                                     </select>
                                     <label for="occupation">Occupation</label>
@@ -524,33 +634,71 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-4 col-md-6 col-6 mb-3" id="employedDiv" style="display:none;">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="work" name="work" placeholder="work" value="<?php echo isset($work) ? $work : ''; ?>" disabled>
-                                    <label for="work">Type Of Work</label>
+                                    <input type="text" class="form-control" id="employedWork" name="employedWork"
+                                        placeholder="Company Name"
+                                        value="<?php echo isset($company) ? htmlspecialchars($company) : ''; ?>"
+                                        disabled>
+                                    <label for="employedWork">Company Name</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="studentLevelDiv" style="display:none;">
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="selfEmployedDiv" style="display:none;">
                                 <div class="form-floating">
-                                    <select class="form-select" id="studentLevel" name="studentLevel" disabled>
-                                        <option value="" disabled <?php echo empty($studentLevel) ? 'selected' : ''; ?>>Select Level</option>
-                                        <option value="Elementary" <?php echo (isset($studentLevel) && $studentLevel == 'Elementary') ? 'selected' : ''; ?>>Elementary</option>
-                                        <option value="High School" <?php echo (isset($studentLevel) && $studentLevel == 'High School') ? 'selected' : ''; ?>>High School</option>
-                                        <option value="Senior High School" <?php echo (isset($studentLevel) && $studentLevel == 'Senior High School') ? 'selected' : ''; ?>>Senior High School</option>
-                                        <option value="College" <?php echo (isset($studentLevel) && $studentLevel == 'College') ? 'selected' : ''; ?>>College</option>
-                                    </select>
-                                    <label for="studentLevel">Student Level</label>
+                                    <input type="text" class="form-control" id="selfEmployedWork"
+                                        name="selfEmployedWork" placeholder="Type of Work"
+                                        value="<?php echo isset($work) ? $work : ''; ?>" disabled>
+                                    <label for="selfEmployedWork">Type of Work / Business</label>
                                 </div>
                             </div>
+
+
+
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="educationalLevelDiv" style="display:none;">
+                                <div class="form-floating">
+                                    <select class="form-control" id="educationalLevel" name="educationalLevel" disabled>
+                                        <option value="" disabled <?php echo empty($educationalLevel) ? 'selected' : ''; ?>>
+                                            Select Level
+                                        </option>
+
+                                        s
+                                        <option value="Elementary Undergraduate" <?php echo ($educationalLevel == 'Elementary Undergraduate') ? 'selected' : ''; ?>>Elementary Undergraduate</option>
+                                        <option value="Elementary Graduate" <?php echo ($educationalLevel == 'Elementary Graduate') ? 'selected' : ''; ?>>Elementary Graduate</option>
+
+                                        <!-- <option value="High School" <?php echo ($educationalLevel == 'High School') ? 'selected' : ''; ?>>High School</option> -->
+                                        <option value="High School Undergraduate" <?php echo ($educationalLevel == 'High School Undergraduate') ? 'selected' : ''; ?>>High School Undergraduate
+                                        </option>
+                                        <option value="High School Graduate" <?php echo ($educationalLevel == 'High School Graduate') ? 'selected' : ''; ?>>High School Graduate</option>
+
+                                        <!-- <option value="Senior High School" <?php echo ($educationalLevel == 'Senior High School') ? 'selected' : ''; ?>>Senior High School</option> -->
+                                        <option value="Senior High Undergraduate" <?php echo ($educationalLevel == 'Senior High Undergraduate') ? 'selected' : ''; ?>>Senior High Undergraduate
+                                        </option>
+                                        <option value="Senior High Graduate" <?php echo ($educationalLevel == 'Senior High Graduate') ? 'selected' : ''; ?>>Senior High Graduate</option>
+
+                                        <!-- <option value="College" <?php echo ($educationalLevel == 'College') ? 'selected' : ''; ?>>College</option> -->
+                                        <option value="College Undergraduate" <?php echo ($educationalLevel == 'College Undergraduate') ? 'selected' : ''; ?>>College Undergraduate</option>
+                                        <option value="College Graduate" <?php echo ($educationalLevel == 'College Graduate') ? 'selected' : ''; ?>>College Graduate</option>
+
+                                        <option value="ALS" <?php echo ($educationalLevel == 'ALS') ? 'selected' : ''; ?>>ALS
+                                        </option>
+                                        <option value="TESDA" <?php echo ($educationalLevel == 'TESDA') ? 'selected' : ''; ?>>
+                                            TESDA</option>
+                                    </select>
+                                    <label for="educationalLevel">Educational Level</label>
+                                </div>
+                            </div>
+
 
                             <div class="col-lg-4 col-md-6 col-6 mb-3" id="shsTrackDiv" style="display:none;">
                                 <div class="form-floating">
                                     <select class="form-select" id="shsTrack" name="shsTrack" disabled>
-                                        <option value="" disabled <?php echo empty($shsTrack) ? 'selected' : ''; ?>>Select Track</option>
+                                        <option value="" disabled <?php echo empty($shsTrack) ? 'selected' : ''; ?>>
+                                            Select Track</option>
                                         <option value="STEM" <?php echo (isset($shsTrack) && $shsTrack == 'STEM') ? 'selected' : ''; ?>>STEM</option>
                                         <option value="ABM" <?php echo (isset($shsTrack) && $shsTrack == 'ABM') ? 'selected' : ''; ?>>ABM</option>
                                         <option value="HUMMS" <?php echo (isset($shsTrack) && $shsTrack == 'HUMMS') ? 'selected' : ''; ?>>HUMMS</option>
                                         <option value="ICT" <?php echo (isset($shsTrack) && $shsTrack == 'ICT') ? 'selected' : ''; ?>>ICT</option>
                                         <option value="GAS" <?php echo (isset($shsTrack) && $shsTrack == 'GAS') ? 'selected' : ''; ?>>GAS</option>
+                                        <option value="TVL" <?php echo (isset($shsTrack) && $shsTrack == 'GAS') ? 'selected' : ''; ?>>TVL</option>
                                     </select>
                                     <label for="shsTrack">Senior High Track</label>
                                 </div>
@@ -571,21 +719,32 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-4 col-md-6 col-6 mb-3" id="collegeYearDiv" style="display:none;">
                                 <div class="form-floating">
-                                    <input type="number" class="form-control" id="collegeYear" name="collegeYear" min="1" max="5" placeholder="Year Level" value="<?php echo isset($collegeYear) ? $collegeYear : ''; ?>" disabled>
+                                    <input type="number" class="form-control" id="collegeYear" name="collegeYear"
+                                        min="1" max="5" placeholder="Year Level"
+                                        value="<?php echo isset($collegeYear) ? $collegeYear : ''; ?>" disabled>
                                     <label for="collegeYear">College Year Level</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($lengthOfStay)) ? 'border border-warning' : ''; ?>" id="lengthOfStay" name="lengthOfStay" value="<?php echo !empty($lengthOfStay) ? (int) $lengthOfStay . ((int) $lengthOfStay == 1 ? ' year' : ' years') : ''; ?>" placeholder="Length Of Stay (in years)" oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" min="0" onkeydown="return !['e','E','-','+','.',','].includes(event.key)" disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($lengthOfStay)) ? 'border border-warning' : ''; ?>"
+                                        id="lengthOfStay" name="lengthOfStay"
+                                        value="<?php echo !empty($lengthOfStay) ? (int) $lengthOfStay . ((int) $lengthOfStay == 1 ? ' year' : ' years') : ''; ?>"
+                                        placeholder="Length Of Stay (in years)"
+                                        oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" min="0"
+                                        onkeydown="return !['e','E','-','+','.',','].includes(event.key)" disabled>
                                     <label for="lengthOfStay">Length Of Stay (in years)</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($residencyType)) ? 'border border-warning' : ''; ?>" id="residencyType" name="residencyType" value="<?php echo $residencyType ?>" placeholder="Type of Residency" readonly disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($residencyType)) ? 'border border-warning' : ''; ?>"
+                                        id="residencyType" name="residencyType" value="<?php echo $residencyType ?>"
+                                        placeholder="Type of Residency" readonly disabled>
                                     <label for="residencyType">Type of Residency</label>
                                     <input type="hidden" id="residencyTypeHidden" name="residencyType">
                                 </div>
@@ -593,7 +752,9 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-7 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="remarks" name="remarks" value="<?php echo $remarks ?>" placeholder="Type of Residency" readonly disabled>
+                                    <input type="text" class="form-control" id="remarks" name="remarks"
+                                        value="<?php echo $remarks ?>" placeholder="Type of Residency" readonly
+                                        disabled>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
@@ -610,14 +771,23 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="tel" class="form-control <?php echo ($incomplete && empty($phoneNumber)) ? 'border border-warning' : ''; ?>" id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>" placeholder="Phone Number" inputmode="numeric" pattern="^09\d{9}$" maxlength="11" title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)" oninput="this.value = this.value.replace(/[^0-9]/g, '');" disabled>
+                                    <input type="tel"
+                                        class="form-control <?php echo ($incomplete && empty($phoneNumber)) ? 'border border-warning' : ''; ?>"
+                                        id="phoneNumber" name="phoneNumber" value="<?php echo $phoneNumber ?>"
+                                        placeholder="Phone Number" inputmode="numeric" pattern="^09\d{9}$"
+                                        maxlength="11"
+                                        title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)"
+                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" disabled>
                                     <label for="phoneNumber">Phone Number</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-6 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="email" class="form-control <?php echo ($incomplete && empty($email)) ? 'border border-warning' : ''; ?>" id="email" name="email" value="<?php echo $email ?>" placeholder="Email Address" disabled>
+                                    <input type="email"
+                                        class="form-control <?php echo ($incomplete && empty($email)) ? 'border border-warning' : ''; ?>"
+                                        id="email" name="email" value="<?php echo $email ?>" placeholder="Email Address"
+                                        disabled>
                                     <label for="email">Email Address</label>
                                 </div>
                             </div>
@@ -634,7 +804,10 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($provinceName)) ? 'border border-warning' : ''; ?>" id="province" name="provinceName" data-saved="<?php echo $provinceName; ?>" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($provinceName)) ? 'border border-warning' : ''; ?>"
+                                        id="province" name="provinceName" data-saved="<?php echo $provinceName; ?>"
+                                        disabled>
                                         <option value="<?php echo $provinceName; ?>" selected>
                                             <?php echo $provinceName ? $provinceName : 'Select Province'; ?>
                                         </option>
@@ -645,7 +818,9 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($cityName)) ? 'border border-warning' : ''; ?>" id="city" name="cityName" data-saved="<?php echo $cityName; ?>" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($cityName)) ? 'border border-warning' : ''; ?>"
+                                        id="city" name="cityName" data-saved="<?php echo $cityName; ?>" disabled>
                                         <option value="<?php echo $cityName; ?>" selected>
                                             <?php echo $cityName ? $cityName : 'Select City'; ?>
                                         </option>
@@ -656,7 +831,10 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($barangayName)) ? 'border border-warning' : ''; ?>" id="barangay" name="barangayName" data-saved="<?php echo $barangayName; ?>" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($barangayName)) ? 'border border-warning' : ''; ?>"
+                                        id="barangay" name="barangayName" data-saved="<?php echo $barangayName; ?>"
+                                        disabled>
                                         <option value="<?php echo $barangayName; ?>" selected>
                                             <?php echo $barangayName ? $barangayName : 'Select Barangay'; ?>
                                         </option>
@@ -669,35 +847,42 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="street" name="streetName" value="<?php echo $streetName ?>" placeholder="Street" disabled>
+                                    <input type="text" class="form-control" id="street" name="streetName"
+                                        value="<?php echo $streetName ?>" placeholder="Street" disabled>
                                     <label for="street">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo" value="<?php echo $blockLotNo ?>" placeholder="Block & Lot/House No." disabled>
+                                    <input type="text" class="form-control" id="blockLotNo" name="blockLotNo"
+                                        value="<?php echo $blockLotNo ?>" placeholder="Block & Lot/House No." disabled>
                                     <label for="blockLotNo">Block & Lot/House No.</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="phase" name="phase" value="<?php echo $phase ?>" placeholder="Phase" disabled>
+                                    <input type="text" class="form-control" id="phase" name="phase"
+                                        value="<?php echo $phase ?>" placeholder="Phase" disabled>
                                     <label for="phase">Phase</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="subdivision" name="subdivisionName" value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
+                                    <input type="text" class="form-control" id="subdivision" name="subdivisionName"
+                                        value="<?php echo $subdivisionName ?>" placeholder="Subdivision" disabled>
                                     <label for="subdivision">Subdivision</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($purok)) ? 'border border-warning' : ''; ?>" id="purok" name="purok" value="<?php echo $purok ?>" placeholder="Purok" disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($purok)) ? 'border border-warning' : ''; ?>"
+                                        id="purok" name="purok" value="<?php echo $purok ?>" placeholder="Purok"
+                                        disabled>
                                     <label for="purok">Purok</label>
                                 </div>
                             </div>
@@ -715,13 +900,17 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-12 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="sameAsCurrent" disabled>
-                                    <label class="form-check-label" for="sameAsCurrent">Use current address as the permanent address</label>
+                                    <label class="form-check-label" for="sameAsCurrent">Use current address as the
+                                        permanent address</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($permanentProvinceName)) ? 'border border-warning' : ''; ?>" id="permanentProvince" name="permanentProvinceName" data-saved="<?php echo $permanentProvinceName; ?>" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($permanentProvinceName)) ? 'border border-warning' : ''; ?>"
+                                        id="permanentProvince" name="permanentProvinceName"
+                                        data-saved="<?php echo $permanentProvinceName; ?>" disabled>
                                         <option value="<?php echo $permanentProvinceName; ?>" selected>
                                             <?php echo $permanentProvinceName ? $permanentProvinceName : 'Select Province'; ?>
                                         </option>
@@ -732,7 +921,10 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($permanentCityName)) ? 'border border-warning' : ''; ?>" id="permanentCity" name="permanentCityName" data-saved="<?php echo $permanentCityName; ?>" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($permanentCityName)) ? 'border border-warning' : ''; ?>"
+                                        id="permanentCity" name="permanentCityName"
+                                        data-saved="<?php echo $permanentCityName; ?>" disabled>
                                         <option value="<?php echo $permanentCityName; ?>" selected>
                                             <?php echo $permanentCityName ? $permanentCityName : 'Select City'; ?>
                                         </option>
@@ -743,7 +935,10 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select <?php echo ($incomplete && empty($permanentBarangayName)) ? 'border border-warning' : ''; ?>" id="permanentBarangay" name="permanentBarangayName" data-saved="<?php echo $permanentBarangayName; ?>" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($permanentBarangayName)) ? 'border border-warning' : ''; ?>"
+                                        id="permanentBarangay" name="permanentBarangayName"
+                                        data-saved="<?php echo $permanentBarangayName; ?>" disabled>
                                         <option value="<?php echo $permanentBarangayName; ?>" selected>
                                             <?php echo $permanentBarangayName ? $permanentBarangayName : 'Select Barangay'; ?>
                                         </option>
@@ -755,35 +950,45 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-6 col-12 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentStreet" name="permanentStreetName" value="<?php echo $permanentStreetName ?>" placeholder="Street" disabled>
+                                    <input type="text" class="form-control" id="permanentStreet"
+                                        name="permanentStreetName" value="<?php echo $permanentStreetName ?>"
+                                        placeholder="Street" disabled>
                                     <label for="permanentStreet">Street</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>" placeholder="Block & Lot/House No." disabled>
+                                    <input type="text" class="form-control" id="permanentBlockLotNo"
+                                        name="permanentBlockLotNo" value="<?php echo $permanentBlockLotNo ?>"
+                                        placeholder="Block & Lot/House No." disabled>
                                     <label for="permanentBlockLotNo">Block & Lot/House No.</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase" value="<?php echo $permanentPhase ?>" placeholder="Phase" disabled>
+                                    <input type="text" class="form-control" id="permanentPhase" name="permanentPhase"
+                                        value="<?php echo $permanentPhase ?>" placeholder="Phase" disabled>
                                     <label for="permanentPhase">Phase</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="permanentSubdivisionName" name="permanentSubdivisionName" value="<?php echo $permanentSubdivisionName ?>" placeholder="Subdivision" disabled>
+                                    <input type="text" class="form-control" id="permanentSubdivisionName"
+                                        name="permanentSubdivisionName" value="<?php echo $permanentSubdivisionName ?>"
+                                        placeholder="Subdivision" disabled>
                                     <label for="permanentSubdivisionName">Subdivision</label>
                                 </div>
                             </div>
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control <?php echo ($incomplete && empty($permanentPurok)) ? 'border border-warning' : ''; ?>" id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>" placeholder="Purok" disabled>
+                                    <input type="text"
+                                        class="form-control <?php echo ($incomplete && empty($permanentPurok)) ? 'border border-warning' : ''; ?>"
+                                        id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>"
+                                        placeholder="Purok" disabled>
                                     <label for="permanentPurok">Purok</label>
                                 </div>
                             </div>
