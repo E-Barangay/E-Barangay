@@ -16,31 +16,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                     style="width: 100%; height: 500px; object-fit: cover; pointer-events:none;" alt="Document">
                 <div class="mt-auto">
 
-                    <?php 
-
-                    $isProfileComplete = !(
-                        empty($userDataRow['firstName'])
-                        || empty($userDataRow['lastName'])
-                        || empty($userDataRow['gender'])
-                        || empty($userDataRow['birthDate'])
-                        || empty($userDataRow['birthPlace'])
-                        || empty($userDataRow['civilStatus'])
-                        || empty($userDataRow['citizenship'])
-                        || empty($userDataRow['lengthOfStay'])
-                        || empty($userDataRow['residencyType'])
-                        || empty($userDataRow['phoneNumber'])
-                        || empty($userDataRow['email'])
-                        || empty($userDataRow['purok'])
-                        || empty($userDataRow['barangayName'])
-                        || empty($userDataRow['cityName'])
-                        || empty($userDataRow['provinceName'])
-                        || empty($userDataRow['permanentPurok'])
-                        || empty($userDataRow['permanentBarangayName'])
-                        || empty($userDataRow['permanentCityName'])
-                        || empty($userDataRow['permanentProvinceName'])
-                    );
-
-                    if (!$isProfileComplete) { ?>
+                    <?php if (!$isProfileComplete) { ?>
                         
                         <form method="POST">
                             <button class="btn btn-primary documentButton mt-2" type="submit" name="documentButton">
@@ -93,7 +69,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                 </div>
 
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" value="<?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName  ?>" id="ownerAddress" name="ownerAddress" placeholder="Owner's Address" required readonly>
+                                    <input type="text" class="form-control" value="<?php echo implode(', ', array_filter([$blockLotNo, $phase, $subdivisionName, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?>" id="ownerAddress" name="ownerAddress" placeholder="Owner's Address" required readonly>
                                     <label for="ownerAddress">Owner's Address</label>
                                 </div>
 

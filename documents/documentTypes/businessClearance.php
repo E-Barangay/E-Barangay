@@ -16,7 +16,7 @@
                     <p style="color: black;"><strong>Business Name:</strong> <?php echo $businessName ?></p>
                     <p style="color: black;"><strong>Business Address:</strong> <?php echo $businessAddress ?></p>
                     <p style="color: black;"><strong>Owner's Name:</strong> <?php echo $fullName ?></p>
-                    <p style="color: black;"><strong>Owner's Address:</strong> <?php echo $streetName . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?></p>
+                    <p style="color: black;"><strong>Owner's Address:</strong> <?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?></p>
                     <p style="color: black;"><strong>Nature of Business:</strong> <?php echo $businessNature ?></p>
                     <p style="color: black;"><strong>Control No:</strong> <?php echo $controlNo ?></p>
                     <p style="color: black;"><strong>Purpose:</strong> <?php echo $purpose ?></p>

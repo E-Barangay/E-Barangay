@@ -33,7 +33,7 @@ if (!isset($_SESSION['userID'])) {
 
 $userQuery = "SELECT * FROM users 
             LEFT JOIN userInfo ON users.userID = userInfo.userID 
-            LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
+            LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID  
             LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
             WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
@@ -43,6 +43,7 @@ $firstName = $userDataRow['firstName'];
 $middleName = $userDataRow['middleName'];
 $lastName = $userDataRow['lastName'];
 $fullName = $firstName . " " . ($middleName ? $middleName[0] . ". " : "") . $lastName;
+$profilePicture = $userDataRow['profilePicture'];
 
 function formatAddress($value) {
     return ucwords(strtolower($value));
@@ -78,11 +79,35 @@ $documentsResult = executeQuery($documentsQuery);
 
 $searchDisplay = !empty($searchTerm) ? htmlspecialchars($searchTerm) : 'document';
 
+$isProfileComplete = !(
+    empty($firstName)
+    || empty($lastName)
+    || empty($profilePicture)
+    || empty($gender)
+    || empty($birthDate)
+    || empty($birthPlace)
+    || empty($civilStatus)
+    || empty($citizenship)
+    || empty($lengthOfStay)
+    || empty($residencyType)
+    || empty($phoneNumber)
+    || empty($email)
+    || empty($purok)
+    || empty($barangayName)
+    || empty($cityName)
+    || empty($provinceName)
+    || empty($permanentPurok)
+    || empty($permanentBarangayName)
+    || empty($permanentCityName)
+    || empty($permanentProvinceName)
+);
 
 if (isset($_POST['documentButton'])) {
-    $_SESSION['warning'] = 'incompleteInformation1';
-
-    header("Location: profile.php");
+    if (!$isProfileComplete) {
+        $_SESSION['warning'] = 'incompleteInformation1';
+        header("Location: profile.php");
+        exit;
+    }
 }
 
 if (isset($_POST['proceedButton'])) {
