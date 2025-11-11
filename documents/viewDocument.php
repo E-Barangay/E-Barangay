@@ -53,7 +53,7 @@ if (isset($_GET['documentTypeID'])) {
 $userQuery = "SELECT * FROM users 
             LEFT JOIN userInfo ON users.userID = userInfo.userID 
             LEFT JOIN documents ON users.userID = documents.userID
-            LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID  
+            LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID  
             LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
             WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);

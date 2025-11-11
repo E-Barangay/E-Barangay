@@ -6,7 +6,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong> , resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for <strong><?php echo $purpose ?></strong> located at the <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " . $provinceName ?></p>
+            <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong> , resident of Barangay San Antonio, City of Santo Tomas Batangas has the intention to construct their unit for <strong><?php echo $purpose ?></strong> located at the <?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?></p>
         </div>
     </div>
     <div class="row">
