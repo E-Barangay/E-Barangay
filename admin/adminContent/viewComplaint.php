@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveComplaint'])) {
 
   $fields = [
     'complaintStatus',
+    'complaintType',
     'complaintTitle',
     'complainantName',
     'complaintPhoneNumber',
@@ -54,6 +55,7 @@ $stmt = $conn->prepare("
       r.complaintID, 
       r.requestDate, 
       r.complaintStatus, 
+      r.complaintType,
       r.complaintTitle,
       COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), r.complainantName) AS complainantName,
       r.complaintVictim,
@@ -336,10 +338,20 @@ function getStatusBadgeClass($status)
                   </div>
 
                   <div class="mb-3">
+                    <label class="form-label"><strong>Change Dispute:</strong></label>
+                    <select name="complaintType" id="complaintType" class="form-select" required disabled>
+                      <option disabled>-- Select Type --</option>
+                      <?php foreach (['Criminal', 'Civil', 'Others'] as $st): ?>
+                        <option value="<?= $st ?>" <?= $complaint['complaintType'] == $st ? 'selected' : '' ?>><?= $st ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                  <div class="mb-3">
                     <label class="form-label"><strong>Change Status:</strong></label>
                     <select name="complaintStatus" id="complaintStatus" class="form-select" required disabled>
                       <option disabled>-- Select Status --</option>
-                      <?php foreach (['Criminal', 'Civil', 'Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
+                      <?php foreach (['Mediation', 'Conciliation', 'Arbitration', 'Repudiated', 'Withdrawn', 'Pending', 'Dismissed', 'Certified'] as $st): ?>
                         <option value="<?= $st ?>" <?= $complaint['complaintStatus'] == $st ? 'selected' : '' ?>><?= $st ?>
                         </option>
                       <?php endforeach; ?>
@@ -380,6 +392,7 @@ function getStatusBadgeClass($status)
     const cancelBtn = document.getElementById('cancelEditBtn');
     const editActions = document.getElementById('editActions');
     const statusDropdown = document.getElementById('complaintStatus');
+    const typeDropdown = document.getElementById('complaintType');
 
     function toggleEditMode(isEditing) {
       // Show/hide input fields
@@ -388,6 +401,7 @@ function getStatusBadgeClass($status)
 
       // Enable/disable the status dropdown
       if (statusDropdown) statusDropdown.disabled = !isEditing;
+      if (typeDropdown) typeDropdown.disabled = !isEditing;
 
       // Toggle action buttons
       editActions.classList.toggle('d-none', !isEditing);
