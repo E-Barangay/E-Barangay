@@ -16,27 +16,201 @@ let ageChart, genderChart, servicesBarChart, servicesLineChart, incidentPieChart
 
 function initCharts() {
     const ageCtx = document.getElementById('ageChart').getContext('2d');
-    ageChart = new Chart(ageCtx, { type: 'bar', data: { labels: ['0-12', '13-17', '18-59', '60+'], datasets: [{ label: 'Population', data: [0, 0, 0, 0], backgroundColor: ['#198754', '#6c757d', '#0d6efd', '#ffc107'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+    ageChart = new Chart(ageCtx, { 
+        type: 'bar', 
+        data: { 
+            labels: ['0-12', '13-17', '18-59', '60+'], 
+            datasets: [{ 
+                label: 'Population', 
+                data: [0, 0, 0, 0], 
+                backgroundColor: ['#198754', '#6c757d', '#0d6efd', '#ffc107'] 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Count: ' + context.parsed.y;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        } 
+    });
 
     const genderCtx = document.getElementById('genderChart').getContext('2d');
-    genderChart = new Chart(genderCtx, { type: 'doughnut', data: { labels: ['Male', 'Female'], datasets: [{ data: [0, 0], backgroundColor: ['#0d6efd', '#dc3545'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+    genderChart = new Chart(genderCtx, { 
+        type: 'doughnut', 
+        data: { 
+            labels: ['Male', 'Female', 'Not Specified'], 
+            datasets: [{ 
+                data: [0, 0, 0], 
+                backgroundColor: ['#0d6efd', '#dc3545', '#6c757d'] 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { 
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return label + ': ' + value + ' (' + percentage + '%)';
+                        }
+                    }
+                }
+            } 
+        } 
+    });
 
     const servicesBarCtx = document.getElementById('servicesBarChart').getContext('2d');
-    servicesBarChart = new Chart(servicesBarCtx, { type: 'bar', data: { labels: [], datasets: [{ label: 'Requests', data: [], backgroundColor: '#0d6efd' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+    servicesBarChart = new Chart(servicesBarCtx, { 
+        type: 'bar', 
+        data: { 
+            labels: [], 
+            datasets: [{ 
+                label: 'Requests', 
+                data: [], 
+                backgroundColor: '#0d6efd' 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } }, 
+            scales: { y: { beginAtZero: true } } 
+        } 
+    });
 
     const servicesLineCtx = document.getElementById('servicesLineChart').getContext('2d');
-    servicesLineChart = new Chart(servicesLineCtx, { type: 'line', data: { labels: [], datasets: [{ label: 'Monthly Requests', data: [], tension: 0.2, fill: true, backgroundColor: 'rgba(13,110,253,0.08)', borderColor: '#0d6efd' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+    servicesLineChart = new Chart(servicesLineCtx, { 
+        type: 'line', 
+        data: { 
+            labels: [], 
+            datasets: [{ 
+                label: 'Monthly Requests', 
+                data: [], 
+                tension: 0.2, 
+                fill: true, 
+                backgroundColor: 'rgba(13,110,253,0.08)', 
+                borderColor: '#0d6efd' 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } }, 
+            scales: { y: { beginAtZero: true } } 
+        } 
+    });
 
-    incidentPieChart = new Chart(document.getElementById('incidentPieChart'), { type: 'pie', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#0d6efd', '#6c757d'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+    incidentPieChart = new Chart(document.getElementById('incidentPieChart'), { 
+        type: 'pie', 
+        data: { 
+            labels: [], 
+            datasets: [{ 
+                data: [], 
+                backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#0d6efd', '#6c757d'] 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false 
+        } 
+    });
 
-    complaintDoughnutChart = new Chart(document.getElementById('complaintDoughnutChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ffc107', '#28a745', '#dc3545'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+    complaintDoughnutChart = new Chart(document.getElementById('complaintDoughnutChart'), { 
+        type: 'doughnut', 
+        data: { 
+            labels: [], 
+            datasets: [{ 
+                data: [], 
+                backgroundColor: ['#ffc107', '#28a745', '#dc3545'] 
+            }] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false 
+        } 
+    });
 
-    incidentTrendChart = new Chart(document.getElementById('incidentTrendChart'), { type: 'line', data: { labels: [], datasets: [{ label: 'New Incidents', data: [], borderColor: '#dc3545', tension: 0.2 }, { label: 'Resolved', data: [], borderColor: '#28a745', tension: 0.2 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
+    incidentTrendChart = new Chart(document.getElementById('incidentTrendChart'), { 
+        type: 'line', 
+        data: { 
+            labels: [], 
+            datasets: [
+                { 
+                    label: 'New Incidents', 
+                    data: [], 
+                    borderColor: '#dc3545', 
+                    tension: 0.2 
+                }, 
+                { 
+                    label: 'Resolved', 
+                    data: [], 
+                    borderColor: '#28a745', 
+                    tension: 0.2 
+                }
+            ] 
+        }, 
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            scales: { y: { beginAtZero: true } } 
+        } 
+    });
 }
 
-function getAgeGroup(age) {
-    if (!age || isNaN(Number(age))) return '60+';
-    age = Number(age);
+function calculateAgeFromBirthdate(birthDate) {
+    if (!birthDate) return null;
+    
+    const birth = new Date(birthDate);
+    if (isNaN(birth.getTime())) return null;
+    
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    
+    return age >= 0 ? age : null;
+}
+
+function getAgeGroup(ageValue, birthDate) {
+    // Try to use provided age first
+    let age = null;
+    
+    if (ageValue && !isNaN(Number(ageValue))) {
+        age = Number(ageValue);
+    } else if (birthDate) {
+        // Calculate from birthdate if age is not provided
+        age = calculateAgeFromBirthdate(birthDate);
+    }
+    
+    // If still no valid age, return null (don't include in chart)
+    if (age === null || age < 0) {
+        return null;
+    }
+    
     if (age <= 12) return '0-12';
     if (age <= 17) return '13-17';
     if (age <= 59) return '18-59';
@@ -44,17 +218,54 @@ function getAgeGroup(age) {
 }
 
 function updateDemographicCharts(data) {
+    console.log('Demographics data received:', data.length, 'records');
+    
     const ageGroups = { '0-12': 0, '13-17': 0, '18-59': 0, '60+': 0 };
-    const genderCount = { Male: 0, Female: 0 };
+    const genderCount = { Male: 0, Female: 0, 'Not Specified': 0 };
+    
+    let recordsWithAge = 0;
+    let recordsWithoutAge = 0;
+    
     data.forEach(u => {
-        const group = getAgeGroup(u.age);
-        ageGroups[group] = (ageGroups[group] || 0) + 1;
-        const g = (u.gender || '').toLowerCase();
-        if (/female/i.test(g)) genderCount.Female++; else genderCount.Male++;
+        // Age grouping - only count if age exists
+        const group = getAgeGroup(u.age, u.birthDate);
+        if (group !== null) {
+            ageGroups[group] = (ageGroups[group] || 0) + 1;
+            recordsWithAge++;
+        } else {
+            recordsWithoutAge++;
+        }
+        
+        // Gender counting - count everyone
+        const g = (u.gender || '').toLowerCase().trim();
+        if (g && (g.includes('male') && !g.includes('female'))) {
+            genderCount.Male++;
+        } else if (g && g.includes('female')) {
+            genderCount.Female++;
+        } else {
+            genderCount['Not Specified']++;
+        }
     });
-    ageChart.data.datasets[0].data = [ageGroups['0-12'], ageGroups['13-17'], ageGroups['18-59'], ageGroups['60+']];
+    
+    console.log('Age distribution:', ageGroups);
+    console.log('Records with age:', recordsWithAge);
+    console.log('Records without age (excluded from chart):', recordsWithoutAge);
+    console.log('Gender distribution:', genderCount);
+    
+    // Update age chart - only 4 categories, no "No Age Data"
+    ageChart.data.datasets[0].data = [
+        ageGroups['0-12'], 
+        ageGroups['13-17'], 
+        ageGroups['18-59'], 
+        ageGroups['60+']
+    ];
     ageChart.update();
-    genderChart.data.datasets[0].data = [genderCount.Male, genderCount.Female];
+    
+    genderChart.data.datasets[0].data = [
+        genderCount.Male, 
+        genderCount.Female,
+        genderCount['Not Specified']
+    ];
     genderChart.update();
 }
 
@@ -124,7 +335,11 @@ function processComplaintsData(rows) {
     return {
         types,
         statusMap,
-        monthly: { labels: formatMonthLabelsOrdered(monthlyIncidents).labels, incidents: formatMonthLabelsOrdered(monthlyIncidents).data, resolved: formatMonthLabelsOrdered(monthlyResolved).data },
+        monthly: { 
+            labels: formatMonthLabelsOrdered(monthlyIncidents).labels, 
+            incidents: formatMonthLabelsOrdered(monthlyIncidents).data, 
+            resolved: formatMonthLabelsOrdered(monthlyResolved).data 
+        },
         summary: { total, primaryCriminal, resolved, escalated, vawc }
     };
 }
@@ -160,16 +375,30 @@ async function fetchJSON(url) {
 let currentServicesData = [], currentComplaintsData = [], currentDemographicsData = [];
 
 async function loadInitialData() {
-    const demUrl = API_BASE + "getDemographics.php";
-    const docsUrl = API_BASE + "getDocuments.php";
-    const compUrl = API_BASE + "getComplaints.php";
-    const [dem, docs, comps] = await Promise.all([fetchJSON(demUrl), fetchJSON(docsUrl), fetchJSON(compUrl)]);
-    currentDemographicsData = dem || [];
-    currentServicesData = docs || [];
-    currentComplaintsData = comps || [];
-    updateDemographicCharts(currentDemographicsData);
-    updateServicesCharts(currentServicesData);
-    updateIncidentCharts(currentComplaintsData);
+    try {
+        const demUrl = API_BASE + "getDemographics.php";
+        const docsUrl = API_BASE + "getDocuments.php";
+        const compUrl = API_BASE + "getComplaints.php";
+        
+        const [dem, docs, comps] = await Promise.all([
+            fetchJSON(demUrl), 
+            fetchJSON(docsUrl), 
+            fetchJSON(compUrl)
+        ]);
+        
+        currentDemographicsData = dem || [];
+        currentServicesData = docs || [];
+        currentComplaintsData = comps || [];
+        
+        console.log('Loaded demographics:', currentDemographicsData.length);
+        
+        updateDemographicCharts(currentDemographicsData);
+        updateServicesCharts(currentServicesData);
+        updateIncidentCharts(currentComplaintsData);
+    } catch (error) {
+        console.error('Error loading initial data:', error);
+        alert('Failed to load initial data. Please refresh the page.');
+    }
 }
 
 function ensureDateInputsDefault() {
@@ -188,7 +417,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     ensureDateInputsDefault();
 
     await loadInitialData();
-
 
     document.getElementById('filterServicesBtn').addEventListener('click', async function () {
         const from = document.getElementById('servicesFromDate').value;
@@ -252,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     document.getElementById('documentExportModal').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('documentTypeSelect').value = "First Time Job Seeker";
+        document.getElementById('documentTypeSelect').value = "All";
     });
 
     document.getElementById('incidentsCsvBtn').addEventListener('click', function (e) {
@@ -261,6 +489,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const to = document.getElementById('incidentToDate').value;
         window.location = EXPORT_BASE + `exportComplaintsCSV.php?from=${from}&to=${to}`;
     });
+    
     document.getElementById('incidentsPrintBtn').addEventListener('click', function (e) {
         e.preventDefault();
         const from = document.getElementById('incidentFromDate').value;
@@ -271,7 +500,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('exportDemographicsBtn').addEventListener('click', function () {
         let rows = currentDemographicsData || [];
         if (!rows.length) return alert('No demographics data to export.');
-        rows = rows.sort((a, b) => a.lastName.localeCompare(b.lastName, 'en', { sensitivity: 'base' }));
+        
+        // Sort by last name
+        rows = rows.sort((a, b) => {
+            const lastA = (a.lastName || '').toLowerCase();
+            const lastB = (b.lastName || '').toLowerCase();
+            return lastA.localeCompare(lastB, 'en', { sensitivity: 'base' });
+        });
 
         const ws = [[
             'Last Name', 'First Name', 'Middle Name', 'Suffix', 'Gender',
@@ -280,29 +515,66 @@ document.addEventListener('DOMContentLoaded', async function () {
             'Remarks', 'Address'
         ]];
 
-        rows.forEach(r => ws.push([
-            r.lastName || '',
-            r.firstName || '',
-            r.middleName || '',
-            r.suffix || '',
-            r.gender || '',
-            r.birthDate || '',
-            r.age || '',
-            r.birthPlace || '',
-            r.bloodType || '',
-            r.civilStatus || '',
-            r.citizenship || '',
-            r.occupation || '',
-            r.lengthOfStay || '',
-            r.residencyType || '',
-            r.remarks || '',
-            r.address || ''
-        ]));
+        rows.forEach(r => {
+            // Calculate age if missing but birthdate exists
+            let displayAge = r.age || '';
+            if (!displayAge && r.birthDate) {
+                const calcAge = calculateAgeFromBirthdate(r.birthDate);
+                if (calcAge !== null) {
+                    displayAge = calcAge;
+                }
+            }
+            
+            ws.push([
+                r.lastName || '',
+                r.firstName || '',
+                r.middleName || '',
+                r.suffix || '',
+                r.gender || '',
+                r.birthDate || '',
+                displayAge,
+                r.birthPlace || '',
+                r.bloodType || '',
+                r.civilStatus || '',
+                r.citizenship || '',
+                r.occupation || '',
+                r.lengthOfStay || '',
+                r.residencyType || '',
+                r.remarks || '',
+                r.address || ''
+            ]);
+        });
 
         const wb = XLSX.utils.book_new();
         const wsSheet = XLSX.utils.aoa_to_sheet(ws);
+        
+        // Auto-size columns
+        const colWidths = [
+            { wch: 15 }, // Last Name
+            { wch: 15 }, // First Name
+            { wch: 15 }, // Middle Name
+            { wch: 8 },  // Suffix
+            { wch: 10 }, // Gender
+            { wch: 12 }, // Birth Date
+            { wch: 6 },  // Age
+            { wch: 20 }, // Birth Place
+            { wch: 10 }, // Blood Type
+            { wch: 12 }, // Civil Status
+            { wch: 12 }, // Citizenship
+            { wch: 20 }, // Occupation
+            { wch: 12 }, // Length Of Stay
+            { wch: 15 }, // Residency Type
+            { wch: 20 }, // Remarks
+            { wch: 40 }  // Address
+        ];
+        wsSheet['!cols'] = colWidths;
+        
         XLSX.utils.book_append_sheet(wb, wsSheet, 'Demographics');
-        XLSX.writeFile(wb, 'Barangay_Demographics.xlsx');
+        
+        const date = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `Barangay_Demographics_${date}.xlsx`);
+        
+        console.log('Exported', rows.length, 'demographic records');
     });
 
 });

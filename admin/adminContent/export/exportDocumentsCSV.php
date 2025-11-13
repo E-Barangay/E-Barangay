@@ -123,7 +123,7 @@ echo '<?xml version="1.0"?>
     <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
    </Borders>
    <Font ss:FontName="Arial" ss:Size="9" ss:Bold="1"/>
-   <Interior ss:Color="#FFA500" ss:Pattern="Solid"/>
+   <Interior ss:Color="#31afab" ss:Pattern="Solid"/>
   </Style>
   <Style ss:ID="DataCell">
    <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>

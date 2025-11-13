@@ -135,7 +135,7 @@ echo '<?xml version="1.0"?>
     <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
    </Borders>
    <Font ss:FontName="Arial" ss:Size="10" ss:Bold="1"/>
-   <Interior ss:Color="#C6E0B4" ss:Pattern="Solid"/>
+   <Interior ss:Color="#FFC7CE" ss:Pattern="Solid"/>
   </Style>
   <Style ss:ID="s64">
    <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
