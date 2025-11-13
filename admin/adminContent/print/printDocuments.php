@@ -28,7 +28,6 @@ if (!empty($whereClauses))
 
 $documentTypeName = ($type && strtoupper($type) !== "ALL") ? $type : "ALL DOCUMENT TYPES";
 
-// Query for First Time Job Seeker
 $query = "
   SELECT 
     userinfo.lastName,
@@ -37,10 +36,9 @@ $query = "
     userinfo.age,
     userinfo.gender,
     userinfo.birthDate,
-    userinfo.studentLevel,
+    userinfo.educationalLevel,
     userinfo.shsTrack,
     userinfo.collegeCourse,
-    userinfo.collegeYear,
     userinfo.outOfSchoolYouth
   FROM userinfo
   INNER JOIN documents ON userinfo.userID = documents.userID
@@ -49,7 +47,6 @@ $query = "
   ORDER BY userinfo.lastName ASC, userinfo.firstName ASC
 ";
 
-// Query for All Document Types
 $servicesQuery = "
     SELECT 
         documents.documentID,
@@ -126,7 +123,7 @@ if ($from && $to) {
       padding: 3px;
     }
     .table thead th {
-      background-color: #f4a460 !important;
+      background-color: #31afab !important;
       color: #000;
       font-weight: bold;
       text-transform: uppercase;
@@ -206,15 +203,14 @@ if ($from && $to) {
           $gender = strtolower($r['gender'] ?? '');
           $isMale = strpos($gender, 'male') !== false && strpos($gender, 'female') === false;
           $isFemale = strpos($gender, 'female') !== false;
-          $studentLevel = strtolower($r['studentLevel'] ?? '');
+          $educationalLevel = strtolower($r['educationalLevel'] ?? '');
           
-          // Convert student level to code
           $levelCode = '';
-          if ($studentLevel === 'elementary') {
+          if ($educationalLevel === 'elementary') {
             $levelCode = 'ELEM';
-          } elseif ($studentLevel === 'high school') {
+          } elseif ($educationalLevel === 'high school') {
             $levelCode = 'HS';
-          } elseif ($studentLevel === 'shs' || $studentLevel === 'senior high school') {
+          } elseif ($educationalLevel === 'shs' || $educationalLevel === 'senior high school') {
             $levelCode = 'SHS';
           }
         ?>
@@ -229,7 +225,7 @@ if ($from && $to) {
           <td><?= $isMale ? '✓' : '' ?></td>
           <td><?= $isFemale ? '✓' : '' ?></td>
           <td><?= $levelCode ?></td>
-          <td><?= ($studentLevel === 'college') ? '✓' : '' ?></td>
+          <td><?= ($educationalLevel === 'college') ? '✓' : '' ?></td>
           <td><?= htmlspecialchars($r['collegeCourse'] ?? '') ?></td>
           <td><?= ($r['outOfSchoolYouth'] == 1) ? '✓' : '' ?></td>
         </tr>
@@ -241,7 +237,6 @@ if ($from && $to) {
   </table>
 </div>
 <?php else: ?>
-<!-- Table for ALL DOCUMENT TYPES -->
 <div class="table-responsive">
   <table class="table table-bordered align-middle table-all">
     <thead>

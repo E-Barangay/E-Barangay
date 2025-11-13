@@ -221,10 +221,10 @@ $estimatedSavings = $settledTotal * 15000;
           <table class="kp-table" style="border:1px solid #000;">
             <thead>
               <tr>
-                <th rowspan="3" style="width:80px; background:#ffc7ce; font-weight:bold;">PROVINCE<br>CITY<br>(1)</th>
-                <th rowspan="3" style="width:40px; background:#ffc7ce; font-weight:bold;">C/M</th>
+                <th rowspan="3" style="width:80px; font-weight:bold;">PROVINCE<br>CITY<br>(1)</th>
+                <th rowspan="3" style="width:40px; font-weight:bold;">C/M</th>
 
-                <th colspan="4" class="wrap-center" style="background:#c6e0b4; font-weight:bold;">NATURE OF DISPUTE (2)
+                <th colspan="4" class="wrap-center" style="background:#ffc7ce; font-weight:bold;">NATURE OF DISPUTE (2)
                 </th>
 
                 <th colspan="4" class="wrap-center" style="background:#bdd7ee; font-weight:bold;">SETTLED CASES (3)</th>
@@ -232,18 +232,18 @@ $estimatedSavings = $settledTotal * 15000;
                 <th colspan="7" class="wrap-center" style="background:#e2efda; font-weight:bold;">UNSETTLED CASES (4)
                 </th>
 
-                <th rowspan="3" style="width:90px; background:#ffc7ce; font-weight:bold;">REFERRED
+                <th rowspan="3" style="width:90px; background:#e2efda; font-weight:bold;">REFERRED
                   TO<br>CONCERNED<br>AGENCY<br>(4g)</th>
-                <th rowspan="3" style="width:60px; background:#ffc7ce; font-weight:bold;">TOTAL<br>(4g)</th>
-                <th rowspan="3" style="width:110px; background:#ffc7ce; font-weight:bold;">ESTIMATED<br>GOVT<br>SAVINGS
+                <th rowspan="3" style="width:60px; background:#e2efda; font-weight:bold;">TOTAL<br>(4g)</th>
+                <th rowspan="3" style="width:110px; background:#e2efda; font-weight:bold;">ESTIMATED<br>GOVT<br>SAVINGS
                 </th>
               </tr>
 
               <tr>
-                <th style="background:#c6e0b4; font-weight:bold;">CRIMINAL<br>(2a)</th>
-                <th style="background:#c6e0b4; font-weight:bold;">CIVIL<br>(2b)</th>
-                <th style="background:#c6e0b4; font-weight:bold;">OTHERS<br>(2c)</th>
-                <th style="background:#c6e0b4; font-weight:bold;">TOTAL<br>(2d)</th>
+                <th style="background:#ffc7ce; font-weight:bold;">CRIMINAL<br>(2a)</th>
+                <th style="background:#ffc7ce; font-weight:bold;">CIVIL<br>(2b)</th>
+                <th style="background:#ffc7ce; font-weight:bold;">OTHERS<br>(2c)</th>
+                <th style="background:#ffc7ce; font-weight:bold;">TOTAL<br>(2d)</th>
 
                 <th style="background:#bdd7ee; font-weight:bold;">MEDIATION<br>(3a)</th>
                 <th style="background:#bdd7ee; font-weight:bold;">CONCILIATION<br>(3b)</th>
@@ -260,10 +260,10 @@ $estimatedSavings = $settledTotal * 15000;
               </tr>
 
               <tr>
-                <th style="background:#c6e0b4;">&nbsp;</th>
-                <th style="background:#c6e0b4;">&nbsp;</th>
-                <th style="background:#c6e0b4;">&nbsp;</th>
-                <th style="background:#c6e0b4;">&nbsp;</th>
+                <th style="background:#ffc7ce;">&nbsp;</th>
+                <th style="background:#ffc7ce;">&nbsp;</th>
+                <th style="background:#ffc7ce;">&nbsp;</th>
+                <th style="background:#ffc7ce;">&nbsp;</th>
 
                 <th style="background:#bdd7ee;">&nbsp;</th>
                 <th style="background:#bdd7ee;">&nbsp;</th>
