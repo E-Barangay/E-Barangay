@@ -199,7 +199,6 @@ $result = mysqli_query($conn, $query);
             </div>
           </div>
 
-          <!-- Desktop Table -->
           <div class="card shadow-sm d-none d-lg-block">
             <div class="card-body p-0">
               <div class="table-responsive">
@@ -364,7 +363,6 @@ $result = mysqli_query($conn, $query);
             <?php endif; ?>
           </div>
 
-          <!-- Mobile View -->
           <div class="d-lg-none">
             <?php
             if (isset($result) && mysqli_num_rows($result) > 0):
@@ -439,7 +437,6 @@ $result = mysqli_query($conn, $query);
                 </div>
               <?php endwhile;
               
-              // Mobile Pagination
               if ($totalPages > 1): ?>
                 <div class="card shadow-sm mt-3">
                   <div class="card-body">
@@ -490,7 +487,6 @@ $result = mysqli_query($conn, $query);
       </div>
     </div>
 
-    <!-- Add Announcement Modal -->
     <div class="modal fade" id="addAnnouncementModal" tabindex="-1">
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -539,7 +535,6 @@ $result = mysqli_query($conn, $query);
       </div>
     </div>
 
-    <!-- Image Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-3">

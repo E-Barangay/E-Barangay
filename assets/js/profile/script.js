@@ -135,18 +135,6 @@ saveButton.addEventListener('click', function (e) {
     let hasError = false;
     let errorMessages = [];
 
-    // // Check current address
-    // if (!province || !city || !barangay) {
-    //     errorMessages.push('Please fill in all address fields (Province, City, Barangay).');
-    //     hasError = true;
-    // }
-
-    // // Check permanent address
-    // if (!permanentProvince || !permanentCity || !permanentBarangay) {
-    //     errorMessages.push('Please fill in all permanent address fields (Province, City, Barangay).');
-    //     hasError = true;
-    // }
-
     if (hasError) {
         e.preventDefault();
 
@@ -229,17 +217,26 @@ function updateResidencyType() {
 
     var isSameAddress = Object.keys(address).every(key => address[key] === permanentAddress[key]);
 
-    if (age === 0 || lengthOfStay === 0) {
-        residencyType = "";
-    } else if (isSameAddress && lengthOfStay >= age) {
-        residencyType = "Bonafide";
-    } else if (isSameAddress && lengthOfStay !== age) {
-        residencyType = "Migrant";
-    } else if (!isSameAddress && lengthOfStay !== age) {
-        residencyType = "Transient";
-    } else {
+    var citizenshipInput = document.getElementById("citizenship");
+    var citizenship = citizenshipInput ? (citizenshipInput.value || "") : "";
+    citizenship = citizenship.toString().toUpperCase(); // safe
+
+    if (citizenship.toUpperCase() !== "FILIPINO") {
         residencyType = "Foreign";
+    } else {
+        if (lengthOfStay === age) {
+            residencyType = "Bonafide";
+        } else if (lengthOfStay >= 3) {
+            residencyType = "Migrant";
+        } else if (lengthOfStay <= 2) {
+            residencyType = "Transient";
+        } else {
+            residencyType = "";
+        }
     }
+
+
+
 
     document.getElementById("residencyType").value = residencyType;
     document.getElementById("residencyTypeHidden").value = residencyType;
@@ -933,99 +930,99 @@ lengthOfStayInput.addEventListener('input', validateLengthOfStay);
 lengthOfStayInput.addEventListener('blur', validateLengthOfStay);
 
 
-// ========== OCCUPATION FIELDS ==========
-const occupation = document.getElementById('occupation');
-const employedDiv = document.getElementById('employedDiv');
-const educationalLevelDiv = document.getElementById('educationalLevelDiv');
+// ========== EDUCATIONAL LEVEL FIELDS ==========
+const educationalLevel = document.getElementById('educationalLevel');
 const shsTrackDiv = document.getElementById('shsTrackDiv');
 const collegeCourseDiv = document.getElementById('collegeCourseDiv');
-const collegeYearDiv = document.getElementById('collegeYearDiv');
-const educationalLevel = document.getElementById('educationalLevel');
-const work = document.getElementById('work');
+
 const shsTrack = document.getElementById('shsTrack');
 const collegeCourse = document.getElementById('collegeCourse');
-const collegeYear = document.getElementById('collegeYear');
 
-// Function to update occupation-related fields visibility
-function updateOccupationFields(occupationVal = null, educationalLevelVal = null) {
-    const occupationValue = occupationVal || occupation.value;
+function updateEducationalFields(educationalLevelVal = null) {
     const educationalLevelValue = educationalLevelVal || educationalLevel.value;
 
-    // Reset all fields first
-    employedDiv.style.display = 'none';
-    selfEmployedDiv.style.display = 'none';
-    educationalLevelDiv.style.display = 'none';
+    // Hide all by default
     shsTrackDiv.style.display = 'none';
     collegeCourseDiv.style.display = 'none';
-    collegeYearDiv.style.display = 'none';
 
-    // Show fields based on occupation
-    if (occupationValue === 'Employed') {
-        employedDiv.style.display = 'block';
+    // Senior High fields
+    if (
+        ['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate']
+            .includes(educationalLevelValue)
+    ) {
+        shsTrackDiv.style.display = 'block';
     }
-    else if (occupationValue === 'Self Employed') {
-        selfEmployedDiv.style.display = 'block';
-    }
-    else if (occupationValue === 'Student') {
-        educationalLevelDiv.style.display = 'block';
 
-        if (['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate'].includes(educationalLevelValue)) {
-            shsTrackDiv.style.display = 'block';
-        }
-        else if (['College', 'College Undergraduate', 'College Graduate'].includes(educationalLevelValue)) {
-            collegeCourseDiv.style.display = 'block';
-            collegeYearDiv.style.display = 'block';
-        }
+    // College fields
+    else if (
+        ['College', 'College Undergraduate', 'College Graduate']
+            .includes(educationalLevelValue)
+    ) {
+        collegeCourseDiv.style.display = 'block';
     }
 }
 
-
-// Wait for DOM load
+// On page load — show fields if user has saved educational level
 document.addEventListener('DOMContentLoaded', function () {
-    const savedOccupation = occupation.getAttribute('data-saved');
     const savedEducationalLevel = educationalLevel.getAttribute('data-saved');
-    updateOccupationFields(savedOccupation, savedEducationalLevel);
+    updateEducationalFields(savedEducationalLevel);
 });
 
-// Event listeners (same as before)
-occupation.addEventListener('change', function () {
-    if (this.value !== 'Student') {
-        educationalLevel.value = '';
-        shsTrack.value = '';
-        collegeCourse.value = '';
-        collegeYear.value = '';
-    }
-    updateOccupationFields();
-});
-
+// When user changes educational level
 educationalLevel.addEventListener('change', function () {
-    const isNotSeniorHigh = !['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate'].includes(this.value);
-    const isNotCollege = !['College', 'College Undergraduate', 'College Graduate'].includes(this.value);
-
-    if (isNotSeniorHigh) shsTrack.value = '';
-    if (isNotCollege) {
+    // Clear unrelated fields
+    if (!['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate']
+        .includes(this.value)) {
+        shsTrack.value = '';
+    }
+    if (!['College', 'College Undergraduate', 'College Graduate']
+        .includes(this.value)) {
         collegeCourse.value = '';
-        collegeYear.value = '';
     }
 
-    updateOccupationFields();
+    updateEducationalFields();
 });
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
-    const educationalLevelValue = "<?php echo isset($educationalLevel) ? $educationalLevel : ''; ?>";
+    const citizenshipInput = document.getElementById('citizenship');
+    const foreignAddressDiv = document.getElementById('foreignAddressDiv');
+    const foreignAddressInput = document.getElementById('foreignPermanentAddress');
+    const phAddressFields = document.querySelectorAll(
+        '#permanentProvince, #permanentCity, #permanentBarangay, #permanentStreet, #permanentBlockLotNo, #permanentPhase, #permanentSubdivisionName, #permanentPurok, #sameAsCurrent'
+    );
 
+    function toggleForeignAddress() {
+        const citizenship = citizenshipInput.value.trim().toLowerCase();
 
-    const collegeCourseDiv = document.getElementById("collegeCourseDiv");
-    const collegeYearDiv = document.getElementById("collegeYearDiv");
-    const shsTrackDiv = document.getElementById("shsTrackDiv");
+        if (citizenship && citizenship !== 'filipino') {
+            // Show foreign address input
+            foreignAddressDiv.style.display = 'block';
+            // foreignAddressInput.disabled = false;
 
-    if (educationalLevelValue.includes("college")) {
-        collegeCourseDiv.style.display = "block";
-        collegeYearDiv.style.display = "block";
-        document.getElementById("collegeCourse").disabled = false;
-        document.getElementById("collegeYear").disabled = false;
-    } else if (educationalLevelValue.includes("senior high")) {
-        shsTrackDiv.style.display = "block";
-        document.getElementById("shsTrack").disabled = false;
+            // Hide PH address fields
+            phAddressFields.forEach(el => {
+                const wrapper = el.closest('.col-lg-3, .col-12, .col-6');
+                if (wrapper) wrapper.style.display = 'none';
+            });
+        } else {
+            // Hide foreign address input
+            foreignAddressDiv.style.display = 'none';
+            foreignAddressInput.disabled = true;
+            foreignAddressInput.value = '';
+
+            // Show PH address fields again
+            phAddressFields.forEach(el => {
+                const wrapper = el.closest('.col-lg-3, .col-12, .col-6');
+                if (wrapper) wrapper.style.display = '';
+            });
+        }
     }
+
+    // Run the check on load
+    toggleForeignAddress();
+
+    // Re-check every time citizenship changes
+    citizenshipInput.addEventListener('input', toggleForeignAddress);
 });

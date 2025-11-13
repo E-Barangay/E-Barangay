@@ -78,9 +78,7 @@ $userInfoID = $userInfoIDRow['userInfoID'];
 $educationalLevel = $userDataRow['educationalLevel'] ?? '';
 $shsTrack = $userDataRow['shsTrack'] ?? '';
 $collegeCourse = $userDataRow['collegeCourse'] ?? '';
-$collegeYear = $userDataRow['collegeYear'] ?? '';
-$work = $userDataRow['work'] ?? '';
-$company = $userDataRow['company'] ?? '';
+
 
 $isProfileComplete = !(
     empty($firstName)
@@ -114,6 +112,8 @@ if (isset($_POST['saveButton'])) {
     $suffix = $_POST['suffix'];
     $gender = $_POST['gender'];
     $birthDate = $_POST['birthDate'];
+    $foreignPermanentAddress = isset($_POST['foreignPermanentAddress']) ? trim($_POST['foreignPermanentAddress']) : '';
+
 
     $age = '';
     if (!empty($birthDate)) {
@@ -180,40 +180,29 @@ if (isset($_POST['saveButton'])) {
     $ageNumeric = (int) filter_var($age, FILTER_SANITIZE_NUMBER_INT);
     $lengthOfStayNumeric = (int) $lengthOfStay;
 
-    if ($ageNumeric === 0 || $lengthOfStayNumeric === 0) {
-        $residencyType = "";
-    } else if ($isSameAddress && $lengthOfStayNumeric >= $ageNumeric) {
-        $residencyType = "Bonafide";
-    } else if ($isSameAddress && $lengthOfStayNumeric !== $ageNumeric) {
-        $residencyType = "Migrant";
-    } else if (!$isSameAddress && $lengthOfStayNumeric !== $ageNumeric) {
-        $residencyType = "Transient";
-    } else {
+    if (strtoupper($citizenship) !== 'FILIPINO') {
         $residencyType = "Foreign";
+    } else {
+        if ($lengthOfStayNumeric === $ageNumeric) {
+            $residencyType = "Bonafide";
+        } else if ($lengthOfStayNumeric >= 3) {
+            $residencyType = "Migrant";
+        } else if ($lengthOfStayNumeric <= 2) {
+            $residencyType = "Transient";
+        } else {
+            $residencyType = "";
+        }
     }
 
-    $work = NULL;
-    $company = NULL;
     $educationalLevel = NULL;
     $shsTrack = NULL;
     $collegeCourse = NULL;
-    $collegeYear = NULL;
 
-    if ($occupation === 'Employed') {
-        // For Employed, input is company name
-        $company = isset($_POST['employedWork']) && !empty($_POST['employedWork'])
-            ? mysqli_real_escape_string($conn, $_POST['employedWork'])
-            : NULL;
-    } else if ($occupation === 'Self Employed') {
-        // For Self Employed, input is type of work
-        $work = isset($_POST['selfEmployedWork']) && !empty($_POST['selfEmployedWork'])
-            ? mysqli_real_escape_string($conn, $_POST['selfEmployedWork'])
-            : NULL;
-    } else if ($occupation === 'Student') {
-        $educationalLevel = isset($_POST['educationalLevel']) && !empty($_POST['educationalLevel'])
-            ? mysqli_real_escape_string($conn, $_POST['educationalLevel'])
-            : NULL;
+    $educationalLevel = isset($_POST['educationalLevel']) && !empty($_POST['educationalLevel'])
+        ? mysqli_real_escape_string($conn, $_POST['educationalLevel'])
+        : NULL;
 
+    if ($educationalLevel !== NULL) {
         $levelLower = strtolower($educationalLevel);
 
         if (strpos($levelLower, 'senior high') !== false) {
@@ -224,12 +213,8 @@ if (isset($_POST['saveButton'])) {
             $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
                 ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
                 : NULL;
-            $collegeYear = isset($_POST['collegeYear']) && !empty($_POST['collegeYear'])
-                ? (int) $_POST['collegeYear']
-                : NULL;
         }
     }
-
     $updateUserInfoQuery = "UPDATE userInfo SET 
     firstName = '$firstName', 
     middleName = '$middleName', 
@@ -243,12 +228,9 @@ if (isset($_POST['saveButton'])) {
     civilStatus = '$civilStatus', 
     citizenship = '$citizenship', 
     occupation = '$occupation',
-    work = " . ($work !== NULL ? "'$work'" : "NULL") . ",
-    company = " . ($company !== NULL ? "'$company'" : "NULL") . ",
     educationalLevel = " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
     shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
     collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
-    collegeYear = " . ($collegeYear !== NULL ? $collegeYear : "NULL") . ",
     lengthOfStay = '$lengthOfStay', 
     residencyType = '$residencyType', 
     remarks = '$remarks'
@@ -263,12 +245,19 @@ if (isset($_POST['saveButton'])) {
                         provinceName = '$provinceName' WHERE userInfoID = $userInfoID;";
     $updateAddressResult = executeQuery($updateAddressQuery);
 
-    $updatePermanentAddressQuery = "UPDATE permanentAddresses SET permanentBlockLotNo = '$permanentBlockLotNo', permanentPhase = '$permanentPhase', 
-                        permanentSubdivisionName = '$permanentSubdivisionName', permanentPurok = '$permanentPurok', 
-                        permanentStreetName = '$permanentStreetName', permanentBarangayName = '$permanentBarangayName', 
-                        permanentCityName = '$permanentCityName', permanentProvinceName = '$permanentProvinceName' 
-                        WHERE userInfoID = $userInfoID;";
-    $updatePermanentAddressResult = executeQuery($updatePermanentAddressQuery);
+    $updatePermanentAddressQuery = "UPDATE permanentAddresses SET 
+    permanentBlockLotNo = " . ($citizenship === 'FILIPINO' ? "'$permanentBlockLotNo'" : "NULL") . ",
+    permanentPhase = " . ($citizenship === 'FILIPINO' ? "'$permanentPhase'" : "NULL") . ",
+    permanentSubdivisionName = " . ($citizenship === 'FILIPINO' ? "'$permanentSubdivisionName'" : "NULL") . ",
+    permanentPurok = " . ($citizenship === 'FILIPINO' ? "'$permanentPurok'" : "NULL") . ",
+    permanentStreetName = " . ($citizenship === 'FILIPINO' ? "'$permanentStreetName'" : "NULL") . ",
+    permanentBarangayName = " . ($citizenship === 'FILIPINO' ? "'$permanentBarangayName'" : "NULL") . ",
+    permanentCityName = " . ($citizenship === 'FILIPINO' ? "'$permanentCityName'" : "NULL") . ",
+    permanentProvinceName = " . ($citizenship === 'FILIPINO' ? "'$permanentProvinceName'" : "NULL") . ",
+    foreignPermanentAddress = " . ($citizenship !== 'FILIPINO' ? "'$foreignPermanentAddress'" : "NULL") . "
+    WHERE userInfoID = $userInfoID;";
+    executeQuery($updatePermanentAddressQuery);
+
 
     if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK) {
         $uploadProfilePicture = $_FILES['profilePicture']['name'];
@@ -588,105 +577,55 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
-                                    <select
-                                        class="form-control <?php echo ($incomplete && empty($citizenship)) ? 'border border-warning' : ''; ?>"
-                                        id="citizenship" name="citizenship" disabled>
-                                        <option value="" disabled <?php echo ($citizenship == '') ? 'selected' : ''; ?>>
-                                            Select Citizenship</option>
-                                        <option value="Filipino" <?php echo ($citizenship == 'Filipino') ? 'selected' : ''; ?>>Filipino</option>
-                                        <option value="American" <?php echo ($citizenship == 'American') ? 'selected' : ''; ?>>American</option>
-                                        <option value="Canadian" <?php echo ($citizenship == 'Canadian') ? 'selected' : ''; ?>>Canadian</option>
-                                        <option value="Chinese" <?php echo ($citizenship == 'Chinese') ? 'selected' : ''; ?>>Chinese</option>
-                                        <option value="Japanese" <?php echo ($citizenship == 'Japanese') ? 'selected' : ''; ?>>Japanese</option>
-                                        <option value="Korean" <?php echo ($citizenship == 'Korean') ? 'selected' : ''; ?>>Korean</option>
-                                        <option value="Indian" <?php echo ($citizenship == 'Indian') ? 'selected' : ''; ?>>Indian</option>
-                                        <option value="Indonesian" <?php echo ($citizenship == 'Indonesian') ? 'selected' : ''; ?>>Indonesian</option>
-                                        <option value="Malaysian" <?php echo ($citizenship == 'Malaysian') ? 'selected' : ''; ?>>Malaysian</option>
-                                        <option value="Singaporean" <?php echo ($citizenship == 'Singaporean') ? 'selected' : ''; ?>>Singaporean</option>
-                                        <option value="Thai" <?php echo ($citizenship == 'Thai') ? 'selected' : ''; ?>>
-                                            Thai</option>
-                                        <option value="Vietnamese" <?php echo ($citizenship == 'Vietnamese') ? 'selected' : ''; ?>>Vietnamese</option>
-                                        <option value="British" <?php echo ($citizenship == 'British') ? 'selected' : ''; ?>>British</option>
-                                        <option value="Australian" <?php echo ($citizenship == 'Australian') ? 'selected' : ''; ?>>Australian</option>
-                                        <option value="French" <?php echo ($citizenship == 'French') ? 'selected' : ''; ?>>French</option>
-                                        <option value="German" <?php echo ($citizenship == 'German') ? 'selected' : ''; ?>>German</option>
-                                        <option value="Italian" <?php echo ($citizenship == 'Italian') ? 'selected' : ''; ?>>Italian</option>
-                                        <option value="Spanish" <?php echo ($citizenship == 'Spanish') ? 'selected' : ''; ?>>Spanish</option>
-                                        <option value="Others" <?php echo ($citizenship == 'Others') ? 'selected' : ''; ?>>Others</option>
-                                    </select>
+                                    <input type="text"
+                                        class="form-control text-uppercase <?php echo ($incomplete && empty($citizenship)) ? 'border border-warning' : ''; ?>"
+                                        id="citizenship" name="citizenship" placeholder="Citizenship"
+                                        value="<?php echo !empty($citizenship) ? htmlspecialchars($citizenship) : 'FILIPINO'; ?>"
+                                        disabled>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
                             </div>
 
+
                             <div class="col-lg-4 col-md-6 col-6 mb-3">
                                 <div class="form-floating">
-                                    <select class="form-select" id="occupation" name="occupation" disabled>
-                                        <option value="" disabled <?php echo empty($occupation) ? 'selected' : ''; ?>>
-                                            Select Occupation</option>
-                                        <option value="Student" <?php echo ($occupation == 'Student') ? 'selected' : ''; ?>>Student</option>
-                                        <option value="Employed" <?php echo ($occupation == 'Employed') ? 'selected' : ''; ?>>Employed</option>
-                                        <option value="Self Employed" <?php echo ($occupation == 'Self Employed') ? 'selected' : ''; ?>>Self Employed</option>
-                                        <option value="Unemployed" <?php echo ($occupation == 'Unemployed') ? 'selected' : ''; ?>>Unemployed</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="occupation" name="occupation"
+                                        placeholder="Occupation" value="<?php echo htmlspecialchars($occupation); ?>"
+                                        disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="employedDiv" style="display:none;">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="employedWork" name="employedWork"
-                                        placeholder="Company Name"
-                                        value="<?php echo isset($company) ? htmlspecialchars($company) : ''; ?>"
-                                        disabled>
-                                    <label for="employedWork">Company Name</label>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="selfEmployedDiv" style="display:none;">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="selfEmployedWork"
-                                        name="selfEmployedWork" placeholder="Type of Work"
-                                        value="<?php echo isset($work) ? $work : ''; ?>" disabled>
-                                    <label for="selfEmployedWork">Type of Work / Business</label>
-                                </div>
-                            </div>
-
-
-
-                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="educationalLevelDiv" style="display:none;">
+                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="educationalLevelDiv">
                                 <div class="form-floating">
                                     <select class="form-control" id="educationalLevel" name="educationalLevel" disabled>
                                         <option value="" disabled <?php echo empty($educationalLevel) ? 'selected' : ''; ?>>
                                             Select Level
                                         </option>
 
-                                        s
-                                        <option value="Elementary Undergraduate" <?php echo ($educationalLevel == 'Elementary Undergraduate') ? 'selected' : ''; ?>>Elementary Undergraduate</option>
+                                        <option value="None" <?php echo ($educationalLevel == 'None') ? 'selected' : ''; ?>>None</option>
+
+                                        <option value="Elementary Undergraduate" <?php echo ($educationalLevel == 'Elementary Undergraduate') ? 'selected' : ''; ?>>
+                                            Elementary Undergraduate</option>
                                         <option value="Elementary Graduate" <?php echo ($educationalLevel == 'Elementary Graduate') ? 'selected' : ''; ?>>Elementary Graduate</option>
 
-                                        <!-- <option value="High School" <?php echo ($educationalLevel == 'High School') ? 'selected' : ''; ?>>High School</option> -->
                                         <option value="High School Undergraduate" <?php echo ($educationalLevel == 'High School Undergraduate') ? 'selected' : ''; ?>>High School Undergraduate
                                         </option>
                                         <option value="High School Graduate" <?php echo ($educationalLevel == 'High School Graduate') ? 'selected' : ''; ?>>High School Graduate</option>
 
-                                        <!-- <option value="Senior High School" <?php echo ($educationalLevel == 'Senior High School') ? 'selected' : ''; ?>>Senior High School</option> -->
                                         <option value="Senior High Undergraduate" <?php echo ($educationalLevel == 'Senior High Undergraduate') ? 'selected' : ''; ?>>Senior High Undergraduate
                                         </option>
                                         <option value="Senior High Graduate" <?php echo ($educationalLevel == 'Senior High Graduate') ? 'selected' : ''; ?>>Senior High Graduate</option>
 
-                                        <!-- <option value="College" <?php echo ($educationalLevel == 'College') ? 'selected' : ''; ?>>College</option> -->
                                         <option value="College Undergraduate" <?php echo ($educationalLevel == 'College Undergraduate') ? 'selected' : ''; ?>>College Undergraduate</option>
                                         <option value="College Graduate" <?php echo ($educationalLevel == 'College Graduate') ? 'selected' : ''; ?>>College Graduate</option>
 
-                                        <option value="ALS" <?php echo ($educationalLevel == 'ALS') ? 'selected' : ''; ?>>ALS
-                                        </option>
-                                        <option value="TESDA" <?php echo ($educationalLevel == 'TESDA') ? 'selected' : ''; ?>>
-                                            TESDA</option>
+                                        <option value="ALS" <?php echo ($educationalLevel == 'ALS') ? 'selected' : ''; ?>>ALS</option>
+                                        <option value="TESDA" <?php echo ($educationalLevel == 'TESDA') ? 'selected' : ''; ?>>TESDA</option>
                                     </select>
                                     <label for="educationalLevel">Educational Level</label>
                                 </div>
                             </div>
-
 
                             <div class="col-lg-4 col-md-6 col-6 mb-3" id="shsTrackDiv" style="display:none;">
                                 <div class="form-floating">
@@ -717,21 +656,12 @@ if (isset($_POST['confirmButton'])) {
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-6 col-6 mb-3" id="collegeYearDiv" style="display:none;">
-                                <div class="form-floating">
-                                    <input type="number" class="form-control" id="collegeYear" name="collegeYear"
-                                        min="1" max="5" placeholder="Year Level"
-                                        value="<?php echo isset($collegeYear) ? $collegeYear : ''; ?>" disabled>
-                                    <label for="collegeYear">College Year Level</label>
-                                </div>
-                            </div>
-
                             <div class="col-lg-3 col-md-5 col-12 mb-3">
                                 <div class="form-floating">
                                     <input type="text"
                                         class="form-control <?php echo ($incomplete && empty($lengthOfStay)) ? 'border border-warning' : ''; ?>"
                                         id="lengthOfStay" name="lengthOfStay"
-                                        value="<?php echo !empty($lengthOfStay) ? (int) $lengthOfStay . ((int) $lengthOfStay == 1 ? ' year' : ' years') : ''; ?>"
+                                        value="<?php echo isset($lengthOfStay) ? (int) $lengthOfStay . ((int) $lengthOfStay == 1 ? ' year' : ' years') : ''; ?>"
                                         placeholder="Length Of Stay (in years)"
                                         oninput="if(this.value.length > 2) this.value = this.value.slice(0, 2);" min="0"
                                         onkeydown="return !['e','E','-','+','.',','].includes(event.key)" disabled>
@@ -752,13 +682,15 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-7 col-12 mb-4">
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="remarks" name="remarks"
-                                        value="<?php echo $remarks ?>" placeholder="Type of Residency" readonly
-                                        disabled>
+                                    <select class="form-select" id="remarks" name="remarks" disabled>
+                                        <option value="" disabled <?php echo empty($remarks) ? 'selected' : ''; ?>>
+                                            Select Remarks</option>
+                                        <option value="No Derogatory" <?php echo ($remarks == 'No Derogatory') ? 'selected' : ''; ?>>No Derogatory</option>
+                                        <option value="With Derogatory" <?php echo ($remarks == 'With Derogatory') ? 'selected' : ''; ?>>With Derogatory</option>
+                                    </select>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
-
                         </div>
 
                         <div class="row">
@@ -990,6 +922,16 @@ if (isset($_POST['confirmButton'])) {
                                         id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>"
                                         placeholder="Purok" disabled>
                                     <label for="permanentPurok">Purok</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-3" id="foreignAddressDiv" style="display: none;">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="foreignPermanentAddress"
+                                        name="foreignPermanentAddress"
+                                        value="<?php echo $userDataRow['foreignPermanentAddress'] ?? ''; ?>"
+                                        placeholder="Enter foreign permanent address" disabled>
+                                    <label for="foreignPermanentAddress">Foreign Permanent Address</label>
                                 </div>
                             </div>
 
