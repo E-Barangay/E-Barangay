@@ -192,62 +192,55 @@ function updateResidencyType() {
     var lengthOfStay = parseInt(document.getElementById("lengthOfStay").value) || 0;
 
     var address = {
-        blockLotNo: document.getElementById("blockLotNo").value,
-        phase: document.getElementById("phase").value,
-        subdivision: document.getElementById("subdivision").value,
-        purok: document.getElementById("purok").value,
-        street: document.getElementById("street").value,
         barangay: document.getElementById("barangay").value,
         city: document.getElementById("city").value,
         province: document.getElementById("province").value
     };
 
     var permanentAddress = {
-        blockLotNo: document.getElementById("permanentBlockLotNo").value,
-        phase: document.getElementById("permanentPhase").value,
-        subdivision: document.getElementById("permanentSubdivisionName").value,
-        purok: document.getElementById("permanentPurok").value,
-        street: document.getElementById("permanentStreet").value,
         barangay: document.getElementById("permanentBarangay").value,
         city: document.getElementById("permanentCity").value,
         province: document.getElementById("permanentProvince").value
     };
 
+    var citizenshipSelect = document.getElementById("citizenship");
+    var citizenship = citizenshipSelect ? (citizenshipSelect.value || "") : "";
+    citizenship = citizenship.toString().toUpperCase();
+
     let residencyType = "";
 
-    var isSameAddress = Object.keys(address).every(key => address[key] === permanentAddress[key]);
+    // Check if both addresses are exactly BATANGAS / SANTO TOMAS / SAN ANTONIO
+    var isSpecificBonafide =
+        address.province.toUpperCase() === "BATANGAS" &&
+        address.city.toUpperCase() === "SANTO TOMAS" &&
+        address.barangay.toUpperCase() === "SAN ANTONIO" &&
+        permanentAddress.province.toUpperCase() === "BATANGAS" &&
+        permanentAddress.city.toUpperCase() === "SANTO TOMAS" &&
+        permanentAddress.barangay.toUpperCase() === "SAN ANTONIO" &&
+        age === lengthOfStay;
 
-    var citizenshipInput = document.getElementById("citizenship");
-    var citizenship = citizenshipInput ? (citizenshipInput.value || "") : "";
-    citizenship = citizenship.toString().toUpperCase(); // safe
-
-    if (citizenship.toUpperCase() !== "FILIPINO") {
+    if (citizenship !== "FILIPINO") {
         residencyType = "Foreign";
-    } else {
-        if (lengthOfStay === age) {
-            residencyType = "Bonafide";
-        } else if (lengthOfStay >= 3) {
-            residencyType = "Migrant";
-        } else if (lengthOfStay <= 2) {
-            residencyType = "Transient";
-        } else {
-            residencyType = "";
-        }
+    } else if (isSpecificBonafide) {
+        residencyType = "Bonafide";
+    } else if (lengthOfStay >= 3) {
+        residencyType = "Migrant";
+    } else if (lengthOfStay <= 2) {
+        residencyType = "Transient";
     }
 
-
-
-
-    document.getElementById("residencyType").value = residencyType;
+    var residencyDropdown = document.getElementById("residencyType");
+    residencyDropdown.value = residencyType;
     document.getElementById("residencyTypeHidden").value = residencyType;
 }
 
+
+// Add your event listeners as before
 [
     "age", "lengthOfStay",
-    "blockLotNo", "phase", "subdivision", "purok", "street",
     "barangay", "city", "province",
-    "permanentBlockLotNo", "permanentPhase", "permanentSubdivisionName", "permanentPurok", "permanentStreet",
-    "permanentBarangay", "permanentCity", "permanentProvince"
+    "permanentBarangay", "permanentCity", "permanentProvince",
+    "citizenship"
 ].forEach(id => {
     var elem = document.getElementById(id);
     if (elem) {
@@ -255,6 +248,11 @@ function updateResidencyType() {
         elem.addEventListener("change", updateResidencyType);
     }
 });
+
+// Run once on load
+updateResidencyType();
+
+
 
 // ========== CURRENT ADDRESS (SELECT DROPDOWNS) ==========
 const provinceSelect = document.getElementById("province");
@@ -986,7 +984,7 @@ educationalLevel.addEventListener('change', function () {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const citizenshipInput = document.getElementById('citizenship');
+    const citizenshipSelect = document.getElementById('citizenship');
     const foreignAddressDiv = document.getElementById('foreignAddressDiv');
     const foreignAddressInput = document.getElementById('foreignPermanentAddress');
     const phAddressFields = document.querySelectorAll(
@@ -994,9 +992,9 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     function toggleForeignAddress() {
-        const citizenship = citizenshipInput.value.trim().toLowerCase();
+        const citizenship = citizenshipSelect.value.trim().toUpperCase();
 
-        if (citizenship && citizenship !== 'filipino') {
+        if (citizenship && citizenship !== 'FILIPINO') {
             // Show foreign address input
             foreignAddressDiv.style.display = 'block';
             // foreignAddressInput.disabled = false;
@@ -1024,5 +1022,6 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleForeignAddress();
 
     // Re-check every time citizenship changes
-    citizenshipInput.addEventListener('input', toggleForeignAddress);
+    citizenshipSelect.addEventListener('change', toggleForeignAddress);
 });
+

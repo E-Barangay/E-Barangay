@@ -176,14 +176,31 @@ if (isset($_POST['saveButton'])) {
         'provinceName' => $permanentProvinceName
     ];
 
-    $isSameAddress = ($address === $permanentAddress);
     $ageNumeric = (int) filter_var($age, FILTER_SANITIZE_NUMBER_INT);
     $lengthOfStayNumeric = (int) $lengthOfStay;
+
+    // Convert to uppercase for exact comparison
+    $currentProvince = strtoupper($provinceName);
+    $currentCity = strtoupper($cityName);
+    $currentBarangay = strtoupper($barangayName);
+
+    $permanentProvince = strtoupper($permanentProvinceName);
+    $permanentCity = strtoupper($permanentCityName);
+    $permanentBarangay = strtoupper($permanentBarangayName);
 
     if (strtoupper($citizenship) !== 'FILIPINO') {
         $residencyType = "Foreign";
     } else {
-        if ($lengthOfStayNumeric === $ageNumeric) {
+        // Check for the specific Bonafide condition
+        if (
+            $currentProvince === 'BATANGAS' &&
+            $currentCity === 'SANTO TOMAS' &&
+            $currentBarangay === 'SAN ANTONIO' &&
+            $permanentProvince === 'BATANGAS' &&
+            $permanentCity === 'SANTO TOMAS' &&
+            $permanentBarangay === 'SAN ANTONIO' &&
+            $ageNumeric === $lengthOfStayNumeric
+        ) {
             $residencyType = "Bonafide";
         } else if ($lengthOfStayNumeric >= 3) {
             $residencyType = "Migrant";
@@ -193,6 +210,7 @@ if (isset($_POST['saveButton'])) {
             $residencyType = "";
         }
     }
+
 
     $educationalLevel = NULL;
     $shsTrack = NULL;
@@ -321,26 +339,31 @@ if (isset($_POST['confirmButton'])) {
                 <div class="col">
 
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">
+                            Welcome! Kindly fill out your profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">
+                            Welcome! Kindly fill out your profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'profileUpdated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your profile has been successfully updated.</div>
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your
+                            profile has been successfully updated.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please
+                            complete your profile information below to
                             proceed with your document request.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation2'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please
+                            complete your profile information below to
                             proceed with your complaint.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
@@ -575,13 +598,197 @@ if (isset($_POST['confirmButton'])) {
                                 </div>
                             </div>
 
+                            <?php
+                            $citizenships = [
+                                'FILIPINO',
+                                'AFGHAN',
+                                'ALBANIAN',
+                                'ALGERIAN',
+                                'AMERICAN',
+                                'ANDORRAN',
+                                'ANGOLAN',
+                                'ARGENTINE',
+                                'ARMENIAN',
+                                'AUSTRALIAN',
+                                'AUSTRIAN',
+                                'AZERBAIJANI',
+                                'BAHAMIAN',
+                                'BAHRAINI',
+                                'BANGLADESHI',
+                                'BARBADIAN',
+                                'BELARUSIAN',
+                                'BELGIAN',
+                                'BELIZEAN',
+                                'BENINESE',
+                                'BHUTANESE',
+                                'BOLIVIAN',
+                                'BOSNIAN',
+                                'BRAZILIAN',
+                                'BRITISH',
+                                'BRUNEIAN',
+                                'BULGARIAN',
+                                'BURKINABE',
+                                'BURMESE',
+                                'BURUNDIAN',
+                                'CAMBODIAN',
+                                'CAMEROONIAN',
+                                'CANADIAN',
+                                'CAPE VERDEAN',
+                                'CENTRAL AFRICAN',
+                                'CHADIAN',
+                                'CHILEAN',
+                                'CHINESE',
+                                'COLOMBIAN',
+                                'COMORAN',
+                                'CONGOLESE',
+                                'COSTA RICAN',
+                                'CROATIAN',
+                                'CUBAN',
+                                'CYPRIOT',
+                                'CZECH',
+                                'DANISH',
+                                'DJIBOUTIAN',
+                                'DOMINICAN',
+                                'DUTCH',
+                                'ECUADORIAN',
+                                'EGYPTIAN',
+                                'EMIRATI',
+                                'EQUATORIAL GUINEAN',
+                                'ERITREAN',
+                                'ESTONIAN',
+                                'ETHIOPIAN',
+                                'FIJIAN',
+                                'FINNISH',
+                                'FRENCH',
+                                'GABONESE',
+                                'GAMBIAN',
+                                'GEORGIAN',
+                                'GERMAN',
+                                'GHANAIAN',
+                                'GREEK',
+                                'GRENADIAN',
+                                'GUATEMALAN',
+                                'GUINEAN',
+                                'GUYANESE',
+                                'HAITIAN',
+                                'HONDURAN',
+                                'HUNGARIAN',
+                                'ICELANDIC',
+                                'INDIAN',
+                                'INDONESIAN',
+                                'IRANIAN',
+                                'IRAQI',
+                                'IRISH',
+                                'ISRAELI',
+                                'ITALIAN',
+                                'IVORIAN',
+                                'JAMAICAN',
+                                'JAPANESE',
+                                'JORDANIAN',
+                                'KAZAKH',
+                                'KENYAN',
+                                'KUWAITI',
+                                'KYRGYZ',
+                                'LAOTIAN',
+                                'LATVIAN',
+                                'LEBANESE',
+                                'LIBERIAN',
+                                'LIBYAN',
+                                'LIECHTENSTEINER',
+                                'LITHUANIAN',
+                                'LUXEMBOURGISH',
+                                'MACEDONIAN',
+                                'MALAGASY',
+                                'MALAWIAN',
+                                'MALAYSIAN',
+                                'MALDIVIAN',
+                                'MALIAN',
+                                'MALTESE',
+                                'MAURITANIAN',
+                                'MAURITIAN',
+                                'MEXICAN',
+                                'MOLDOVAN',
+                                'MONEGASQUE',
+                                'MONGOLIAN',
+                                'MONTENEGRIN',
+                                'MOROCCAN',
+                                'MOZAMBICAN',
+                                'NAMIBIAN',
+                                'NEPALESE',
+                                'NEW ZEALANDER',
+                                'NICARAGUAN',
+                                'NIGERIAN',
+                                'NIGERIEN',
+                                'NORTH KOREAN',
+                                'NORWEGIAN',
+                                'OMANI',
+                                'PAKISTANI',
+                                'PALESTINIAN',
+                                'PANAMANIAN',
+                                'PAPUA NEW GUINEAN',
+                                'PARAGUAYAN',
+                                'PERUVIAN',
+                                'POLISH',
+                                'PORTUGUESE',
+                                'QATARI',
+                                'ROMANIAN',
+                                'RUSSIAN',
+                                'RWANDAN',
+                                'SAINT LUCIAN',
+                                'SALVADORAN',
+                                'SAMOAN',
+                                'SAN MARINESE',
+                                'SAUDI',
+                                'SENEGALESE',
+                                'SERBIAN',
+                                'SEYCHELLOIS',
+                                'SIERRA LEONEAN',
+                                'SINGAPOREAN',
+                                'SLOVAK',
+                                'SLOVENIAN',
+                                'SOMALI',
+                                'SOUTH AFRICAN',
+                                'SOUTH KOREAN',
+                                'SPANISH',
+                                'SRI LANKAN',
+                                'SUDANESE',
+                                'SURINAMESE',
+                                'SWEDISH',
+                                'SWISS',
+                                'SYRIAN',
+                                'TAIWANESE',
+                                'TAJIK',
+                                'TANZANIAN',
+                                'THAI',
+                                'TOGOLESE',
+                                'TONGAN',
+                                'TRINIDADIAN',
+                                'TUNISIAN',
+                                'TURKISH',
+                                'TURKMEN',
+                                'UGANDAN',
+                                'UKRAINIAN',
+                                'URUGUAYAN',
+                                'UZBEK',
+                                'VENEZUELAN',
+                                'VIETNAMESE',
+                                'YEMENI',
+                                'ZAMBIAN',
+                                'ZIMBABWEAN'
+                            ];
+                            ?>
+
                             <div class="col-lg-3 col-md-5 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control text-uppercase <?php echo ($incomplete && empty($citizenship)) ? 'border border-warning' : ''; ?>"
-                                        id="citizenship" name="citizenship" placeholder="Citizenship"
-                                        value="<?php echo !empty($citizenship) ? htmlspecialchars($citizenship) : 'FILIPINO'; ?>"
-                                        disabled>
+                                    <select
+                                        class="form-select text-uppercase <?php echo ($incomplete && empty($citizenship)) ? 'border border-warning' : ''; ?>"
+                                        id="citizenship" name="citizenship" disabled>
+                                        <?php foreach ($citizenships as $country): ?>
+                                            <option value="<?php echo $country; ?>" <?php echo (!empty($citizenship) && strtoupper($citizenship) === $country) || (empty($citizenship) && $country === 'FILIPINO') ? 'selected' : ''; ?>>
+                                                <?php echo $country; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
                                     <label for="citizenship">Citizenship</label>
                                 </div>
                             </div>
@@ -620,7 +827,8 @@ if (isset($_POST['confirmButton'])) {
                                         <option value="College Undergraduate" <?php echo ($educationalLevel == 'College Undergraduate') ? 'selected' : ''; ?>>College Undergraduate</option>
                                         <option value="College Graduate" <?php echo ($educationalLevel == 'College Graduate') ? 'selected' : ''; ?>>College Graduate</option>
 
-                                        <option value="ALS" <?php echo ($educationalLevel == 'ALS') ? 'selected' : ''; ?>>ALS</option>
+                                        <option value="ALS" <?php echo ($educationalLevel == 'ALS') ? 'selected' : ''; ?>>
+                                            ALS</option>
                                         <option value="TESDA" <?php echo ($educationalLevel == 'TESDA') ? 'selected' : ''; ?>>TESDA</option>
                                     </select>
                                     <label for="educationalLevel">Educational Level</label>
