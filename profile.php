@@ -176,14 +176,31 @@ if (isset($_POST['saveButton'])) {
         'provinceName' => $permanentProvinceName
     ];
 
-    $isSameAddress = ($address === $permanentAddress);
     $ageNumeric = (int) filter_var($age, FILTER_SANITIZE_NUMBER_INT);
     $lengthOfStayNumeric = (int) $lengthOfStay;
+
+    // Convert to uppercase for exact comparison
+    $currentProvince = strtoupper($provinceName);
+    $currentCity = strtoupper($cityName);
+    $currentBarangay = strtoupper($barangayName);
+
+    $permanentProvince = strtoupper($permanentProvinceName);
+    $permanentCity = strtoupper($permanentCityName);
+    $permanentBarangay = strtoupper($permanentBarangayName);
 
     if (strtoupper($citizenship) !== 'FILIPINO') {
         $residencyType = "Foreign";
     } else {
-        if ($lengthOfStayNumeric === $ageNumeric) {
+        // Check for the specific Bonafide condition
+        if (
+            $currentProvince === 'BATANGAS' &&
+            $currentCity === 'SANTO TOMAS' &&
+            $currentBarangay === 'SAN ANTONIO' &&
+            $permanentProvince === 'BATANGAS' &&
+            $permanentCity === 'SANTO TOMAS' &&
+            $permanentBarangay === 'SAN ANTONIO' &&
+            $ageNumeric === $lengthOfStayNumeric
+        ) {
             $residencyType = "Bonafide";
         } else if ($lengthOfStayNumeric >= 3) {
             $residencyType = "Migrant";
@@ -193,6 +210,7 @@ if (isset($_POST['saveButton'])) {
             $residencyType = "";
         }
     }
+
 
     $educationalLevel = NULL;
     $shsTrack = NULL;
@@ -321,26 +339,31 @@ if (isset($_POST['confirmButton'])) {
                 <div class="col">
 
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">
+                            Welcome! Kindly fill out your profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">
+                            Welcome! Kindly fill out your profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'profileUpdated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your profile has been successfully updated.</div>
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your
+                            profile has been successfully updated.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please
+                            complete your profile information below to
                             proceed with your document request.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation2'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please
+                            complete your profile information below to
                             proceed with your complaint.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
