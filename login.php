@@ -24,7 +24,29 @@ if (isset($_POST['next'])) {
     if (mysqli_num_rows($emailCheckResult) > 0) {
         $user = mysqli_fetch_assoc($emailCheckResult);
         
-        if ($user['isNew'] === 'Yes') {
+        $restrictionEnd = $user['restrictionEnd'];
+        $restrictionReason = $user['restrictionReason'];
+
+        if ($user['isRestricted'] === 'Yes' && !empty($restrictionEnd)) {
+            
+            date_default_timezone_set('Asia/Manila');
+            $currentTime = date('Y-m-d H:i:s');
+
+            $restrictionEndTime = new DateTime($restrictionEnd, new DateTimeZone('Asia/Manila'));
+            $currentDatetime = new DateTime($currentTime, new DateTimeZone('Asia/Manila'));
+
+            if ($restrictionEndTime <= $currentDatetime) {
+                $unrestrictQuery = "UPDATE users SET isRestricted = 'No', restrictionStart = NULL, restrictionEnd = NULL, restrictionReason = NULL WHERE email = '$email'";
+                executeQuery($unrestrictQuery);
+                
+                $_SESSION['restriction_lifted'] = true;
+                $_SESSION['email'] = $email;
+                $loginStep = "existingPassword";
+            } else {
+                $_SESSION['warning'] = 'userRestricted';
+                $loginStep = "email";
+            }
+        } elseif ($user['isNew'] === 'Yes') {
             $_SESSION['email'] = $email;
 
             $verificationCode = random_int(100000, 999999);
@@ -504,52 +526,56 @@ if (isset($_POST['login'])) {
                     <div class="row my-4">
                         
                         <div class="col-12">
+                            <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'userRestricted'): ?>
+                                <div class="alert alert-warning" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Account restricted for about&nbsp;<strong><span id="countdown" style="white-space: nowrap;"></span></strong>&nbsp;due to <?php echo strtolower($restrictionReason); ?>.</div>
+                                <?php unset($_SESSION['warning']); ?>
+                            <?php endif; ?>
                             <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'notFoundEmail'): ?>
-                                <div class="alert alert-warning">Email not found. Please sign up to create an account.</div>
+                                <div class="alert alert-warning" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Email not found. Please sign up to create an account.</div>
                                 <?php unset($_SESSION['warning']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'enterEmailToReset'): ?>
-                                <div class="alert alert-warning">Please enter your email to reset your password.</div>
+                                <div class="alert alert-warning" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please enter your email to reset your password.</div>
                                 <?php unset($_SESSION['warning']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'emailSent'): ?>
-                                <div class="alert alert-success">Verification code sent successfully! Please check your email to continue.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Verification code sent successfully! Please check your email to continue.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'codeResent'): ?>
-                                <div class="alert alert-success">A new verification code has been sent to your email.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>A new verification code has been sent to your email.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'resetVerificationSent'): ?>
-                                <div class="alert alert-success">A verification code has been sent to your email to reset your password.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>A verification code has been sent to your email to reset your password.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'verifiedNewUser'): ?>
-                                <div class="alert alert-success">Your email has been successfully verified! Please create a password to complete your account setup.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your email has been successfully verified! Please create a password to complete your account setup.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'verifiedReset'): ?>
-                                <div class="alert alert-success">Verification successful! Please create a new password for your account.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Verification successful! Please create a new password for your account.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'verificationCodeExpired'): ?>
-                                <div class="alert alert-danger">Your verification code has expired. Please resend a new code.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Your verification code has expired. Please resend a new code.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidVerificationCode'): ?>
-                                <div class="alert alert-danger">Invalid verification code.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Invalid verification code.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'weakPassword'): ?>
-                                <div class="alert alert-danger">Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'mismatchPassword'): ?>
-                                <div class="alert alert-danger">Passwords do not match.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Passwords do not match.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidPassword'): ?>
-                                <div class="alert alert-danger">Invalid Password.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Invalid Password.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                         </div>
@@ -686,6 +712,53 @@ if (isset($_POST['login'])) {
             </div>
         </div>
     </div>
+
+    <?php if (isset($restrictionEnd)): ?>
+        <script>
+            var restrictionEnd = new Date("<?php echo $restrictionEnd ?>").getTime();
+            var countdownElement = document.getElementById('countdown');
+            var alertBox = countdownElement.closest('.alert');
+
+            function updateCountdown() {
+                var now = new Date().getTime();
+                var distance = restrictionEnd - now;
+
+                if (distance < 0) {
+                    clearInterval(timer);
+
+                    alertBox.classList.remove('alert-warning');
+                    alertBox.classList.add('alert-success');
+                    alertBox.innerHTML = `
+                        <i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>
+                        Account restriction lifted. Click <strong>Next</strong> to proceed.
+                    `;
+                    return;
+                }
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                var timeString = "";
+                if (days > 0) {
+                    timeString += days + "d ";
+                }
+                if (hours > 0 || days > 0) {
+                    timeString += hours + "h ";
+                }
+                if (minutes > 0 || hours > 0 || days > 0) {
+                    timeString += minutes + "m ";
+                }
+
+                timeString += seconds + "s";
+                countdownElement.innerHTML = timeString;
+            }
+
+            updateCountdown();
+            var timer = setInterval(updateCountdown, 1000);
+        </script>
+    <?php endif; ?>
 
     <script>
         function togglePassword(inputId, icon) {
