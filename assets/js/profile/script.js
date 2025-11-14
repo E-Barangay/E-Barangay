@@ -217,11 +217,11 @@ function updateResidencyType() {
 
     var isSameAddress = Object.keys(address).every(key => address[key] === permanentAddress[key]);
 
-    var citizenshipInput = document.getElementById("citizenship");
-    var citizenship = citizenshipInput ? (citizenshipInput.value || "") : "";
-    citizenship = citizenship.toString().toUpperCase(); // safe
+    var citizenshipSelect = document.getElementById("citizenship");
+    var citizenship = citizenshipSelect ? (citizenshipSelect.value || "") : "";
+    citizenship = citizenship.toString().toUpperCase();
 
-    if (citizenship.toUpperCase() !== "FILIPINO") {
+    if (citizenship !== "FILIPINO") {
         residencyType = "Foreign";
     } else {
         if (lengthOfStay === age) {
@@ -230,15 +230,11 @@ function updateResidencyType() {
             residencyType = "Migrant";
         } else if (lengthOfStay <= 2) {
             residencyType = "Transient";
-        } else {
-            residencyType = "";
         }
     }
 
-
-
-
-    document.getElementById("residencyType").value = residencyType;
+    var residencyDropdown = document.getElementById("residencyType");
+    residencyDropdown.value = residencyType;
     document.getElementById("residencyTypeHidden").value = residencyType;
 }
 
@@ -247,7 +243,8 @@ function updateResidencyType() {
     "blockLotNo", "phase", "subdivision", "purok", "street",
     "barangay", "city", "province",
     "permanentBlockLotNo", "permanentPhase", "permanentSubdivisionName", "permanentPurok", "permanentStreet",
-    "permanentBarangay", "permanentCity", "permanentProvince"
+    "permanentBarangay", "permanentCity", "permanentProvince",
+    "citizenship"
 ].forEach(id => {
     var elem = document.getElementById(id);
     if (elem) {
@@ -255,6 +252,10 @@ function updateResidencyType() {
         elem.addEventListener("change", updateResidencyType);
     }
 });
+
+// Run once on load
+updateResidencyType();
+
 
 // ========== CURRENT ADDRESS (SELECT DROPDOWNS) ==========
 const provinceSelect = document.getElementById("province");
@@ -986,7 +987,7 @@ educationalLevel.addEventListener('change', function () {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const citizenshipInput = document.getElementById('citizenship');
+    const citizenshipSelect = document.getElementById('citizenship');
     const foreignAddressDiv = document.getElementById('foreignAddressDiv');
     const foreignAddressInput = document.getElementById('foreignPermanentAddress');
     const phAddressFields = document.querySelectorAll(
@@ -994,9 +995,9 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     function toggleForeignAddress() {
-        const citizenship = citizenshipInput.value.trim().toLowerCase();
+        const citizenship = citizenshipSelect.value.trim().toUpperCase();
 
-        if (citizenship && citizenship !== 'filipino') {
+        if (citizenship && citizenship !== 'FILIPINO') {
             // Show foreign address input
             foreignAddressDiv.style.display = 'block';
             // foreignAddressInput.disabled = false;
@@ -1024,5 +1025,6 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleForeignAddress();
 
     // Re-check every time citizenship changes
-    citizenshipInput.addEventListener('input', toggleForeignAddress);
+    citizenshipSelect.addEventListener('change', toggleForeignAddress);
 });
+
