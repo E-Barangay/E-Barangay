@@ -338,31 +338,31 @@ if (isset($_POST['verify'])) {
 
                         <div class="col-12">
                             <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'emailExists'): ?>
-                                <div class="alert alert-warning">This email is already registered. Please use a different one.</div>
+                                <div class="alert alert-warning" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>This email is already registered. Please use a different one.</div>
                                 <?php unset($_SESSION['warning']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'weakPassword'): ?>
-                                <div class="alert alert-danger">Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Oops! Password must be 8+ characters with uppercase, lowercase, number, and symbol.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'mismatchPassword'): ?>
-                                <div class="alert alert-danger">Passwords do not match.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Passwords do not match.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'verificationCodeExpired'): ?>
-                                <div class="alert alert-danger">Your verification code has expired. Please resend a new code.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Your verification code has expired. Please resend a new code.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidVerificationCode'): ?>
-                                <div class="alert alert-danger">Invalid verification code.</div>
+                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Invalid verification code.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'emailSent'): ?>
-                                <div class="alert alert-success">Verification code sent successfully! Please check your email to continue.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Verification code sent successfully! Please check your email to continue.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                             <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'codeResent'): ?>
-                                <div class="alert alert-success">A new verification code has been sent to your email.</div>
+                                <div class="alert alert-success" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>A new verification code has been sent to your email.</div>
                                 <?php unset($_SESSION['success']); ?>
                             <?php endif; ?>
                         </div>

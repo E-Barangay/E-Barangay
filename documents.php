@@ -183,7 +183,7 @@ if (isset($_POST['confirmCancelButton'])) {
             <div class="row">
 
                 <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'requestConfirmed'): ?>
-                    <div class="alert alert-success text-center mb-4">Your request for <?php echo htmlspecialchars($_SESSION['documentName']); ?> has been submitted successfully!</div>
+                    <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your request for <?php echo htmlspecialchars($_SESSION['documentName']); ?> has been submitted successfully!</div>
                     <?php unset($_SESSION['success']); unset($_SESSION['documentName']); ?>
                 <?php endif; ?>
 
