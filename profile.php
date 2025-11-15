@@ -339,31 +339,26 @@ if (isset($_POST['confirmButton'])) {
                 <div class="col">
 
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">
-                            Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Welcome! Kindly fill out your profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">
-                            Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Welcome! Kindly fill out your profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'profileUpdated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your
-                            profile has been successfully updated.</div>
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your profile has been successfully updated.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please
-                            complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please complete your profile information below to
                             proceed with your document request.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation2'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;">Please
-                            complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please complete your profile information below to
                             proceed with your complaint.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>

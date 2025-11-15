@@ -43,7 +43,16 @@ $firstName = $userDataRow['firstName'];
 $middleName = $userDataRow['middleName'];
 $lastName = $userDataRow['lastName'];
 $fullName = $firstName . " " . ($middleName ? $middleName[0] . ". " : "") . $lastName;
+$gender = $userDataRow['gender'];
 $profilePicture = $userDataRow['profilePicture'];
+$birthDate = $userDataRow['birthDate'];
+$birthPlace = $userDataRow['birthPlace'];
+$civilStatus = $userDataRow['civilStatus'];
+$citizenship = $userDataRow['citizenship'];
+$lengthOfStay = $userDataRow['lengthOfStay'];
+$residencyType = $userDataRow['residencyType'];
+$phoneNumber = $userDataRow['phoneNumber'];
+$email = $userDataRow['email'];
 
 function formatAddress($value) {
     return ucwords(strtolower($value));
@@ -183,7 +192,7 @@ if (isset($_POST['confirmCancelButton'])) {
             <div class="row">
 
                 <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'requestConfirmed'): ?>
-                    <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;">Your request for <?php echo htmlspecialchars($_SESSION['documentName']); ?> has been submitted successfully!</div>
+                    <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your request for <?php echo htmlspecialchars($_SESSION['documentName']); ?> has been submitted successfully!</div>
                     <?php unset($_SESSION['success']); unset($_SESSION['documentName']); ?>
                 <?php endif; ?>
 
