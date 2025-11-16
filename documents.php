@@ -128,6 +128,7 @@ if (isset($_POST['proceedButton'])) {
     $_SESSION['businessNature'] = $_POST['businessNature'] ?? '';
     $_SESSION['controlNo'] = $_POST['controlNo'] ?? '';
     $_SESSION['ownership'] = $_POST['ownership'] ?? '';
+    $_SESSION['educationStatus'] = $_POST['educationStatus'] ?? '';
     $_SESSION['spouseName'] = $_POST['spouseName'] ?? '';
     $_SESSION['marriageYear'] = $_POST['marriageYear'] ?? '';
     $_SESSION['childNo'] = $_POST['childNo'] ?? '';
@@ -148,7 +149,7 @@ if (isset($_POST['confirmCancelButton'])) {
 } elseif (isset($_POST['restoreRequestButton'])) {
     $documentID = $_POST['documentID'] ?? '';
 
-    $cancelRequestQuery = "UPDATE documents SET documentStatus = 'Pending', cancelledDate = NULL WHERE documentID = $documentID";
+    $cancelRequestQuery = "UPDATE documents SET documentStatus = 'Pending', requestDate = NOW() ,cancelledDate = NULL WHERE documentID = $documentID";
     $cancelRequestResult = executeQuery($cancelRequestQuery);
     
     header("Location: documents.php?content=documentRequest");
