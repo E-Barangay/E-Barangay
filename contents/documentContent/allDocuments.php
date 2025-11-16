@@ -6,41 +6,68 @@ function toCamelCase($string) {
     return lcfirst($string);
 }
 
-$userRequestQuery = "SELECT documentTypeID FROM documents WHERE userID = $userID";
+$userRequestQuery = "SELECT * FROM documents WHERE userID = $userID";
 $userRequestResult = executeQuery($userRequestQuery);
 
 $requestedTypes = [];
+$requestedDates = [];
+$requestedExpiries = [];
+$requestedStatuses = [];
 
 while ($userRequestRow = mysqli_fetch_assoc($userRequestResult)) {
     $requestedTypes[] = $userRequestRow['documentTypeID'];
+    $requestedDates[$userRequestRow['documentTypeID']] = $userRequestRow['requestDate'];
+    $requestedExpiries[$userRequestRow['documentTypeID']] = date('Y-m-d H:i:s', strtotime($userRequestRow['requestDate'] . ' +1 year'));
+    $requestedStatuses[$userRequestRow['documentTypeID']] = $userRequestRow['documentStatus'];
 }
 
 if(mysqli_num_rows($documentsResult) > 0)   {
     while ($documentsRow = mysqli_fetch_assoc($documentsResult)) { 
         $modalID = toCamelCase($documentsRow['documentName']);
 
-        $isRequested = in_array($documentsRow['documentTypeID'], $requestedTypes);
+        $isRequested = isset($requestedStatuses[$documentsRow['documentTypeID']]) && $requestedStatuses[$documentsRow['documentTypeID']] !== 'cancelled';
+        $requestDate = $requestedDates[$documentsRow['documentTypeID']] ?? '';
+        $expiryDate = $requestedExpiries[$documentsRow['documentTypeID']] ?? '';
+        $requestStatus = $requestedStatuses[$documentsRow['documentTypeID']] ?? '';
+
+        $isFirstTimeJobSeeker = ($documentsRow['documentTypeID'] == 4);
+
+        $buttonDisabled = false;
+        $expiryCountdown = '';
+
+        if ($requestStatus == 'Cancelled' || $requestStatus === 'Denied' || $requestStatus === 'Archived') {
+            $buttonDisabled = false;
+            $expiryCountdown = '';
+        } elseif ($isFirstTimeJobSeeker && $isRequested && ($requestStatus == 'Pending' || $requestStatus == 'Approved')) {
+            $buttonDisabled = true;
+            $expiryCountdown = '<br><small>This can only be requested once</small>';
+        } elseif ($requestStatus === 'Pending' || $requestStatus === 'Approved') {
+            $buttonDisabled = true;
+            $expiryCountdown = '<br><small>Available again after <span class="countdown fw-bold" data-expiry="' . $expiryDate . '"></span></small>';
+        }
+        
     ?>
-    <div class="col-6 col-md-4 col-lg-4 p-1">
-        <div class="documentCard card my-0 my-sm-2">
-            <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top"
-                style="width: 100%; height: 500px; object-fit: cover; pointer-events:none;" alt="Document">
+    <div class="col-12 col-md-6 col-lg-4 p-1 mb-2 mb-md-5 mb-lg-4">
+        <div class="documentCard card mb-5 mb-md-3 mb-lg-4">
+            <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top" style="width: 100%; height: 500px; object-fit: cover; pointer-events:none;" alt="Document">
             <div class="mt-auto">
 
                 <?php if (!$isProfileComplete) { ?>
-                    
+
                     <form method="POST">
-                        <button class="btn btn-primary documentButton mt-2" type="submit" name="documentButton" <?php echo $isRequested ? 'disabled' : ''; ?>>
+                        <button class="btn btn-primary documentButton mt-2 <?php echo $buttonDisabled ? 'disabled' : ''; ?>" type="submit" name="documentButton">
                             <?php echo $documentsRow['documentName']; ?>
+                            <?php echo $expiryCountdown; ?>
                         </button>
                     </form>
 
                 <?php } else { ?>
 
-                    <button class="btn btn-primary documentButton mt-2" type="button" <?php echo $isRequested ? 'disabled' : ''; ?> data-bs-toggle="modal" data-bs-target="#<?php echo $modalID; ?>Modal">
+                    <button class="btn btn-primary documentButton mt-2 <?php echo $buttonDisabled ? 'disabled' : ''; ?>" type="button" data-bs-toggle="modal" data-bs-target="#<?php echo $modalID; ?>Modal">
                         <?php echo $documentsRow['documentName']; ?>
+                        <?php echo $expiryCountdown; ?>
                     </button>
-
+                    
                 <?php } ?>
                 
             </div>
@@ -149,6 +176,19 @@ if(mysqli_num_rows($documentsResult) > 0)   {
                                 <label for="purpose">Purpose</label>
                             </div>
 
+                        <?php } elseif ($documentsRow['documentTypeID'] == 4) { ?>
+
+                            <p class="note mb-3">Please confirm your current educational status:</p>
+
+                            <div class="form-floating">
+                                <select class="form-select" id="educationStatus" name="educationStatus" required>
+                                    <option value="" selected disabled>Select your status</option>
+                                    <option value="Studying">Yes, I am still studying</option>
+                                    <option value="Not Studying">No, I am no longer studying</option>
+                                </select>
+                                <label for="educationStatus">Educational Status</label>
+                            </div>
+
                         <?php } elseif ($documentsRow['documentTypeID'] == 3) { ?>
                             
                             <p class="note mb-3">Please select the purpose for your request:</p>
@@ -229,3 +269,51 @@ if(mysqli_num_rows($documentsResult) > 0)   {
     </div>
 
 <?php } ?>
+
+<script>
+    function startDocumentCountdowns() {
+        var countdownElements = document.querySelectorAll('.countdown');
+
+        countdownElements.forEach(function(countdown) {
+            var expiry = new Date(countdown.getAttribute('data-expiry')).getTime();
+
+            function updateCountdown() {
+                var now = new Date().getTime();
+                var distance = expiry - now;
+
+                if (distance <= 0) {
+                    var card = countdown.closest('.documentCard');
+                    if (card) {
+                        var btn = card.querySelector('.documentButton');
+                        if (btn) btn.classList.remove('disabled');
+                    }
+
+                    if (countdown.parentNode) {
+                        countdown.parentNode.remove();
+                    }
+
+                    return;
+                }
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                var timeString = "";
+                if (days > 0) timeString += days + "d ";
+                if (hours > 0 || days > 0) timeString += hours + "h ";
+                if (minutes > 0 || hours > 0 || days > 0) timeString += minutes + "m ";
+                timeString += seconds + "s";
+
+                countdown.innerHTML = timeString;
+            }
+
+            updateCountdown();
+
+            setInterval(updateCountdown, 1000);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', startDocumentCountdowns);
+</script>

@@ -117,6 +117,15 @@ input.form-control:focus {
     color: white;
 }
 
+.documentButton.disabled,
+.documentButton:disabled {
+    background-color: #19AFA5;
+    border-color: #19AFA5;
+    color: white;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .noDocument, .noRequest {
     font-size: 16px;
 }

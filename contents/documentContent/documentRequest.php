@@ -130,7 +130,7 @@ $documentRequestResult = executeQuery($documentRequestQuery);
                                                         <h5 class="modal-title">Request Approved</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                     </div>
-                                                    <div class="modal-body">
+                                                    <div class="modal-body text-start">
                                                         This request has already been approved.
                                                     </div>
                                                     <div class="modal-footer">

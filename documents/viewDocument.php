@@ -118,6 +118,7 @@ $controlNo = $_SESSION['controlNo'] ?? '';
 $spouseName = $_SESSION['spouseName'] ?? '';
 $marriageYear = $_SESSION['marriageYear'] ?? '';
 $ownership = $_SESSION['ownership'] ?? '';
+$educationStatus = $_SESSION['educationStatus'] ?? '';
 $childNo = $_SESSION['childNo'] ?? '';
 $soloParentSinceDate = $_SESSION['soloParentSinceDate'] ?? '';
 
@@ -127,6 +128,8 @@ if (isset($_POST['yes'])) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 8) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', NOW(), NULL, NULL, NULL, NULL)";
+    } elseif ($documentTypeID == 4) {
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, educationStatus, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$educationStatus', NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 7) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 9) {
@@ -137,6 +140,14 @@ if (isset($_POST['yes'])) {
 
     $documentRequestResult = executeQuery($documentRequestQuery);
 
+    if ($educationStatus == "Not Studying") {
+        $updateUserInfoQuery = "UPDATE userInfo SET isOSY = 'Yes' WHERE userID = $userID";
+    } else {
+        $updateUserInfoQuery = "UPDATE userInfo SET isOSY = 'No' WHERE userID = $userID";
+    }
+
+    executeQuery($updateUserInfoQuery);
+
     unset(
         $_SESSION['purpose'],
         $_SESSION['businessName'],
@@ -144,6 +155,7 @@ if (isset($_POST['yes'])) {
         $_SESSION['businessNature'],
         $_SESSION['controlNo'],
         $_SESSION['ownership'],
+        $_SESSION['educationStatus'],
         $_SESSION['spouseName'],
         $_SESSION['marriageYear'],
         $_SESSION['childNo']
