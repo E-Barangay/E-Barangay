@@ -111,14 +111,25 @@ cancelButton.addEventListener('click', function () {
         }
     }
 
+    // Restore educational fields visibility based on original educational level
+    const originalEducationalLevel = educationalLevel.value;
+    updateEducationalFields(originalEducationalLevel);
+
+
     // Restore occupation fields visibility based on original values
-    updateOccupationFields();
+    // updateOccupationFields();
+
+    const citizenshipSelect = document.getElementById('citizenship');
+    if (citizenshipSelect && window.toggleForeignAddress) {
+        window.toggleForeignAddress();
+    }
 
     // Remove any validation alerts
     const existingAlert = document.querySelector('.validation-alert');
     if (existingAlert) {
         existingAlert.remove();
     }
+
 });
 
 saveButton.addEventListener('click', function (e) {
@@ -209,7 +220,7 @@ function updateResidencyType() {
 
     let residencyType = "";
 
-    // Check if both addresses are exactly BATANGAS / SANTO TOMAS / SAN ANTONIO
+    // Condition: current + permanent must both match
     var isSpecificBonafide =
         address.province.toUpperCase() === "BATANGAS" &&
         address.city.toUpperCase() === "SANTO TOMAS" &&
@@ -219,14 +230,22 @@ function updateResidencyType() {
         permanentAddress.barangay.toUpperCase() === "SAN ANTONIO" &&
         age === lengthOfStay;
 
+    // Condition: ONLY current address must match
+    var isSpecificCurrentAddress =
+        address.province.toUpperCase() === "BATANGAS" &&
+        address.city.toUpperCase() === "SANTO TOMAS" &&
+        address.barangay.toUpperCase() === "SAN ANTONIO";
+
     if (citizenship !== "FILIPINO") {
         residencyType = "Foreign";
     } else if (isSpecificBonafide) {
         residencyType = "Bonafide";
-    } else if (lengthOfStay >= 3) {
+    } else if (lengthOfStay >= 3 && isSpecificCurrentAddress) {
         residencyType = "Migrant";
-    } else if (lengthOfStay <= 2) {
+    } else if (lengthOfStay <= 2 && isSpecificCurrentAddress) {
         residencyType = "Transient";
+    } else {
+        residencyType = "";
     }
 
     var residencyDropdown = document.getElementById("residencyType");
@@ -234,8 +253,7 @@ function updateResidencyType() {
     document.getElementById("residencyTypeHidden").value = residencyType;
 }
 
-
-// Add your event listeners as before
+// Add event listeners
 [
     "age", "lengthOfStay",
     "barangay", "city", "province",
@@ -251,6 +269,7 @@ function updateResidencyType() {
 
 // Run once on load
 updateResidencyType();
+
 
 
 
@@ -894,13 +913,156 @@ function calculateAgeFromBirthDate() {
     updateResidencyType();
 }
 
+// Add this function after the validateLengthOfStay function
+
+function handleLengthOfStayAddressLogic() {
+    const lengthOfStayValue = parseInt(lengthOfStayInput.value) || 0;
+    const provinceSelect = document.getElementById('province');
+    const citySelect = document.getElementById('city');
+    const barangaySelect = document.getElementById('barangay');
+
+    if (lengthOfStayValue >= 0) {
+        // Find the correct keys in the JSON data
+        let batangasKey = null;
+        let santoTomasKey = null;
+        let sanAntonioValue = null;
+
+        // Search for Batangas province key
+        if (jsonData) {
+            for (const regionCode of Object.keys(jsonData)) {
+                const provinces = jsonData[regionCode].province_list;
+                for (const provKey of Object.keys(provinces)) {
+                    if (provKey.toUpperCase().includes('BATANGAS')) {
+                        batangasKey = provKey;
+
+                        // Search for Santo Tomas city key
+                        const municipalities = provinces[provKey].municipality_list;
+                        for (const cityKey of Object.keys(municipalities)) {
+                            if (cityKey.toUpperCase().includes('SANTO TOMAS')) {
+                                santoTomasKey = cityKey;
+
+                                // Search for San Antonio barangay
+                                const barangays = municipalities[cityKey].barangay_list || [];
+                                for (const brgy of barangays) {
+                                    if (brgy.toUpperCase().includes('SAN ANTONIO')) {
+                                        sanAntonioValue = brgy;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (batangasKey) break;
+            }
+        }
+
+        // Set the values if found
+        if (batangasKey) {
+            provinceSelect.value = batangasKey;
+
+            // Populate cities for Batangas
+            if (window.populateCitiesByProvinceKey && santoTomasKey) {
+                window.populateCitiesByProvinceKey(batangasKey, santoTomasKey);
+                citySelect.value = santoTomasKey;
+
+                // Populate barangays for Santo Tomas
+                if (window.populateBarangaysByKeys && sanAntonioValue) {
+                    window.populateBarangaysByKeys(batangasKey, santoTomasKey, sanAntonioValue);
+                    barangaySelect.value = sanAntonioValue;
+                }
+            }
+        }
+
+        // Disable the address fields but keep them submittable
+        // Change disabled to readonly to ensure values are submitted
+        provinceSelect.disabled = true;
+        citySelect.disabled = true;
+        barangaySelect.disabled = true;
+
+        // Create or update hidden inputs to ensure values are submitted
+        let hiddenProvince = document.getElementById('hiddenProvince');
+        if (!hiddenProvince) {
+            hiddenProvince = document.createElement('input');
+            hiddenProvince.type = 'hidden';
+            hiddenProvince.id = 'hiddenProvince';
+            hiddenProvince.name = 'provinceName';
+            provinceSelect.parentElement.appendChild(hiddenProvince);
+        }
+        hiddenProvince.value = provinceSelect.value;
+
+        let hiddenCity = document.getElementById('hiddenCity');
+        if (!hiddenCity) {
+            hiddenCity = document.createElement('input');
+            hiddenCity.type = 'hidden';
+            hiddenCity.id = 'hiddenCity';
+            hiddenCity.name = 'cityName';
+            citySelect.parentElement.appendChild(hiddenCity);
+        }
+        hiddenCity.value = citySelect.value;
+
+        let hiddenBarangay = document.getElementById('hiddenBarangay');
+        if (!hiddenBarangay) {
+            hiddenBarangay = document.createElement('input');
+            hiddenBarangay.type = 'hidden';
+            hiddenBarangay.id = 'hiddenBarangay';
+            hiddenBarangay.name = 'barangayName';
+            barangaySelect.parentElement.appendChild(hiddenBarangay);
+        }
+        hiddenBarangay.value = barangaySelect.value;
+
+        // Remove name attribute from disabled selects to prevent empty submission
+        provinceSelect.removeAttribute('name');
+        citySelect.removeAttribute('name');
+        barangaySelect.removeAttribute('name');
+
+        // Add visual indication
+        provinceSelect.style.backgroundColor = '#e9ecef';
+        citySelect.style.backgroundColor = '#e9ecef';
+        barangaySelect.style.backgroundColor = '#e9ecef';
+
+    } else {
+        // Remove hidden inputs if they exist
+        const hiddenProvince = document.getElementById('hiddenProvince');
+        const hiddenCity = document.getElementById('hiddenCity');
+        const hiddenBarangay = document.getElementById('hiddenBarangay');
+
+        if (hiddenProvince) hiddenProvince.remove();
+        if (hiddenCity) hiddenCity.remove();
+        if (hiddenBarangay) hiddenBarangay.remove();
+
+        // Restore name attributes
+        provinceSelect.setAttribute('name', 'provinceName');
+        citySelect.setAttribute('name', 'cityName');
+        barangaySelect.setAttribute('name', 'barangayName');
+
+        // Enable the address fields if in edit mode
+        if (isEdit) {
+            provinceSelect.disabled = false;
+            citySelect.disabled = false;
+            barangaySelect.disabled = false;
+
+            // Remove visual indication
+            provinceSelect.style.backgroundColor = '';
+            citySelect.style.backgroundColor = '';
+            barangaySelect.style.backgroundColor = '';
+        }
+    }
+
+    // Update residency type after address changes
+    updateResidencyType();
+}
+
+// Update the validateLengthOfStay function to include this logic
 function validateLengthOfStay() {
     const ageValue = ageInput.value;
 
     // If age is empty or blank, clear length of stay
     if (!ageValue || ageValue === '') {
         lengthOfStayInput.value = '';
-        updateResidencyType(); // Update residency type when cleared
+        updateResidencyType();
         return;
     }
 
@@ -911,9 +1073,57 @@ function validateLengthOfStay() {
         lengthOfStayInput.value = age;
     }
 
+    // Call the address logic handler
+    handleLengthOfStayAddressLogic();
+
     // Update residency type after validation
     updateResidencyType();
 }
+
+// Add event listener to length of stay to trigger the logic
+lengthOfStayInput.addEventListener('input', validateLengthOfStay);
+lengthOfStayInput.addEventListener('blur', validateLengthOfStay);
+
+// Also call this when edit button is clicked (add to existing edit button listener)
+editButton.addEventListener('click', function () {
+    isEdit = true;
+    originalValues = [];
+    originalSameAsCurrentChecked = sameAsCurrent.checked;
+
+    // Save original address values
+    originalProvinceValue = document.getElementById('province').value;
+    originalCityValue = document.getElementById('city').value;
+    originalBarangayValue = document.getElementById('barangay').value;
+    originalPermanentProvinceValue = document.getElementById('permanentProvince').value;
+    originalPermanentCityValue = document.getElementById('permanentCity').value;
+    originalPermanentBarangayValue = document.getElementById('permanentBarangay').value;
+
+    inputs.forEach(function (input) {
+        originalValues.push(input.value);
+        input.removeAttribute('disabled');
+    });
+    sameAsCurrent.disabled = false;
+    editButton.classList.add('d-none');
+    cancelButton.classList.remove('d-none');
+    saveButton.classList.remove('d-none');
+
+    if (addButton) addButton.classList.remove('d-none');
+    if (deleteButton) deleteButton.classList.remove('d-none');
+
+    // Check length of stay and apply address logic
+    handleLengthOfStayAddressLogic();
+});
+
+// Call on page load to set initial state
+document.addEventListener('DOMContentLoaded', function () {
+    // Wait for JSON to load before checking
+    const checkInterval = setInterval(function () {
+        if (isJsonLoaded) {
+            handleLengthOfStayAddressLogic();
+            clearInterval(checkInterval);
+        }
+    }, 100);
+});
 
 // Trigger live calculation on birthDate input change
 birthDateInput.addEventListener('input', calculateAgeFromBirthDate);
@@ -1007,7 +1217,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             // Hide foreign address input
             foreignAddressDiv.style.display = 'none';
-            foreignAddressInput.disabled = true;
+            foreignAddressInput.disabled = false;
             foreignAddressInput.value = '';
 
             // Show PH address fields again
@@ -1017,6 +1227,8 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     }
+
+    window.toggleForeignAddress = toggleForeignAddress;
 
     // Run the check on load
     toggleForeignAddress();

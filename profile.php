@@ -179,7 +179,6 @@ if (isset($_POST['saveButton'])) {
     $ageNumeric = (int) filter_var($age, FILTER_SANITIZE_NUMBER_INT);
     $lengthOfStayNumeric = (int) $lengthOfStay;
 
-    // Convert to uppercase for exact comparison
     $currentProvince = strtoupper($provinceName);
     $currentCity = strtoupper($cityName);
     $currentBarangay = strtoupper($barangayName);
@@ -188,28 +187,32 @@ if (isset($_POST['saveButton'])) {
     $permanentCity = strtoupper($permanentCityName);
     $permanentBarangay = strtoupper($permanentBarangayName);
 
+    $isSpecificBonafide =
+        $currentProvince === 'BATANGAS' &&
+        $currentCity === 'SANTO TOMAS' &&
+        $currentBarangay === 'SAN ANTONIO' &&
+        $permanentProvince === 'BATANGAS' &&
+        $permanentCity === 'SANTO TOMAS' &&
+        $permanentBarangay === 'SAN ANTONIO' &&
+        $ageNumeric === $lengthOfStayNumeric;
+
+    $isSpecificCurrentAddress =
+        $currentProvince === 'BATANGAS' &&
+        $currentCity === 'SANTO TOMAS' &&
+        $currentBarangay === 'SAN ANTONIO';
+
     if (strtoupper($citizenship) !== 'FILIPINO') {
         $residencyType = "Foreign";
+    } else if ($isSpecificBonafide) {
+        $residencyType = "Bonafide";
+    } else if ($lengthOfStayNumeric >= 3 && $isSpecificCurrentAddress) {
+        $residencyType = "Migrant";
+    } else if ($lengthOfStayNumeric <= 2 && $isSpecificCurrentAddress) {
+        $residencyType = "Transient";
     } else {
-        // Check for the specific Bonafide condition
-        if (
-            $currentProvince === 'BATANGAS' &&
-            $currentCity === 'SANTO TOMAS' &&
-            $currentBarangay === 'SAN ANTONIO' &&
-            $permanentProvince === 'BATANGAS' &&
-            $permanentCity === 'SANTO TOMAS' &&
-            $permanentBarangay === 'SAN ANTONIO' &&
-            $ageNumeric === $lengthOfStayNumeric
-        ) {
-            $residencyType = "Bonafide";
-        } else if ($lengthOfStayNumeric >= 3) {
-            $residencyType = "Migrant";
-        } else if ($lengthOfStayNumeric <= 2) {
-            $residencyType = "Transient";
-        } else {
-            $residencyType = "";
-        }
+        $residencyType = "";
     }
+
 
 
     $educationalLevel = NULL;
@@ -233,6 +236,11 @@ if (isset($_POST['saveButton'])) {
                 : NULL;
         }
     }
+
+    if (empty($residencyType)) {
+        $residencyType = NULL;
+    }
+
     $updateUserInfoQuery = "UPDATE userInfo SET 
     firstName = '$firstName', 
     middleName = '$middleName', 
@@ -250,7 +258,7 @@ if (isset($_POST['saveButton'])) {
     shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
     collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
     lengthOfStay = '$lengthOfStay', 
-    residencyType = '$residencyType', 
+    residencyType = " . ($residencyType !== NULL ? "'$residencyType'" : "NULL") . ", 
     remarks = '$remarks'
     WHERE userID = $userID;";
     $updateUserInfoResult = executeQuery($updateUserInfoQuery);
@@ -854,6 +862,12 @@ if (isset($_POST['confirmButton'])) {
                                         <option value="BSECE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSECE') ? 'selected' : ''; ?>>BSECE</option>
                                         <option value="BSEE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSEE') ? 'selected' : ''; ?>>BSEE</option>
                                         <option value="BSBA" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSBA') ? 'selected' : ''; ?>>BSBA</option>
+                                        <option value="BSTM" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSTM') ? 'selected' : ''; ?>>BSTM </option>
+                                        <option value="BSHRM" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSHRM') ? 'selected' : ''; ?>>BSHRM</option>
+                                        <option value="BSED" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSED') ? 'selected' : ''; ?>>BSED</option>
+                                        <option value="BSCE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSCE') ? 'selected' : ''; ?>>BSCE</option>
+                                        <option value="BSME" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSME') ? 'selected' : ''; ?>>BSME</option>
+
                                     </select>
                                     <label for="collegeCourse">College Course</label>
                                 </div>
