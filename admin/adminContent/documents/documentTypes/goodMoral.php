@@ -7,7 +7,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong>, Legal Age, <?php echo $civilStatus . ", " . $citizenship . " a resident of " . $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName . ", as " . $residencyType . " been residing here since " ?> <strong><?php echo $yearsOfStay ?></strong> up to present.</p>
+                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong>, Legal Age, <?php echo $civilStatus . ", " . $citizenship . " a resident of " ?><?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?>, as <?php echo $residencyType . " been residing here since " ?> <strong><?php echo $yearsOfStay ?></strong> up to present.</p>
             </div>
         </div>
         <div class="row">

@@ -20,7 +20,7 @@
                         <p class="mb-1"><strong>Business Address:</strong> <?php echo $businessAddress ?></p>
                         <p class="mb-1"><strong>Owner's Name:</strong> <?php echo $fullName ?></p>
                         <p class="mb-1"><strong>Owner's Address:</strong>
-                            <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " . $streetName . " " . $barangayName . ", " . $cityName . ", " . $provinceName ?>
+                            <?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?>
                         </p>
                         <p class="mb-1"><strong>Nature of Business:</strong> <?php echo $businessNature ?></p>
                         <p class="mb-1"><strong>Control No:</strong> <?php echo $controlNo ?></p>

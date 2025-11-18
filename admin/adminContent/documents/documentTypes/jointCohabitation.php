@@ -7,7 +7,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong> & <strong><?php echo $spouseName ?></strong>, Legal Age, <?php echo $civilStatus . ", " . $citizenship . " and a " ?> <strong><?php echo $residencyType ?></strong> resident of <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " . $streetName . ", ". $barangayName . ", " . $cityName . ", " . $provinceName . ", that they are living together as spouses without the benefit of a valid marriage since "?><strong>Year <?php echo $marriageYear ?> up to present</strong>.</p>
+                <p style="text-indent: 48px; text-align: justify;">This is to certify that <strong><?php echo $fullName ?></strong> & <strong><?php echo $spouseName ?></strong>, Legal Age, <?php echo $civilStatus . ", " . $citizenship . " and a " ?> <strong><?php echo $residencyType ?></strong> resident of <?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?>, that they are living together as spouses without the benefit of a valid marriage since <strong>Year <?php echo $marriageYear ?> up to present</strong>.</p>
             </div>
         </div>
         <div class="row">
