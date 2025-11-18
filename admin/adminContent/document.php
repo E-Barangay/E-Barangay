@@ -54,6 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       $purpose = $_POST['ownership'] ?? '';
       break;
 
+    case '4': // First Time Jobseeker
+      $educationStatus = $_POST['educationStatus'] ?? '';
+      $purpose = 'General Request';
+      break;
+
     case '1': // Barangay Clearance, Good Health, Residency
     case '5':
     case '8':
@@ -81,10 +86,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       break;
   }
 
-  $insertQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, spouseName, marriageYear, childNo, soloParentSinceDate, documentStatus, requestDate) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())";
+  $insertQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, educationStatus, spouseName, marriageYear, childNo, soloParentSinceDate, documentStatus, requestDate) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())";
   $stmt = $pdo->prepare($insertQuery);
-  $stmt->execute([$documentTypeID, $userID, $purpose, $businessName, $businessAddress, $businessNature, $controlNo, $ownership, $spouseName, $marriageYear, $childNo, $soloParentSinceDate]);
+  $stmt->execute([$documentTypeID, $userID, $purpose, $businessName, $businessAddress, $businessNature, $controlNo, $ownership, $educationStatus, $spouseName, $marriageYear, $childNo, $soloParentSinceDate]);
+
+  if ($documentTypeID == 4) {
+    if ($educationStatus === "Not Studying") {
+        $update = $pdo->prepare("UPDATE userInfo SET isOSY = 'Yes' WHERE userID = ?");
+        $update->execute([$userID]);
+    } else {
+        $update = $pdo->prepare("UPDATE userInfo SET isOSY = 'No' WHERE userID = ?");
+        $update->execute([$userID]);
+    }
+  }
 
   echo "<script>window.location.href = 'index.php?page=document';</script>";
   exit();
@@ -669,7 +684,6 @@ $docTypesResults = executeQuery($docTypesQuery);
 
               <!-- Business Clearance (documentTypeID = 2) -->
               <div class="document-form-section" data-doc-type="business" style="display: none;">
-                <p class="note mb-3">Please fill out your business details and choose the purpose of your request:</p>
 
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="businessName" name="businessName"
@@ -738,10 +752,21 @@ $docTypesResults = executeQuery($docTypesQuery);
                   <label for="ownership">Ownership</label>
                 </div>
               </div>
+                
+              <div class="document-form-section" data-doc-type="firstTime" style="display: none;">
+
+                <div class="form-floating">
+                    <select class="form-select" id="educationStatus" name="educationStatus" required>
+                        <option value="" selected disabled>Select your status</option>
+                        <option value="Studying">Yes still studying</option>
+                        <option value="Not Studying">No longer studying</option>
+                    </select>
+                    <label for="educationStatus">Educational Status</label>
+                </div>
+              </div>
 
               <!-- Barangay Clearance (documentTypeID = 1, 5, 9) -->
               <div class="document-form-section" data-doc-type="clearance" style="display: none;">
-                <p class="note mb-3">Please select the purpose for your request:</p>
 
                 <div class="form-floating">
                   <select class="form-select selectPurpose" id="purpose" name="purpose" required>
@@ -765,7 +790,6 @@ $docTypesResults = executeQuery($docTypesQuery);
 
               <!-- Construction Clearance (documentTypeID = 3) -->
               <div class="document-form-section" data-doc-type="construction" style="display: none;">
-                <p class="note mb-3">Please select the purpose for your request:</p>
 
                 <div class="form-floating">
                   <select class="form-select" id="constructionClearancePurpose" name="purpose" required>
@@ -783,7 +807,6 @@ $docTypesResults = executeQuery($docTypesQuery);
 
               <!-- Marriage Certificate (documentTypeID = 7) -->
               <div class="document-form-section" data-doc-type="marriage" style="display: none;">
-                <p class="note mb-3">Please fill out your marriage details below.</p>
 
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="spouseName" name="spouseName" placeholder="Spouse Name"
@@ -802,7 +825,6 @@ $docTypesResults = executeQuery($docTypesQuery);
 
               <!-- Certificate of No. of Children (documentTypeID = 10) -->
               <div class="document-form-section" data-doc-type="children" style="display: none;">
-                <p class="note mb-3">Please enter the number of children you have.</p>
 
                 <div class="form-floating mb-3">
                   <input type="number" class="form-control" id="childNo" name="childNo"
@@ -867,6 +889,13 @@ $docTypesResults = executeQuery($docTypesQuery);
         // Business Clearance (ID = 2)
         if (selectedType === '2') {
           activeSection = document.querySelector('[data-doc-type="business"]');
+        }
+        //First Time Job Seeker (ID = 4)
+        else if (selectedType === '4') {
+          activeSection = document.querySelector('[data-doc-type="firstTime"]');
+        }
+        else if (['1', '5', '8'].includes(selectedType)) {
+          activeSection = document.querySelector('[data-doc-type="clearance"]');
         }
         // Barangay Clearance (IDs = 1, 5, 8)
         else if (['1', '5', '8'].includes(selectedType)) {

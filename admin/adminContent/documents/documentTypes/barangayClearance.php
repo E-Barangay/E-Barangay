@@ -13,8 +13,8 @@
         <div class="row">
             <div class="col-9 text-start">
                 <p class="mb-1"><strong>Name:</strong> <?php echo $fullName ?></p>
-                <p class="mb-1"><strong>Address:</strong> <?php echo $blockLotNo . ", " . $phase . ", " . $subdivisionName . ", " .$purok . ", " .$streetName . ", " .$barangayName . ", " .$cityName . ", " .$provinceName ?></p>
-                <p class="mb-1"><strong>Permanent Address:</strong> <?php echo $permanentBlockLotNo . ", " . $permanentPhase . ", " . $permanentSubdivisionName . ", " . $permanentPurok . ", " . $permanentStreetName . ", " . $permanentBarangayName . ", " . $permanentCityName . ", " . $permanentProvinceName; ?></p>
+                <p class="mb-1"><strong>Address:</strong> <?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?></p>
+                <p class="mb-1"><strong>Permanent Address:</strong> <?php echo implode(', ', array_filter([$permanentBlockLotNo, $permanentSubdivisionName, $permanentPhase, $permanentPurok, $permanentStreetName, $permanentBarangayName, $permanentCityName, $permanentProvinceName])) ?></p>
                 <p class="mb-1"><strong>Place of Birth:</strong> <?php echo $birthPlace ?></p>
                 <p class="mb-1"><strong>Date of Birth:</strong> <?php echo date("F j, Y", strtotime($birthDate)); ?></p>
                 <p class="mb-1"><strong>Age: </strong> <?php echo $age . " years old"; ?></p>
