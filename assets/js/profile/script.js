@@ -130,6 +130,20 @@ cancelButton.addEventListener('click', function () {
         existingAlert.remove();
     }
 
+    // Restore SHS Track state
+    const savedTrack = shsTrackSelect.getAttribute('data-saved') || '';
+    const isCustomTrack = savedTrack && !predefinedTracks.includes(savedTrack);
+
+    if (isCustomTrack) {
+        shsTrackSelect.value = 'Others';
+        shsTrackText.value = savedTrack;
+    } else {
+        shsTrackSelect.value = savedTrack;
+        shsTrackText.value = '';
+    }
+
+    toggleShsTrackInput();
+
 });
 
 saveButton.addEventListener('click', function (e) {
@@ -184,6 +198,7 @@ saveButton.addEventListener('click', function (e) {
     editButton.classList.remove('d-none');
     cancelButton.classList.add('d-none');
     saveButton.classList.add('d-none');
+
 });
 
 if (fileInput && preview) {
@@ -1167,6 +1182,8 @@ function updateEducationalFields(educationalLevelVal = null) {
             .includes(educationalLevelValue)
     ) {
         collegeCourseDiv.style.display = 'block';
+        // Initialize the college course display when showing
+        toggleCollegeCourseInput();
     }
 }
 
@@ -1181,11 +1198,13 @@ educationalLevel.addEventListener('change', function () {
     // Clear unrelated fields
     if (!['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate']
         .includes(this.value)) {
-        shsTrack.value = '';
+        shsTrackSelect.value = '';
+        shsTrackText.value = '';
     }
     if (!['College', 'College Undergraduate', 'College Graduate']
         .includes(this.value)) {
         collegeCourse.value = '';
+        collegeCourseText.value = '';
     }
 
     updateEducationalFields();
@@ -1237,3 +1256,213 @@ document.addEventListener("DOMContentLoaded", function () {
     citizenshipSelect.addEventListener('change', toggleForeignAddress);
 });
 
+// ========== COLLEGE COURSE "OTHERS" HANDLING ==========
+const collegeCourseSelect = document.getElementById('collegeCourse');
+const collegeCourseText = document.getElementById('collegeCourseText');
+const collegeCourseLabel = document.getElementById('collegeCourseLabel');
+const backToDropdownBtn = document.getElementById('backToDropdownBtn');
+
+// Store predefined courses for restoration
+const predefinedCourses = ['BSIT', 'BSECE', 'BSEE', 'BSBA', 'BSTM', 'BSHRM', 'BSED', 'BSCE', 'BSME'];
+
+function toggleCollegeCourseInput() {
+    const selectedValue = collegeCourseSelect.value;
+    const isEditMode = !collegeCourseSelect.disabled;
+
+    if (selectedValue === 'Others') {
+        // Hide select, show text input
+        collegeCourseSelect.classList.add('d-none');
+        collegeCourseText.classList.remove('d-none');
+
+        // Only show button in edit mode, otherwise hide it completely
+        if (isEditMode) {
+            backToDropdownBtn.classList.remove('d-none');
+        } else {
+            backToDropdownBtn.classList.add('d-none');
+        }
+
+        // Match disabled state
+        collegeCourseText.disabled = !isEditMode;
+
+        // Only focus if we're in edit mode
+        if (isEditMode) {
+            collegeCourseText.focus();
+        }
+    } else {
+        // Show select, hide text input and back button
+        collegeCourseSelect.classList.remove('d-none');
+        collegeCourseText.classList.add('d-none');
+        backToDropdownBtn.classList.add('d-none');
+
+        // Clear text input when switching back to dropdown
+        if (selectedValue !== '') {
+            collegeCourseText.value = '';
+        }
+    }
+}
+
+// Handle back to dropdown button click
+backToDropdownBtn.addEventListener('click', function () {
+    if (!collegeCourseSelect.disabled) {
+        // Reset to empty selection to show all options
+        collegeCourseSelect.value = '';
+        toggleCollegeCourseInput();
+
+        // Focus on the dropdown
+        collegeCourseSelect.focus();
+    }
+});
+
+// Initialize on page load
+function initializeCollegeCourseField() {
+    // Check if "Others" is already selected (from PHP)
+    if (collegeCourseSelect.value === 'Others') {
+        toggleCollegeCourseInput();
+    }
+}
+
+// Run on DOM load
+document.addEventListener('DOMContentLoaded', initializeCollegeCourseField);
+
+// Listen for changes on the select
+collegeCourseSelect.addEventListener('change', toggleCollegeCourseInput);
+
+// Update the existing editButton event listener to handle college course
+editButton.addEventListener('click', function () {
+    // Re-run toggle to show button when entering edit mode
+    if (collegeCourseSelect.value === 'Others') {
+        toggleCollegeCourseInput();
+    }
+});
+
+// Update cancel button to properly restore college course state
+cancelButton.addEventListener('click', function () {
+    // Get the saved value
+    const savedCourse = collegeCourseSelect.getAttribute('data-saved') || '';
+
+    // Check if saved course is custom
+    const isCustom = savedCourse && !predefinedCourses.includes(savedCourse);
+
+    if (isCustom) {
+        collegeCourseSelect.value = 'Others';
+        collegeCourseText.value = savedCourse;
+    } else {
+        collegeCourseSelect.value = savedCourse;
+        collegeCourseText.value = '';
+    }
+
+    toggleCollegeCourseInput();
+});
+
+
+// ========== SHS TRACK "OTHERS" HANDLING ==========
+// Add this section after the college course handling code
+
+const shsTrackSelect = document.getElementById('shsTrack');
+const shsTrackText = document.getElementById('shsTrackText');
+const shsTrackLabel = document.getElementById('shsTrackLabel');
+const backToShsDropdownBtn = document.getElementById('backToShsDropdownBtn');
+
+// Store predefined tracks for restoration
+const predefinedTracks = ['STEM', 'ABM', 'HUMMS', 'ICT', 'GAS', 'TVL'];
+
+function toggleShsTrackInput() {
+    const selectedValue = shsTrackSelect.value;
+    const isEditMode = !shsTrackSelect.disabled;
+
+    if (selectedValue === 'Others') {
+        // Hide select, show text input
+        shsTrackSelect.classList.add('d-none');
+        shsTrackText.classList.remove('d-none');
+
+        // Only show button in edit mode, otherwise hide it completely
+        if (isEditMode) {
+            backToShsDropdownBtn.classList.remove('d-none');
+        } else {
+            backToShsDropdownBtn.classList.add('d-none');
+        }
+
+        // Match disabled state
+        shsTrackText.disabled = !isEditMode;
+
+        // Only focus if we're in edit mode
+        if (isEditMode) {
+            shsTrackText.focus();
+        }
+    } else {
+        // Show select, hide text input and back button
+        shsTrackSelect.classList.remove('d-none');
+        shsTrackText.classList.add('d-none');
+        backToShsDropdownBtn.classList.add('d-none');
+
+        // Clear text input when switching back to dropdown
+        if (selectedValue !== '') {
+            shsTrackText.value = '';
+        }
+    }
+}
+
+// Handle back to dropdown button click
+backToShsDropdownBtn.addEventListener('click', function () {
+    if (!shsTrackSelect.disabled) {
+        // Reset to empty selection to show all options
+        shsTrackSelect.value = '';
+        toggleShsTrackInput();
+
+        // Focus on the dropdown
+        shsTrackSelect.focus();
+    }
+});
+
+// Initialize on page load
+function initializeShsTrackField() {
+    // Check if "Others" is already selected (from PHP)
+    if (shsTrackSelect.value === 'Others') {
+        toggleShsTrackInput();
+    }
+}
+
+// Run on DOM load
+document.addEventListener('DOMContentLoaded', initializeShsTrackField);
+
+// Listen for changes on the select
+shsTrackSelect.addEventListener('change', toggleShsTrackInput);
+
+// Update the existing editButton event listener to handle SHS track
+// Add this to your existing editButton click handler
+const originalEditButtonHandler = editButton.onclick;
+editButton.addEventListener('click', function () {
+    // Re-run toggle to show button when entering edit mode
+    if (shsTrackSelect.value === 'Others') {
+        toggleShsTrackInput();
+    }
+});
+
+// Update the updateEducationalFields function to initialize SHS track display
+function updateEducationalFields(educationalLevelVal = null) {
+    const educationalLevelValue = educationalLevelVal || educationalLevel.value;
+
+    // Hide all by default
+    shsTrackDiv.style.display = 'none';
+    collegeCourseDiv.style.display = 'none';
+
+    // Senior High fields
+    if (
+        ['Senior High School', 'Senior High Undergraduate', 'Senior High Graduate']
+            .includes(educationalLevelValue)
+    ) {
+        shsTrackDiv.style.display = 'block';
+        // Initialize the SHS track display when showing
+        toggleShsTrackInput();
+    }
+
+    // College fields
+    else if (
+        ['College', 'College Undergraduate', 'College Graduate']
+            .includes(educationalLevelValue)
+    ) {
+        collegeCourseDiv.style.display = 'block';
+        // Initialize the college course display when showing
+        toggleCollegeCourseInput();
+    }
+}

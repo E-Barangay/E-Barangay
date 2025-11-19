@@ -227,13 +227,26 @@ if (isset($_POST['saveButton'])) {
         $levelLower = strtolower($educationalLevel);
 
         if (strpos($levelLower, 'senior high') !== false) {
-            $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
-                ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
-                : NULL;
+            // Check if user selected "Others" option
+            if (isset($_POST['shsTrack']) && $_POST['shsTrack'] === 'Others') {
+                $shsTrack = isset($_POST['shsTrackOther']) && !empty($_POST['shsTrackOther'])
+                    ? mysqli_real_escape_string($conn, $_POST['shsTrackOther'])
+                    : NULL;
+            } else {
+                $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
+                    ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
+                    : NULL;
+            }
         } else if (strpos($levelLower, 'college') !== false) {
-            $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
-                ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
-                : NULL;
+            if (isset($_POST['collegeCourse']) && $_POST['collegeCourse'] === 'Others') {
+                $collegeCourse = isset($_POST['collegeCourseOther']) && !empty($_POST['collegeCourseOther'])
+                    ? mysqli_real_escape_string($conn, $_POST['collegeCourseOther'])
+                    : NULL;
+            } else {
+                $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
+                    ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
+                    : NULL;
+            }
         }
     }
 
@@ -347,26 +360,36 @@ if (isset($_POST['confirmButton'])) {
                 <div class="col">
 
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'newUser'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i
+                                class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Welcome! Kindly fill out your
+                            profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordCreated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Welcome! Kindly fill out your profile details
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i
+                                class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Welcome! Kindly fill out your
+                            profile details
                             below so you can enjoy all the services we offer.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'profileUpdated'): ?>
-                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your profile has been successfully updated.</div>
+                        <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i
+                                class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your profile has been
+                            successfully updated.</div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation1'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i
+                                class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please complete your
+                            profile information below to
                             proceed with your document request.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
                     <?php if (isset($_SESSION['warning']) && $_SESSION['warning'] === 'incompleteInformation2'): ?>
-                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please complete your profile information below to
+                        <div class="alert alert-warning text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i
+                                class="fa-solid fa-triangle-exclamation" style="margin-right:8px;"></i>Please complete your
+                            profile information below to
                             proceed with your complaint.</div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
@@ -838,9 +861,16 @@ if (isset($_POST['confirmButton'])) {
                                 </div>
                             </div>
 
+                            <?php
+                            $predefinedTracks = ['STEM', 'ABM', 'HUMMS', 'ICT', 'GAS', 'TVL'];
+                            $isCustomTrack = !empty($shsTrack) && !in_array($shsTrack, $predefinedTracks);
+                            ?>
+
                             <div class="col-lg-4 col-md-6 col-6 mb-3" id="shsTrackDiv" style="display:none;">
-                                <div class="form-floating">
-                                    <select class="form-select" id="shsTrack" name="shsTrack" disabled>
+                                <div class="form-floating position-relative">
+                                    <select class="form-select <?php echo $isCustomTrack ? 'd-none' : ''; ?>"
+                                        id="shsTrack" name="shsTrack"
+                                        data-saved="<?php echo htmlspecialchars($shsTrack ?? ''); ?>" disabled>
                                         <option value="" disabled <?php echo empty($shsTrack) ? 'selected' : ''; ?>>
                                             Select Track</option>
                                         <option value="STEM" <?php echo (isset($shsTrack) && $shsTrack == 'STEM') ? 'selected' : ''; ?>>STEM</option>
@@ -848,28 +878,64 @@ if (isset($_POST['confirmButton'])) {
                                         <option value="HUMMS" <?php echo (isset($shsTrack) && $shsTrack == 'HUMMS') ? 'selected' : ''; ?>>HUMMS</option>
                                         <option value="ICT" <?php echo (isset($shsTrack) && $shsTrack == 'ICT') ? 'selected' : ''; ?>>ICT</option>
                                         <option value="GAS" <?php echo (isset($shsTrack) && $shsTrack == 'GAS') ? 'selected' : ''; ?>>GAS</option>
-                                        <option value="TVL" <?php echo (isset($shsTrack) && $shsTrack == 'GAS') ? 'selected' : ''; ?>>TVL</option>
+                                        <option value="TVL" <?php echo (isset($shsTrack) && $shsTrack == 'TVL') ? 'selected' : ''; ?>>TVL</option>
+                                        <option value="Others" <?php echo $isCustomTrack ? 'selected' : ''; ?>>Others |
+                                            Specify</option>
                                     </select>
-                                    <label for="shsTrack">Senior High Track</label>
+                                    <input type="text"
+                                        class="form-control <?php echo $isCustomTrack ? '' : 'd-none'; ?>"
+                                        id="shsTrackText" name="shsTrackOther" placeholder="Specify SHS Track"
+                                        value="<?php echo $isCustomTrack ? htmlspecialchars($shsTrack) : ''; ?>"
+                                        style="padding-right: 40px;" disabled>
+                                    <label for="shsTrack" id="shsTrackLabel">Senior High Track</label>
+                                    <button type="button"
+                                        class="btn btn-sm <?php echo $isCustomTrack ? '' : 'd-none'; ?>"
+                                        id="backToShsDropdownBtn"
+                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; padding: 2px 8px; font-size: 12px;"
+                                        title="Back to dropdown">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </button>
                                 </div>
                             </div>
 
+                            <?php
+                            $predefinedCourses = ['BSIT', 'BSECE', 'BSEE', 'BSBA', 'BSTM', 'BSHRM', 'BSED', 'BSCE', 'BSME'];
+                            $isCustomCourse = !empty($collegeCourse) && !in_array($collegeCourse, $predefinedCourses);
+                            ?>
+
                             <div class="col-lg-4 col-md-6 col-6 mb-3" id="collegeCourseDiv" style="display:none;">
-                                <div class="form-floating">
-                                    <select class="form-select" id="collegeCourse" name="collegeCourse" disabled>
+                                <div class="form-floating position-relative">
+                                    <select class="form-select <?php echo $isCustomCourse ? 'd-none' : ''; ?>"
+                                        id="collegeCourse" name="collegeCourse"
+                                        data-saved="<?php echo htmlspecialchars($collegeCourse ?? ''); ?>" disabled>
                                         <option value="" disabled <?php echo empty($collegeCourse) ? 'selected' : ''; ?>>Select Course</option>
                                         <option value="BSIT" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSIT') ? 'selected' : ''; ?>>BSIT</option>
                                         <option value="BSECE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSECE') ? 'selected' : ''; ?>>BSECE</option>
                                         <option value="BSEE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSEE') ? 'selected' : ''; ?>>BSEE</option>
                                         <option value="BSBA" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSBA') ? 'selected' : ''; ?>>BSBA</option>
-                                        <option value="BSTM" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSTM') ? 'selected' : ''; ?>>BSTM </option>
+                                        <option value="BSTM" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSTM') ? 'selected' : ''; ?>>BSTM</option>
                                         <option value="BSHRM" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSHRM') ? 'selected' : ''; ?>>BSHRM</option>
                                         <option value="BSED" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSED') ? 'selected' : ''; ?>>BSED</option>
                                         <option value="BSCE" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSCE') ? 'selected' : ''; ?>>BSCE</option>
                                         <option value="BSME" <?php echo (isset($collegeCourse) && $collegeCourse == 'BSME') ? 'selected' : ''; ?>>BSME</option>
-
+                                        <option value="Others" <?php echo $isCustomCourse ? 'selected' : ''; ?>>Others |
+                                            Specify
+                                        </option>
                                     </select>
-                                    <label for="collegeCourse">College Course</label>
+                                    <input type="text"
+                                        class="form-control <?php echo $isCustomCourse ? '' : 'd-none'; ?>"
+                                        id="collegeCourseText" name="collegeCourseOther"
+                                        placeholder="Specify College Course"
+                                        value="<?php echo $isCustomCourse ? htmlspecialchars($collegeCourse) : ''; ?>"
+                                        style="padding-right: 40px;" disabled>
+                                    <label for="collegeCourse" id="collegeCourseLabel">College Course</label>
+                                    <button type="button"
+                                        class="btn btn-sm <?php echo $isCustomCourse ? '' : 'd-none'; ?>"
+                                        id="backToDropdownBtn"
+                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); z-index: 10; padding: 2px 8px; font-size: 12px;"
+                                        title="Back to dropdown">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </button>
                                 </div>
                             </div>
 
