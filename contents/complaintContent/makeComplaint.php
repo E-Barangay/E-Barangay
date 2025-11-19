@@ -45,14 +45,40 @@ if (isset($_POST['submit'])) {
     $isAction = 'NO';
     $latitude = mysqli_real_escape_string($conn, $_POST['latitude']);
     $longitude = mysqli_real_escape_string($conn, $_POST['longitude']);
+    $complaintTypes = [
+        "Physical Assault and Threats" => "Criminal",
+        "Alcohol-Related Disturbances" => "Criminal",
+        "Curfew Violations" => "Criminal",
+        "Smoking and Littering Violations" => "Criminal",
+        "Vandalism and Property Damage" => "Criminal",
+        "Theft and Stolen Property Incidents" => "Criminal",
+
+        "Noise Complaints" => "Civil",
+        "Boundary and Land Disputes" => "Civil",
+        "Neighborhood Quarrels" => "Civil",
+        "Animal-Related Complaints" => "Civil",
+        "Youth-Related Issues" => "Civil",
+        "Barangay Clearance and Permit Concerns" => "Civil",
+        "Garbage and Sanitation Complaints" => "Civil",
+        "Traffic and Parking Issues" => "Civil",
+        "Water Supply Disputes" => "Civil",
+        "Business-Related Conflicts" => "Civil",
+        "Illegal Structures and Encroachments" => "Civil",
+    ];
+
+    if ($complaintTitle === "Other") {
+        $complaintType = "Other";
+    } else {
+        $complaintType = $complaintTypes[$complaintTitle] ?? "Other";
+    }
 
     if (!empty($complaintDescription) && !empty($complaintTitle)) {
         $userID = $_SESSION['userID'];
 
         $sql = "INSERT INTO complaints 
-                (userID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complainantName, complaintVictim, victimAge, isDeleted, victimRelationship, ActionTaken, latitude, longitude)
+                (userID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complainantName, complaintVictim, victimAge, isDeleted, victimRelationship, ActionTaken, latitude, longitude, complaintType)
                 VALUES 
-                ('$userID', '$complaintTitle', '$complaintDescription', NOW(), '$requestStatus', '$phoneNumber', '$complaintAccused', '$complaintAddress', '$userName', '$complaintVictim', '$userAge', '$isDeleted', '$relationshipVictim', '$isAction', '$latitude', '$longitude')";
+                ('$userID', '$complaintTitle', '$complaintDescription', NOW(), '$requestStatus', '$phoneNumber', '$complaintAccused', '$complaintAddress', '$userName', '$complaintVictim', '$userAge', '$isDeleted', '$relationshipVictim', '$isAction', '$latitude', '$longitude', '$complaintType')";
         if (mysqli_query($conn, $sql)) {
 
             $complaintID = mysqli_insert_id($conn);
@@ -180,29 +206,31 @@ if (isset($_POST['submit'])) {
                                 <label for="title" class="form-label me-2"
                                     style="color: #19AFA5; min-width: 80px;">Title:</label>
                                 <select class="form-select" id="title" name="title" required>
-                                    <option value="" disabled selected></option>
+                                    <option value="" disabled selected>Select Complaint Type</option>
+                                    <option value="Physical Assault and Threats">Physical Assault and Threats</option>
+                                    <option value="Alcohol-Related Disturbances">Alcohol-Related Disturbances</option>
+                                    <option value="Curfew Violations">Curfew Violations</option>
+                                    <option value="Smoking and Littering Violations">Smoking and Littering Violations
+                                    </option>
+                                    <option value="Vandalism and Property Damage">Vandalism and Property Damage</option>
+                                    <option value="Theft and Stolen Property Incidents">Theft and Stolen Property
+                                        Incidents</option>
+
                                     <option value="Noise Complaints">Noise Complaints</option>
                                     <option value="Boundary and Land Disputes">Boundary and Land Disputes</option>
                                     <option value="Neighborhood Quarrels">Neighborhood Quarrels</option>
                                     <option value="Animal-Related Complaints">Animal-Related Complaints</option>
                                     <option value="Youth-Related Issues">Youth-Related Issues</option>
-                                    <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit
-                                        Concerns
-                                    </option>
+                                    <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit Concerns</option>
                                     <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints
                                     </option>
-                                    <option value="Alcohol-Related Disturbances">Alcohol-Related Disturbances</option>
                                     <option value="Traffic and Parking Issues">Traffic and Parking Issues</option>
-                                    <option value="Physical Assault and Threats">Physical Assault and Threats</option>
                                     <option value="Water Supply Disputes">Water Supply Disputes</option>
                                     <option value="Business-Related Conflicts">Business-Related Conflicts</option>
-                                    <option value="Curfew Violations">Curfew Violations</option>
-                                    <option value="Smoking and Littering Violations">Smoking and Littering Violations
-                                    </option>
-                                    <option value="Illegal Structures and Encroachments">Illegal Structures and
-                                        Encroachments
-                                    </option>
+                                    <option value="Illegal Structures and Encroachments">Illegal Structures and Encroachments</option>
+
                                     <option value="Other">Other</option>
+
                                 </select>
                             </div>
                         </div>
