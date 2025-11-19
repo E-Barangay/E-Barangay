@@ -206,15 +206,14 @@ if (isset($_POST['submit'])) {
                                 <label for="title" class="form-label me-2"
                                     style="color: #19AFA5; min-width: 80px;">Title:</label>
                                 <select class="form-select" id="title" name="title" required>
-                                    <option value="" disabled selected>Select Complaint Type</option>
+                                    <option value="" disabled selected>Select Complaint</option>
                                     <option value="Physical Assault and Threats">Physical Assault and Threats</option>
                                     <option value="Alcohol-Related Disturbances">Alcohol-Related Disturbances</option>
                                     <option value="Curfew Violations">Curfew Violations</option>
                                     <option value="Smoking and Littering Violations">Smoking and Littering Violations
                                     </option>
                                     <option value="Vandalism and Property Damage">Vandalism and Property Damage</option>
-                                    <option value="Theft and Stolen Property Incidents">Theft and Stolen Property
-                                        Incidents</option>
+                                    <option value="Theft and Stolen Property Incidents">Theft and Stolen Property Incidents</option>
 
                                     <option value="Noise Complaints">Noise Complaints</option>
                                     <option value="Boundary and Land Disputes">Boundary and Land Disputes</option>
@@ -222,8 +221,7 @@ if (isset($_POST['submit'])) {
                                     <option value="Animal-Related Complaints">Animal-Related Complaints</option>
                                     <option value="Youth-Related Issues">Youth-Related Issues</option>
                                     <option value="Barangay Clearance and Permit Concerns">Barangay Clearance and Permit Concerns</option>
-                                    <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints
-                                    </option>
+                                    <option value="Garbage and Sanitation Complaints">Garbage and Sanitation Complaints</option>
                                     <option value="Traffic and Parking Issues">Traffic and Parking Issues</option>
                                     <option value="Water Supply Disputes">Water Supply Disputes</option>
                                     <option value="Business-Related Conflicts">Business-Related Conflicts</option>
