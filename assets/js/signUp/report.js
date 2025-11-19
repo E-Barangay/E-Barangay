@@ -117,7 +117,12 @@ map.on('click', function (e) {
     currentMarker = L.marker([lat, lng]).addTo(map);
 
     fetch(`/E-Barangay/contents/complaintContent/proxy.php?lat=${lat}&lon=${lng}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
         .then(data => {
             var address = data.display_name;
             if (address) {
@@ -126,7 +131,12 @@ map.on('click', function (e) {
             } else {
                 currentMarker.bindPopup("Unknown Location").openPopup();
             }
+        })
+        .catch(err => {
+            console.error("Fetch Error:", err);
+            currentMarker.bindPopup("Location lookup failed").openPopup();
         });
+
 
 });
 
