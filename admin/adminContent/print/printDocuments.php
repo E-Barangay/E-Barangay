@@ -39,7 +39,7 @@ $query = "
     userinfo.educationalLevel,
     userinfo.shsTrack,
     userinfo.collegeCourse,
-    userinfo.outOfSchoolYouth
+    userinfo.isOSY
   FROM userinfo
   INNER JOIN documents ON userinfo.userID = documents.userID
   INNER JOIN documenttypes ON documents.documentTypeID = documenttypes.documentTypeID
@@ -227,7 +227,7 @@ if ($from && $to) {
           <td><?= $levelCode ?></td>
           <td><?= ($educationalLevel === 'college') ? '✓' : '' ?></td>
           <td><?= htmlspecialchars($r['collegeCourse'] ?? '') ?></td>
-          <td><?= ($r['outOfSchoolYouth'] == 1) ? '✓' : '' ?></td>
+          <td><?= ($r['isOSY'] == 1) ? '✓' : '' ?></td>
         </tr>
         <?php endforeach; ?>
       <?php else: ?>
