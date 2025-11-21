@@ -51,6 +51,7 @@ $civilStatus = $userDataRow['civilStatus'];
 $citizenship = $userDataRow['citizenship'];
 $lengthOfStay = $userDataRow['lengthOfStay'];
 $residencyType = $userDataRow['residencyType'];
+$remarks = $userDataRow['remarks'];
 $phoneNumber = $userDataRow['phoneNumber'];
 $email = $userDataRow['email'];
 
