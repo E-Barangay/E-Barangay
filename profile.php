@@ -965,15 +965,12 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-md-7 col-12 mb-4">
                                 <div class="form-floating">
-                                    <select class="form-select" id="remarks" name="remarks" disabled>
-                                        <option value="" disabled <?php echo empty($remarks) ? 'selected' : ''; ?>>
-                                            Select Remarks</option>
-                                        <option value="No Derogatory" <?php echo ($remarks == 'No Derogatory') ? 'selected' : ''; ?>>No Derogatory</option>
-                                        <option value="With Derogatory" <?php echo ($remarks == 'With Derogatory') ? 'selected' : ''; ?>>With Derogatory</option>
-                                    </select>
+                                    <input type="text" class="form-control" id="remarks" name="remarks"
+                                        value="<?php echo htmlspecialchars($remarks); ?>" disabled readonly>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="row">

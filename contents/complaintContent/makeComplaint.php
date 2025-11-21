@@ -76,7 +76,7 @@ if (isset($_POST['submit'])) {
         $userID = $_SESSION['userID'];
 
         $sql = "INSERT INTO complaints 
-                (userID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complainantName, complaintVictim, victimAge, isDeleted, victimRelationship, ActionTaken, latitude, longitude, complaintType)
+                (userID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complainantName, complaintVictim, victimAge, isDeleted, victimRelationship, ActionTaken, complaintLatitude, complaintLongitude, complaintType)
                 VALUES 
                 ('$userID', '$complaintTitle', '$complaintDescription', NOW(), '$requestStatus', '$phoneNumber', '$complaintAccused', '$complaintAddress', '$userName', '$complaintVictim', '$userAge', '$isDeleted', '$relationshipVictim', '$isAction', '$latitude', '$longitude', '$complaintType')";
         if (mysqli_query($conn, $sql)) {

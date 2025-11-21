@@ -14,7 +14,7 @@ $url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=jso
 // Add User-Agent and disable SSL verify for localhost
 $opts = [
     "http" => [
-        "header" => "User-Agent: E-Barangay/1.0 (contact@example.com)\r\n"
+        "header" => "User-Agent: E-Barangay/1.0 (brgysanantonioputol@gmail.com)\r\n"
     ],
     "ssl" => [
         "verify_peer" => false,
