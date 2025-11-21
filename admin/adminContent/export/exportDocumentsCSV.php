@@ -60,7 +60,7 @@ $documentquery = "
         userinfo.collegeYear,
         userinfo.collegeCourse,
         userinfo.shsTrack,
-        userinfo.work AS outOfSchoolYouth,
+        userinfo.work AS isOSY,
         CONCAT(
             addresses.streetName, ', ',
             addresses.blockLotNo, ', ',
