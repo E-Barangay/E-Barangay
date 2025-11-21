@@ -35,6 +35,16 @@ if(mysqli_num_rows($documentsResult) > 0)   {
         $buttonDisabled = false;
         $expiryCountdown = '';
 
+        if ($documentsRow['documentTypeID'] == 6 && $remarks === "With Derogatory") {
+            $buttonDisabled = true;
+            $expiryCountdown = '<br><small>Restricted due to derogatory record</small>';
+        }
+
+        if ($documentsRow['documentTypeID'] == 7 && $civilStatus === "Married") {
+            $buttonDisabled = true;
+            $expiryCountdown = '<br><small>Not allowed for married individuals</small>';
+        }
+
         if ($requestStatus == 'Cancelled' || $requestStatus === 'Denied' || $requestStatus === 'Archived') {
             $buttonDisabled = false;
             $expiryCountdown = '';
