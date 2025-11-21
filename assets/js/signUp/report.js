@@ -116,29 +116,27 @@ map.on('click', function (e) {
 
     currentMarker = L.marker([lat, lng]).addTo(map);
 
-    fetch(`/E-Barangay/contents/complaintContent/proxy.php?lat=${lat}&lon=${lng}`)
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => { throw new Error(text); });
-            }
-            return response.json();
-        })
+    fetch(`https://api.maptiler.com/geocoding/${lng},${lat}.json?key=ZnRwy10K33uDAz9hPMkT`)
+        .then(res => res.json())
         .then(data => {
-            var address = data.display_name;
-            if (address) {
-                currentMarker.bindPopup(address).openPopup();
-                setCoordinates(lat, lng);
-            } else {
-                currentMarker.bindPopup("Unknown Location").openPopup();
-            }
+            const address = data.features?.[0]?.place_name || "Unknown Location";
+            currentMarker.bindPopup(address, {
+                maxWidth: 180,
+                minWidth: 120,
+                maxHeight: 120,
+                autoPan: true,
+                closeButton: true,
+                className: 'custom-popup-small'
+            }).openPopup();
+
+            setCoordinates(lat, lng);
         })
         .catch(err => {
             console.error("Fetch Error:", err);
             currentMarker.bindPopup("Location lookup failed").openPopup();
         });
-
-
 });
+
 
 function setCoordinates(lat, lng) {
     document.getElementById('lat').value = lat;

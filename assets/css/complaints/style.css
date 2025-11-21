@@ -182,3 +182,14 @@ make complaint */
 #scrollable::-webkit-scrollbar {
   display: none;
 }
+
+.custom-popup-small .leaflet-popup-content-wrapper {
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.custom-popup-small .leaflet-popup-content {
+  margin: 4px;
+  text-align: center;
+}
