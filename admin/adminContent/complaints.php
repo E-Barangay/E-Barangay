@@ -86,7 +86,7 @@ $status = $_GET['complaintStatus'] ?? '';
 $type = $_GET['complaintType'] ?? '';
 $date = $_GET['date'] ?? '';
 
-$perPage = 10;
+$perPage = 20;
 $currentPage = isset($_GET['p']) ? (int) $_GET['p'] : 1;
 if ($currentPage < 1)
   $currentPage = 1;
@@ -211,8 +211,6 @@ function getBorderClass($status)
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
 
   <style>
     body {
@@ -289,6 +287,18 @@ function getBorderClass($status)
       max-height: calc(100vh - 200px);
       overflow-y: auto;
     }
+
+    .filterButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .filterButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
   </style>
 </head>
 
@@ -296,11 +306,11 @@ function getBorderClass($status)
   <div class="container-fluid p-3 p-md-4">
     <div class="card shadow-lg border-0 rounded-3">
       <div class="card-body p-0">
-        <div class="text-white p-4 rounded-top" style="background-color: #31afab;">
+        <div class="text-white p-4 rounded-top" style="background-color: #19AFA5;">
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div class="d-flex align-items-center">
               <i class="fas fa-file-alt me-3 fs-4"></i>
-              <h1 class="h4 mb-0 fw-semibold">Katarungnang Pambarangay</h1>
+              <h1 class="h4 mb-0 fw-semibold">Katarungang Pambarangay</h1>
             </div>
             <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addComplaintModal">
               <i class="fas fa-plus me-2"></i>Add Complaint
@@ -348,7 +358,7 @@ function getBorderClass($status)
                   </div>
 
                   <div class="col-md-2">
-                    <button type="submit" class="btn btn-info text-white w-100">
+                    <button type="submit" class="btn btn-info filterButton text-white w-100">
                       <i class="fas fa-filter me-2"></i>Filter
                     </button>
                   </div>
@@ -443,45 +453,47 @@ function getBorderClass($status)
                     $end = min($offset + $result->num_rows, $totalRecords);
                     ?>
                     <small class="text-muted">
-                      Showing <?= $start ?>–<?= $end ?> of <?= $totalRecords ?>
+                      Showing <?= $totalRecords ?>
                       complaint<?= $totalRecords !== 1 ? 's' : '' ?>
                     </small>
                   </div>
                 </div>
 
                 <!-- Pagination controls -->
-                <div class="col-12 col-md-6">
-                  <nav class="d-flex justify-content-center justify-content-md-end">
-                    <ul class="pagination pagination-sm mb-0">
-                      <?php
-                      $queryBase = "page=complaints&search=" . urlencode($search) . "&status=" . urlencode($status) . "&date=" . urlencode($date);
-                      ?>
+                <?php if ($totalRecords > 20): ?>
+                  <div class="col-12 col-md-6">
+                    <nav class="d-flex justify-content-center justify-content-md-end">
+                      <ul class="pagination pagination-sm mb-0">
+                        <?php
+                        $queryBase = "page=complaints&search=" . urlencode($search) . "&status=" . urlencode($status) . "&date=" . urlencode($date);
+                        ?>
 
-                      <!-- Previous -->
-                      <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= $queryBase ?>&p=<?= max(1, $currentPage - 1) ?>"
-                          aria-label="Previous">
-                          <span aria-hidden="true">&laquo;</span>
-                        </a>
-                      </li>
-
-                      <!-- Numbered pages -->
-                      <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                          <a class="page-link" href="?<?= $queryBase ?>&p=<?= $i ?>"><?= $i ?></a>
+                        <!-- Previous -->
+                        <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                          <a class="page-link" href="?<?= $queryBase ?>&p=<?= max(1, $currentPage - 1) ?>"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                          </a>
                         </li>
-                      <?php endfor; ?>
 
-                      <!-- Next -->
-                      <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-                        <a class="page-link" href="?<?= $queryBase ?>&p=<?= min($totalPages, $currentPage + 1) ?>"
-                          aria-label="Next">
-                          <span aria-hidden="true">&raquo;</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
+                        <!-- Numbered pages -->
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                          <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                            <a class="page-link" href="?<?= $queryBase ?>&p=<?= $i ?>"><?= $i ?></a>
+                          </li>
+                        <?php endfor; ?>
+
+                        <!-- Next -->
+                        <li class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                          <a class="page-link" href="?<?= $queryBase ?>&p=<?= min($totalPages, $currentPage + 1) ?>"
+                            aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                <?php endif; ?>
               </div>
 
               <!-- Add Complaint Modal -->

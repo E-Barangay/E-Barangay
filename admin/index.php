@@ -43,7 +43,7 @@ include("../sharedAssets/connect.php");
       left: 0;
       height: 100vh;
       width: 260px;
-      background-color: rgb(49, 175, 171);
+      background-color: #19AFA5;
       color: #fff;
       display: flex;
       flex-direction: column;
@@ -135,7 +135,7 @@ include("../sharedAssets/connect.php");
       justify-content: center;
     }
 
-    .logout-custom {
+    .logoutButton{
       color: #fff;
       width: 100%;
       padding: 12px 20px;
@@ -144,15 +144,9 @@ include("../sharedAssets/connect.php");
       justify-content: center;
       gap: 8px;
       text-decoration: none;
-      background-color: #f01a13ff;
-      border-radius: 8px;
+      border-radius: 12px;
       transition: background-color 0.3s ease;
       text-align: center;
-    }
-
-    .logout-custom:hover,
-    .logout-custom.active {
-      background-color: #6d0b07ff;
     }
 
     .sidebar.collapsed .logout-custom span {
@@ -178,6 +172,10 @@ include("../sharedAssets/connect.php");
 
     .mobile-nav {
       display: none;
+    }
+
+    .form-select, .form-control {
+      box-shadow: none;
     }
 
     @media (max-width: 991px) {
@@ -226,57 +224,57 @@ include("../sharedAssets/connect.php");
   <div class="wrapper">
 
     <aside class="sidebar" id="sidebar">
-      <div class="sidebar-logo text-center py-3">
-        <img src="../assets/images/logoSanAntonio.png" alt="Logo" id="toggleSidebar" class="mb-2">
+      <div class="sidebar-logo text-center pt-5 pb-4">
+        <img src="../assets/images/logoSanAntonio.png" alt="Logo" id="toggleSidebar" class="mb-3">
 
         <div class="sidebar-text">
-          <h6 class="mb-0" style="font-size: 16px; font-weight: 600;">Barangay</h6>
-          <h6 style="font-size: 18px; font-weight: bold;">San Antonio</h6>
+          <h6 class="mb-0" style="font-size: 18px;">Barangay</h6>
+          <h6 style="font-size: 20px; font-weight: bold;">San Antonio</h6>
         </div>
       </div>
       <ul class="sidebar-nav">
         <li class="sidebar-item">
           <a href="?page=dashboard" class="sidebar-link <?php if ($page === 'dashboard')
             echo 'active'; ?>">
-            <i class="bi bi-speedometer2"></i> <span>DASHBOARD</span>
+            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
           </a>
         </li>
         <li class="sidebar-item">
           <a href="?page=resident" class="sidebar-link <?php if ($page === 'resident')
             echo 'active'; ?>">
-            <i class="bi bi-person"></i> <span>RESIDENT</span>
+            <i class="bi bi-person"></i> <span>Residents</span>
           </a>
         </li>
         <li class="sidebar-item">
           <a href="?page=announcement" class="sidebar-link <?php if ($page === 'announcement')
             echo 'active'; ?>">
-            <i class="bi bi-megaphone"></i> <span>ANNOUNCEMENT</span>
+            <i class="bi bi-megaphone"></i> <span>Announcements</span>
           </a>
         </li>
         <li class="sidebar-item">
           <a href="?page=complaints" class="sidebar-link <?php if ($page === 'complaints')
             echo 'active'; ?>">
-            <i class="bi bi-exclamation-diamond"></i> <span>COMPLAINTS</span>
+            <i class="bi bi-exclamation-diamond"></i> <span>Complaints</span>
           </a>
         </li>
         <li class="sidebar-item">
           <a href="?page=document" class="sidebar-link <?php if ($page === 'document')
             echo 'active'; ?>">
-            <i class="bi bi-file-earmark-text"></i> <span>DOCUMENT</span>
+            <i class="bi bi-file-earmark-text"></i> <span>Document</span>
           </a>
         </li>
                 <li class="sidebar-item">
           <a href="?page=reports" class="sidebar-link <?php if ($page === 'reports')
             echo 'active'; ?>">
-            <i class="bi bi-bar-chart"></i> <span>REPORTS</span>
+            <i class="bi bi-bar-chart"></i> <span>Reports</span>
           </a>
         </li>
       </ul>
       <div class="logout-wrapper">
         <a href="../sharedAssets/logOut.php" onclick="return confirm('Are you sure you want to logout?')"
-          class="sidebar-link logout-custom d-flex align-items-center">
-          <i class="bi bi-box-arrow-right me-2"></i>
-          <span>LOGOUT</span>
+          class="sidebar-link btn btn-danger logoutButton d-flex align-items-center">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Logout</span>
         </a>
       </div>
     </aside>

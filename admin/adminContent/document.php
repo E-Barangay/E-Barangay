@@ -195,7 +195,6 @@ $docTypesResults = executeQuery($docTypesQuery);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
 
 
@@ -329,6 +328,18 @@ $docTypesResults = executeQuery($docTypesQuery);
       border-color: #11A1A1;
       color: white;
     }
+
+    .filterButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .filterButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+      color: white;
+    }
     
   </style>
 </head>
@@ -338,7 +349,7 @@ $docTypesResults = executeQuery($docTypesQuery);
   <div class="container-fluid p-3 p-md-4">
     <div class="card shadow border-0 rounded-3">
       <div class="card-body p-0">
-        <div class="text-white p-4 rounded-top" style="background-color: #31afab;">
+        <div class="text-white p-4 rounded-top" style="background-color: #19AFA5;">
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div class="d-flex align-items-center">
               <i class="fas fa-file-alt me-3 fs-4"></i>
@@ -396,7 +407,7 @@ $docTypesResults = executeQuery($docTypesQuery);
                   </div>
 
                   <div class="col-lg-2 col-md-6">
-                    <button class="btn btn-info text-white w-100" type="submit">
+                    <button class="btn btn-info filterButton text-white w-100" type="submit">
                       <i class="fas fa-filter me-2"></i>Filter
                     </button>
                   </div>
@@ -558,20 +569,19 @@ $docTypesResults = executeQuery($docTypesQuery);
                 </table>
               </div>
             </div>
-
-            <?php if ($totalPages > 1): ?>
-              <div class="card-footer bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="text-muted small">
-                    Showing <?= min($offset + 1, $totalRecords) ?> to <?= min($offset + $recordsPerPage, $totalRecords) ?>
-                    of <?= $totalRecords ?> entries
-                  </div>
+            
+            <div class="card-footer bg-light">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted small">
+                  Showing <?= $totalRecords ?> document request
+                </div>
+                <?php if ($totalRecords > 20): ?>
                   <nav>
                     <ul class="pagination pagination-sm mb-0">
                       <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
                         <a class="page-link"
                           href="?page=document&pg=<?= $currentPage - 1 ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>">
-                          <i class="fas fa-chevron-left"></i> Back
+                          <i class="fas fa-chevron-left"></i>
                         </a>
                       </li>
 
@@ -609,14 +619,14 @@ $docTypesResults = executeQuery($docTypesQuery);
                       <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
                         <a class="page-link"
                           href="?page=document&pg=<?= $currentPage + 1 ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($statusFilter) ?>&date=<?= urlencode($dateFilter) ?>&doctype=<?= urlencode($docTypeFilter) ?>">
-                          Next <i class="fas fa-chevron-right"></i>
+                          <i class="fas fa-chevron-right"></i>
                         </a>
                       </li>
                     </ul>
                   </nav>
-                </div>
+                <?php endif; ?>
               </div>
-            <?php endif; ?>
+            </div>
           </div>
         </div>
       </div>

@@ -68,9 +68,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['newStatus'])) {
     $userID = $_POST['userID'];
     $status = $_POST['newStatus'];
+    $restrictionReason = $_POST['restrictionReason'] ?? NULL;
 
-    $query = "UPDATE users SET isRestricted = '$status' WHERE userID = '$userID'";
-    echo mysqli_query($conn, $query) ? "success" : "error";
+    if ($status === 'No') {
+        $unrestrictUserQuery = "UPDATE users SET isRestricted = '$status', restrictionStart = NULL, restrictionEnd = NULL, restrictionReason = NULL WHERE userID = '$userID'";
+        executeQuery($unrestrictUserQuery);
+    } else {
+        $restrictUserQuery = "UPDATE users SET isRestricted = '$status', restrictionStart = NOW(), restrictionEnd = DATE_ADD(NOW(), INTERVAL 7 DAY), restrictionReason = '$restrictionReason' WHERE userID = '$userID'";
+        executeQuery($restrictUserQuery);
+    }
 }
 
 // ===================== GET RESIDENTS =====================
@@ -81,17 +87,17 @@ $residencyFilter = isset($_GET['residencyType']) ? $_GET['residencyType'] : '';
 $restrictedFilter = isset($_GET['restricted']) ? $_GET['restricted'] : '';
 
 // Pagination
-$limit = 10;
+$limit = 20;
 $currentPage = isset($_GET['p']) && is_numeric($_GET['p']) ? (int) $_GET['p'] : 1;
 $offset = ($currentPage - 1) * $limit;
 
 // Base queries
-$sql = "SELECT 
+$sql = "SELECT
+    u.email,
+    u.phoneNumber,
     ui.userInfoID,
     ui.userID,
-    ui.firstName,
-    ui.middleName,
-    ui.lastName,
+    CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS fullname,
     ui.suffix,
     ui.gender,
     ui.birthDate,
@@ -179,12 +185,12 @@ $result = mysqli_query($conn, $sql);
     }
 
     .btn-custom {
-        background-color: #31afab;
+        background-color: #19AFA5;
         color: #fff;
     }
 
     .btn-custom:hover {
-        background-color: #279995;
+        background-color: #11A1A1;
         color: #fff;
     }
 
@@ -195,17 +201,17 @@ $result = mysqli_query($conn, $sql);
     }
 
     .btn-primary {
-        background-color: #31afab;
-        border-color: #31afab;
+        background-color: #19AFA5;
+        border-color: #19AFA5;
     }
 
     .btn-primary:hover {
-        background-color: #2a9995;
-        border-color: #2a9995;
+        background-color: #11A1A1;
+        border-color: #11A1A1;
     }
 
     .modal-header {
-        background-color: #31afab;
+        background-color: #19AFA5;
         color: white;
     }
 
@@ -214,15 +220,15 @@ $result = mysqli_query($conn, $sql);
     }
 
     .pagination .page-link {
-        color: #31afab;
+        color: #19AFA5;
         background-color: white;
         border: 1px solid #dee2e6;
         transition: all 0.2s ease-in-out;
     }
 
     .pagination .page-item.active .page-link {
-        background-color: #31afab;
-        border-color: #31afab;
+        background-color: #19AFA5;
+        border-color: #19AFA5;
         color: white;
     }
 
@@ -253,6 +259,42 @@ $result = mysqli_query($conn, $sql);
         background-color: #31afab !important;
         color: #fff;
     }
+
+    .viewButton {
+      background-color: transparent;
+      border-color: #19AFA5;
+      color: #19AFA5;
+    }
+
+    .viewButton:hover {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
+
+    .form-control:focus {
+        box-shadow: none !important;
+        outline: none; 
+        border: 1px solid #19AFA5;       
+    }
+
+    .form-select:focus {
+        box-shadow: none !important; 
+        outline: none; 
+        border: 1px solid #19AFA5; 
+    }
+
+    .filterButton {
+        background-color: #19AFA5;
+        border-color: #19AFA5;
+        color: white;
+    }
+
+    .filterButton:hover {
+        background-color: #11A1A1;
+        border-color: #11A1A1;
+        color: white;
+    }
 </style>
 
 <body>
@@ -261,7 +303,7 @@ $result = mysqli_query($conn, $sql);
         <div class="card shadow-lg border-0 rounded-3">
             <div class="card-body p-0">
 
-                <div class="text-white p-4 rounded-top" style="background-color: #31afab;">
+                <div class="text-white p-4 rounded-top" style="background-color: #19AFA5;">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-file-alt me-3 fs-4"></i>
@@ -325,7 +367,7 @@ $result = mysqli_query($conn, $sql);
 
 
                                     <div class="col-md-2">
-                                        <button type="submit" class="btn btn-custom w-100">
+                                        <button type="submit" class="btn btn-custom filterButton w-100">
                                             <i class="fas fa-filter me-2"></i>Filter
                                         </button>
                                     </div>
@@ -339,34 +381,32 @@ $result = mysqli_query($conn, $sql);
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
-                                        <tr>
-                                            <th>Last Name</th>
-                                            <th>First Name</th>
-                                            <th>Middle Name</th>
-                                            <th>Birth Date</th>
+                                        <tr class="align-middle">
+                                            <th class="align-middle">Resident Name</th>
+                                            <th>Email Address</th>
+                                            <th>Phone Number</th>
+                                            <th>Date of Birth</th>
                                             <th>Gender</th>
-                                            <th>Address</th>
                                             <th>Residency Type</th>
-                                            <th>Restricted</th>
+                                            <th>isRestricted</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php if ($result->num_rows > 0): ?>
                                             <?php while ($row = $result->fetch_assoc()): ?>
-                                                <tr>
-                                                    <td><?= htmlspecialchars($row['lastName']); ?></td>
-                                                    <td><?= htmlspecialchars($row['firstName']); ?></td>
-                                                    <td><?= htmlspecialchars($row['middleName']); ?></td>
-                                                    <td><?= htmlspecialchars($row['birthDate']); ?></td>
+                                                <tr class="align-middle">
+                                                    <td><?= htmlspecialchars($row['fullname']) ?></td>
+                                                    <td><?= htmlspecialchars($row['email']); ?></td>
+                                                    <td><?= htmlspecialchars($row['phoneNumber']); ?></td>
+                                                    <td><?= date('M d, Y', strtotime($row['birthDate'])) ?></td>
                                                     <td><?= htmlspecialchars($row['gender']); ?></td>
-                                                    <td><?= htmlspecialchars($row['cityName'] . ', ' . $row['provinceName']); ?>
                                                     <td><?= htmlspecialchars($row['residencyType']); ?>
                                                     <td><?= htmlspecialchars($row['isRestricted']); ?>
                                                     </td>
                                                     <td>
                                                         <a href="adminContent/viewResident.php?userID=<?= $row['userID'] ?: 0 ?>"
-                                                            class="btn btn-sm btn-outline-primary">
+                                                            class="btn btn-sm viewButton">
                                                             <i class="fas fa-eye gap"></i>
                                                         </a>
                                                         <!-- Toggle Restrict Button -->
@@ -374,33 +414,47 @@ $result = mysqli_query($conn, $sql);
                                                             class="btn btn-sm <?= ($row['isRestricted'] === 'Yes') ? 'btn-success' : 'btn-danger' ?>"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#restrictUserModal<?= $row['userID'] ?>">
-                                                            <i
-                                                                class="fas <?= ($row['isRestricted'] === 'Yes') ? 'fa-check' : 'fa-times' ?>"></i>
+                                                            <i class="fa-solid <?= ($row['isRestricted'] === 'Yes') ? 'fa-circle-check' : 'fa-ban' ?>"></i>
                                                         </button>
 
-                                                        <!-- Modal -->
-                                                        <div class="modal fade" id="restrictUserModal<?= $row['userID'] ?>"
-                                                            tabindex="-1">
-                                                            <div class="modal-dialog modal-dialog-centered">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title">
-                                                                            <?= ($row['isRestricted'] === 'Yes') ? 'Unrestrict User' : 'Restrict User' ?>
-                                                                        </h5>
-                                                                        <button type="button" class="btn-close"
-                                                                            data-bs-dismiss="modal"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        Are you sure you want to
-                                                                        <?= ($row['isRestricted'] === 'Yes') ? 'unrestrict' : 'restrict' ?>
-                                                                        this user?
-                                                                    </div>
-                                                                    <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary"
-                                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <form method="POST" style="display:inline;">
+                                                            <!-- Modal -->
+                                                            <div class="modal fade" id="restrictUserModal<?= $row['userID'] ?>"
+                                                                tabindex="-1">
+                                                                <div class="modal-dialog modal-dialog-centered">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">
+                                                                                <?= ($row['isRestricted'] === 'Yes') ? 'Unrestrict User' : 'Restrict User' ?>
+                                                                            </h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            Are you sure you want to
+                                                                            <?= ($row['isRestricted'] === 'Yes') ? 'unrestrict' : 'restrict' ?>
+                                                                            this user?
 
-                                                                        <!-- Fixed Form -->
-                                                                        <form method="POST" style="display:inline;">
+                                                                            <?php if ($row['isRestricted'] !== 'Yes'): ?>
+                                                                                <div class="mt-3">
+                                                                                    <label for="restrictionReason" class="form-label">Restriction Reason</label>
+                                                                                    <select name="restrictionReason" id="restrictionReason" class="form-select" required>
+                                                                                        <option value="" disabled selected>Select restriction reason</option>
+                                                                                        <option value="Multiple invalid attempts">Multiple invalid attempts</option>
+                                                                                        <option value="Providing invalid or false information">Providing invalid or false information</option>
+                                                                                        <option value="Abusive or inappropriate behavior">Abusive or inappropriate behavior</option>
+                                                                                        <option value="Suspicious or fraudulent activity">Suspicious or fraudulent activity</option>
+                                                                                        <option value="Violation of platform rules">Violation of platform rules</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                            <?php endif; ?>
+                                                                        </div>
+
+                                                                        
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary"
+                                                                                data-bs-dismiss="modal">Cancel</button>
+                                                                            
                                                                             <input type="hidden" name="userID"
                                                                                 value="<?= $row['userID'] ?>">
                                                                             <input type="hidden" name="newStatus"
@@ -408,11 +462,11 @@ $result = mysqli_query($conn, $sql);
                                                                             <button type="submit" class="btn btn-danger">
                                                                                 Confirm
                                                                             </button>
-                                                                        </form>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             <?php endwhile; ?>
@@ -759,38 +813,40 @@ $result = mysqli_query($conn, $sql);
                                         </small>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <nav class="d-flex justify-content-center justify-content-md-end">
-                                        <ul class="pagination pagination-sm mb-0">
-                                            <?php
-                                            $queryBase = "page=resident&search=" . urlencode($search) . "&sortBy=" . urlencode($sortBy) . "&order=" . urlencode($order);
-                                            ?>
+                                <?php if ($totalRows > 20): ?>
+                                    <div class="col-12 col-md-6">
+                                        <nav class="d-flex justify-content-center justify-content-md-end">
+                                            <ul class="pagination pagination-sm mb-0">
+                                                <?php
+                                                $queryBase = "page=resident&search=" . urlencode($search) . "&sortBy=" . urlencode($sortBy) . "&order=" . urlencode($order);
+                                                ?>
 
-                                            <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
-                                                <a class="page-link"
-                                                    href="?<?= $queryBase ?>&p=<?= max(1, $currentPage - 1) ?>"
-                                                    aria-label="Previous">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                </a>
-                                            </li>
-
-                                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                                <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
-                                                    <a class="page-link" href="?<?= $queryBase ?>&p=<?= $i ?>"><?= $i ?></a>
+                                                <li class="page-item <?= ($currentPage <= 1) ? 'disabled' : '' ?>">
+                                                    <a class="page-link"
+                                                        href="?<?= $queryBase ?>&p=<?= max(1, $currentPage - 1) ?>"
+                                                        aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
+                                                    </a>
                                                 </li>
-                                            <?php endfor; ?>
 
-                                            <li
-                                                class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
-                                                <a class="page-link"
-                                                    href="?<?= $queryBase ?>&p=<?= min($totalPages, $currentPage + 1) ?>"
-                                                    aria-label="Next">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-                                </div>
+                                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                                    <li class="page-item <?= ($i == $currentPage) ? 'active' : '' ?>">
+                                                        <a class="page-link" href="?<?= $queryBase ?>&p=<?= $i ?>"><?= $i ?></a>
+                                                    </li>
+                                                <?php endfor; ?>
+
+                                                <li
+                                                    class="page-item <?= ($currentPage >= $totalPages) ? 'disabled' : '' ?>">
+                                                    <a class="page-link"
+                                                        href="?<?= $queryBase ?>&p=<?= min($totalPages, $currentPage + 1) ?>"
+                                                        aria-label="Next">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
