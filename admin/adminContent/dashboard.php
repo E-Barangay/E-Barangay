@@ -105,7 +105,7 @@ $purokDataForJS = array_values($purokStats);
   --primary-color: #19AFA5;
   --primary-dark: #158B82;
 }
-body { min-height: 100vh; background: #f5f7f8; font-family: Arial, Helvetica, sans-serif; }
+body { min-height: 100vh; background: #f5f7f8; font-family: 'Poppins', sans-serif; }
 .stat-card { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: #fff; transition: .3s; }
 .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,.15)!important; }
 .map-section, .population-section { background: #3B7979; }

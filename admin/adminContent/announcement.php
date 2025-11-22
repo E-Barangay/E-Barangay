@@ -139,6 +139,18 @@ $result = mysqli_query($conn, $query);
     background-color: #e9f8f8;
     color: #31afab;
   }
+
+  .filterButton {
+    background-color: #19AFA5;
+    border-color: #19AFA5;
+    color: white;
+  }
+
+  .filterButton:hover {
+    background-color: #11A1A1;
+    border-color: #11A1A1;
+    color: white;
+  }
 </style>
 
 <body>
@@ -159,7 +171,7 @@ $result = mysqli_query($conn, $query);
 
     <div class="card shadow-lg border-0 rounded-3">
       <div class="card-body p-0">
-        <div class="text-white p-4 rounded-top" style="background-color:#31afab;">
+        <div class="text-white p-4 rounded-top" style="background-color:#19AFA5;">
           <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div class="d-flex align-items-center">
               <i class="fas fa-bullhorn me-2 fs-5 fs-md-4"></i>
@@ -191,7 +203,7 @@ $result = mysqli_query($conn, $query);
                     value="<?php echo htmlspecialchars($dateFilter); ?>">
                 </div>
                 <div class="col-12 col-md-3">
-                  <button type="submit" class="btn btn-custom w-100">
+                  <button type="submit" class="btn btn-custom filterButton w-100">
                     <i class="fas fa-filter me-2"></i>Filter
                   </button>
                 </div>
