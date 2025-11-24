@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
             $remarksValue = 'No Derogatory Record'; // default
         }
 
-        $insertResident = "INSERT INTO userInfo
+        $insertResident = "INSERT INTO userinfo
                 (userID, firstName, middleName, lastName, gender, birthDate, age, birthPlace, bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType, isVoter, remarks)
                 VALUES
                 ($userID, '{$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}', '{$_POST['isVoter']}', '$remarksValue')";
@@ -106,12 +106,12 @@ $sql = "SELECT
     a.cityName,
     a.provinceName,
     u.isRestricted
-FROM userInfo ui
+FROM userinfo ui
 INNER JOIN users u ON ui.userID = u.userID
 LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
 WHERE u.role = 'user'";
 
-$countSql = "SELECT COUNT(*) AS total FROM userInfo ui
+$countSql = "SELECT COUNT(*) AS total FROM userinfo ui
              INNER JOIN users u ON ui.userID = u.userID
              WHERE u.role = 'user'";
 
@@ -399,9 +399,9 @@ $result = mysqli_query($conn, $sql);
                                                     <td><?= htmlspecialchars($row['fullname']) ?></td>
                                                     <td><?= htmlspecialchars($row['email']); ?></td>
                                                     <td><?= htmlspecialchars($row['phoneNumber']); ?></td>
-                                                    <td><?= date('M d, Y', strtotime($row['birthDate'])) ?></td>
-                                                    <td><?= htmlspecialchars($row['gender']); ?></td>
-                                                    <td><?= htmlspecialchars($row['residencyType']); ?>
+                                                    <td><?= !empty($row['birthDate']) ? date('F d, Y', strtotime($row['birthDate'])) : '' ?></td>
+                                                    <td><?= htmlspecialchars($row['gender'] ?? ''); ?></td>
+                                                    <td><?= htmlspecialchars($row['residencyType'] ?? ''); ?>
                                                     <td><?= htmlspecialchars($row['isRestricted']); ?>
                                                     </td>
                                                     <td>

@@ -7,7 +7,7 @@ if (isset($_SESSION['userID'])) {
     $userQuery = "
         SELECT ui.firstName, ui.middleName, ui.lastName, ui.suffix, ui.age,
                u.phoneNumber
-        FROM userInfo ui
+        FROM userinfo ui
         INNER JOIN users u ON ui.userID = u.userID
         WHERE u.userID = '$userID'
         LIMIT 1
@@ -100,7 +100,7 @@ if (isset($_POST['submit'])) {
                     $targetPath = $uploadDir . $uniqueName;
 
                     if (move_uploaded_file($tmpName, $targetPath)) {
-                        $evidenceQuery = "INSERT INTO complaintEvidence (complaintID, filePath, uploadedAt) 
+                        $evidenceQuery = "INSERT INTO complaintevidence (complaintID, filePath, uploadedAt) 
                           VALUES ('$complaintID', '$targetPath', NOW())";
                         mysqli_query($conn, $evidenceQuery);
                     }

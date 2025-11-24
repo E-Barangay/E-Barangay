@@ -11,9 +11,9 @@ if (!isset($_SESSION['userID'])) {
 $userID = $_SESSION['userID'];
 
 $userQuery = "SELECT * FROM users 
-            LEFT JOIN userInfo ON users.userID = userInfo.userID 
-            LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID    
-            LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+            LEFT JOIN userinfo ON users.userID = userinfo.userID 
+            LEFT JOIN addresses ON userinfo.userInfoID = addresses.userInfoID    
+            LEFT JOIN permanentaddresses ON userinfo.userInfoID = permanentaddresses.userInfoID
             WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
@@ -48,10 +48,7 @@ if (!empty($birthDate)) {
 
 function formatAddress($value)
 {
-    if ($value === null || $value === '') {
-        return '';
-    }
-    return ucwords(strtolower($value));
+    return ucwords(strtolower($value ?? ''));
 }
 
 
@@ -73,7 +70,7 @@ $permanentBarangayName = formatAddress($userDataRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userDataRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
 
-$userInfoIDQuery = "SELECT userInfoID FROM userInfo WHERE userID = $userID";
+$userInfoIDQuery = "SELECT userInfoID FROM userinfo WHERE userID = $userID";
 $userInfoIDResult = executeQuery($userInfoIDQuery);
 $userInfoIDRow = mysqli_fetch_assoc($userInfoIDResult);
 
@@ -258,7 +255,7 @@ if (isset($_POST['saveButton'])) {
         $residencyType = NULL;
     }
 
-    $updateUserInfoQuery = "UPDATE userInfo SET 
+    $updateUserInfoQuery = "UPDATE userinfo SET 
     firstName = '$firstName', 
     middleName = '$middleName', 
     lastName = '$lastName', 
@@ -288,7 +285,7 @@ if (isset($_POST['saveButton'])) {
                         provinceName = '$provinceName' WHERE userInfoID = $userInfoID;";
     $updateAddressResult = executeQuery($updateAddressQuery);
 
-    $updatePermanentAddressQuery = "UPDATE permanentAddresses SET 
+    $updatePermanentAddressQuery = "UPDATE permanentaddresses SET 
     permanentBlockLotNo = " . ($citizenship === 'FILIPINO' ? "'$permanentBlockLotNo'" : "NULL") . ",
     permanentPhase = " . ($citizenship === 'FILIPINO' ? "'$permanentPhase'" : "NULL") . ",
     permanentSubdivisionName = " . ($citizenship === 'FILIPINO' ? "'$permanentSubdivisionName'" : "NULL") . ",
@@ -307,7 +304,7 @@ if (isset($_POST['saveButton'])) {
         $targetPath = "uploads/profiles/" . basename($uploadProfilePicture);
 
         if (move_uploaded_file($_FILES['profilePicture']['tmp_name'], $targetPath)) {
-            $profileUpdateQuery = "UPDATE userInfo SET profilePicture = '$uploadProfilePicture' WHERE userInfoID = $userInfoID";
+            $profileUpdateQuery = "UPDATE userinfo SET profilePicture = '$uploadProfilePicture' WHERE userInfoID = $userInfoID";
             $profileUpdateResult = executeQuery($profileUpdateQuery);
         }
     }
@@ -319,7 +316,7 @@ if (isset($_POST['saveButton'])) {
 }
 
 if (isset($_POST['confirmButton'])) {
-    $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = NULL WHERE userInfoID = $userInfoID";
+    $updateProfilePictureQuery = "UPDATE userinfo SET profilePicture = NULL WHERE userInfoID = $userInfoID";
     $updateProfilePictureResult = executeQuery($updateProfilePictureQuery);
 
     header("Location: profile.php");

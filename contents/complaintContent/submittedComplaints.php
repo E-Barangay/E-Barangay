@@ -9,7 +9,7 @@ if (isset($_SESSION['userID'])) {
 
   if ($result && mysqli_num_rows($result) > 0) {
     while ($row = mysqli_fetch_assoc($result)) {
-      $imgQuery = "SELECT filePath FROM complaintEvidence WHERE complaintID = '{$row['complaintID']}'";
+      $imgQuery = "SELECT filePath FROM complaintevidence WHERE complaintID = '{$row['complaintID']}'";
       $imgResult = mysqli_query($conn, $imgQuery);
       $images = [];
       if ($imgResult && mysqli_num_rows($imgResult) > 0) {

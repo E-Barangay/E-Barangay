@@ -32,9 +32,9 @@ if (!isset($_SESSION['userID'])) {
 }
 
 $userQuery = "SELECT * FROM users 
-            LEFT JOIN userInfo ON users.userID = userInfo.userID 
-            LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID  
-            LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+            LEFT JOIN userinfo ON users.userID = userinfo.userID 
+            LEFT JOIN addresses ON userinfo.userInfoID = addresses.userInfoID  
+            LEFT JOIN permanentaddresses ON userinfo.userInfoID = permanentaddresses.userInfoID
             WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
@@ -56,7 +56,7 @@ $phoneNumber = $userDataRow['phoneNumber'];
 $email = $userDataRow['email'];
 
 function formatAddress($value) {
-    return ucwords(strtolower($value));
+    return ucwords(strtolower($value ?? ''));
 }
 
 $blockLotNo = $userDataRow['blockLotNo'];
@@ -79,7 +79,7 @@ $permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
 
 $searchTerm = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-$documentsQuery = "SELECT * FROM documentTypes";
+$documentsQuery = "SELECT * FROM documenttypes";
 
 if (!empty($searchTerm)) {
     $documentsQuery .= " WHERE documentName LIKE '%$searchTerm%'";

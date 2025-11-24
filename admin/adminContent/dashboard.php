@@ -71,7 +71,7 @@ if ($conn) {
         GROUP BY a.purok");
 
     while ($row = mysqli_fetch_assoc($res)) {
-        $p = preg_match('/^Purok\s*\d+/i', $row['purok']) ? $row['purok'] : 'Purok ' . preg_replace('/\D/', '', $row['purok']);
+        $p = preg_match('/^Purok\s*\d+/i', $row['purok'] ?? '') ? ($row['purok'] ?? '') : 'Purok ' . preg_replace('/\D/', '', $row['purok'] ?? '');
         if (!isset($purokStats[$p])) continue;
 
         $totalR = (int) $row['total_residents'];
@@ -99,6 +99,7 @@ $purokDataForJS = array_values($purokStats);
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
 <style>
 :root {

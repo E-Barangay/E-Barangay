@@ -9,7 +9,7 @@ $countResult = executeQuery($countQuery);
 $total = mysqli_fetch_assoc($countResult)['total'];
 $pages = ceil($total / $limit);
 
-$documentRequestQuery = "SELECT * FROM documents LEFT JOIN documentTypes ON documents.documentTypeID = documentTypes.documentTypeID WHERE userID = $userID AND documentStatus != 'Archived' ORDER BY requestDate DESC";
+$documentRequestQuery = "SELECT * FROM documents LEFT JOIN documenttypes ON documents.documentTypeID = documenttypes.documentTypeID WHERE userID = $userID AND documentStatus != 'Archived' ORDER BY requestDate DESC";
 $documentRequestResult = executeQuery($documentRequestQuery);
 
 ?>
