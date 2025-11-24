@@ -48,8 +48,12 @@ if (!empty($birthDate)) {
 
 function formatAddress($value)
 {
+    if ($value === null || $value === '') {
+        return '';
+    }
     return ucwords(strtolower($value));
 }
+
 
 $blockLotNo = $userDataRow['blockLotNo'];
 $phase = $userDataRow['phase'];
@@ -823,7 +827,7 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-4 col-md-6 col-6 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="occupation" name="occupation"
-                                        placeholder="Occupation" value="<?php echo htmlspecialchars($occupation); ?>"
+                                        placeholder="Occupation" value="<?php echo htmlspecialchars($occupation ?? ''); ?>"
                                         disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
@@ -966,7 +970,7 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-3 col-md-7 col-12 mb-4">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="remarks" name="remarks"
-                                        value="<?php echo htmlspecialchars($remarks); ?>" disabled readonly>
+                                        value="<?php echo htmlspecialchars($remarks ?? ''); ?>" disabled readonly>
                                     <label for="remarks">Remarks</label>
                                 </div>
                             </div>
