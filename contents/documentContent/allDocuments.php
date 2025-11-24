@@ -17,7 +17,7 @@ $requestedStatuses = [];
 while ($userRequestRow = mysqli_fetch_assoc($userRequestResult)) {
     $requestedTypes[] = $userRequestRow['documentTypeID'];
     $requestedDates[$userRequestRow['documentTypeID']] = $userRequestRow['requestDate'];
-    $requestedExpiries[$userRequestRow['documentTypeID']] = date('Y-m-d H:i:s', strtotime($userRequestRow['requestDate'] . ' +1 year'));
+    $requestedExpiries[$userRequestRow['documentTypeID']] = date('Y-m-d H:i:s', strtotime($userRequestRow['requestDate'] . ' +6 months'));
     $requestedStatuses[$userRequestRow['documentTypeID']] = $userRequestRow['documentStatus'];
 }
 

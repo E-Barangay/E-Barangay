@@ -17,9 +17,9 @@ if (isset($_GET['page'])) {
             break;
         case "makeComplaint":
             $userQuery = "SELECT * FROM users 
-                        LEFT JOIN userInfo ON users.userID = userInfo.userID 
-                        LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID  
-                        LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+                        LEFT JOIN userinfo ON users.userID = userinfo.userID 
+                        LEFT JOIN addresses ON userinfo.userInfoID = addresses.userInfoID  
+                        LEFT JOIN permanentaddresses ON userinfo.userInfoID = permanentaddresses.userInfoID
                         WHERE users.userID = $userID";
             $userResult = executeQuery($userQuery);
 
@@ -147,8 +147,5 @@ if (isset($_GET['page'])) {
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
         crossorigin="anonymous"></script>
     <script src="assets/js/signUp/report.js"></script>
-
-
-
-
+    
 </body>

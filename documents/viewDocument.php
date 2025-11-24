@@ -51,10 +51,10 @@ if (isset($_GET['documentTypeID'])) {
 }
 
 $userQuery = "SELECT * FROM users 
-            LEFT JOIN userInfo ON users.userID = userInfo.userID 
+            LEFT JOIN userinfo ON users.userID = userinfo.userID 
             LEFT JOIN documents ON users.userID = documents.userID
-            LEFT JOIN addresses ON userInfo.userInfoID = addresses.userInfoID  
-            LEFT JOIN permanentAddresses ON userInfo.userInfoID = permanentAddresses.userInfoID
+            LEFT JOIN addresses ON userinfo.userInfoID = addresses.userInfoID  
+            LEFT JOIN permanentaddresses ON userinfo.userInfoID = permanentaddresses.userInfoID
             WHERE users.userID = $userID";
 $userResult = executeQuery($userQuery);
 
@@ -103,7 +103,7 @@ $permanentBarangayName = formatAddress($userRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userRow['permanentProvinceName']);
 
-$documentQuery = "SELECT * FROM documentTypes WHERE documentTypeID = $documentTypeID";
+$documentQuery = "SELECT * FROM documenttypes WHERE documentTypeID = $documentTypeID";
 $documentResult = executeQuery($documentQuery);
 
 $documentRow = mysqli_fetch_assoc($documentResult);
@@ -131,7 +131,7 @@ if (isset($_POST['yes'])) {
     } elseif ($documentTypeID == 4) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, educationStatus, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$educationStatus', NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 7) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 9) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW(), NULL, NULL, NULL, NULL)";
     } else {
@@ -141,9 +141,9 @@ if (isset($_POST['yes'])) {
     $documentRequestResult = executeQuery($documentRequestQuery);
 
     if ($educationStatus == "Not Studying") {
-        $updateUserInfoQuery = "UPDATE userInfo SET isOSY = 'Yes' WHERE userID = $userID";
+        $updateUserInfoQuery = "UPDATE userinfo SET isOSY = 'Yes' WHERE userID = $userID";
     } else {
-        $updateUserInfoQuery = "UPDATE userInfo SET isOSY = 'No' WHERE userID = $userID";
+        $updateUserInfoQuery = "UPDATE userinfo SET isOSY = 'No' WHERE userID = $userID";
     }
 
     executeQuery($updateUserInfoQuery);

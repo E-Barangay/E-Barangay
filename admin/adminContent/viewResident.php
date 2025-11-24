@@ -40,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   WHERE userID=$userID");
 
   //Update userInfo table
-  mysqli_query($conn, "UPDATE userInfo SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix', gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace', civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation', isVoter='$isVoter', remarks='$remarks', residencyType='$residencyType'  
+  mysqli_query($conn, "UPDATE userinfo SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix', gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace', civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation', isVoter='$isVoter', remarks='$remarks', residencyType='$residencyType'  
   WHERE userID=$userID");
 
-  $getInfo = mysqli_query($conn, "SELECT userInfoID FROM userInfo WHERE userID = $userID");
+  $getInfo = mysqli_query($conn, "SELECT userInfoID FROM userinfo WHERE userID = $userID");
   $row = mysqli_fetch_assoc($getInfo);
   $userInfoID = $row['userInfoID'];
 
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
       $targetPath = "../../uploads/profiles/" . basename($uploadProfilePicture);
 
       if (move_uploaded_file($_FILES['profilePicture']['tmp_name'], $targetPath)) {
-          $profileUpdateQuery = "UPDATE userInfo SET profilePicture = '$uploadProfilePicture' WHERE userInfoID = $userInfoID";
+          $profileUpdateQuery = "UPDATE userinfo SET profilePicture = '$uploadProfilePicture' WHERE userInfoID = $userInfoID";
           $profileUpdateResult = executeQuery($profileUpdateQuery);
       }
   }
@@ -114,7 +114,7 @@ if (isset($_GET['userID'])) {
   pa.permanentPurok AS permanentPurok
 
 FROM users u
-INNER JOIN userInfo i ON i.userID = u.userID
+INNER JOIN userinfo i ON i.userID = u.userID
 LEFT JOIN addresses a ON a.userInfoID = i.userInfoID
 LEFT JOIN permanentaddresses pa ON pa.userInfoID = i.userInfoID
 WHERE u.userID = $userID";
@@ -135,7 +135,7 @@ WHERE u.userID = $userID";
 $userInfoID = $user['userInfoID'];
 
 if (isset($_POST['confirmButton'])) {
-  $updateProfilePictureQuery = "UPDATE userInfo SET profilePicture = 'defaulProfile.png' WHERE userInfoID = $userInfoID";
+  $updateProfilePictureQuery = "UPDATE userinfo SET profilePicture = 'defaulProfile.png' WHERE userInfoID = $userInfoID";
   $updateProfilePictureResult = executeQuery($updateProfilePictureQuery);
 
   header("Location: viewResident.php?userID=$userID");
@@ -203,7 +203,11 @@ if (isset($_POST['confirmButton'])) {
                   <div class="row g-3" style="color: black;">
                     <div class="col-3 view-mode">
                       <div class="info-row ">
-                        <img src="../../uploads/profiles/<?= htmlspecialchars($user['profilePicture']) ?>" style="width: 250px; height: 250px; object-fit: cover;" alt="Resident Profile">
+                        <?php if (empty($userDataRow['profilePicture'])) { ?>
+                          <img src="../../uploads/profiles/defaultProfile.png" style="width: 250px; height: 250px; object-fit: cover;" alt="Resident Profile">
+                        <?php } else { ?>
+                          <img src="../../uploads/profiles/<?= htmlspecialchars($user['profilePicture']) ?>" style="width: 250px; height: 250px; object-fit: cover;" alt="Resident Profile">
+                        <?php } ?>
                       </div>
                     </div>
                     <div class="col-9">
@@ -211,55 +215,55 @@ if (isset($_POST['confirmButton'])) {
                         <div class="col-md-4 mb-3 view-mode">
                           <div class="info-row">
                             <strong>Resident Name:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['fullname']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['fullname'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-5 mb-3 view-mode">
                           <div class="info-row">
                             <strong>Email:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['email']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['email'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-3 mb-3 view-mode">
                           <div class="info-row">
                             <strong>Phone Number:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['phoneNumber']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['phoneNumber'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-4 my-3 view-mode">
                           <div class="info-row">
                             <strong>Date of Birth:</strong>
-                            <div class="mt-1"><?= date('F d, Y', strtotime($user['birthDate'])) ?></div>
+                            <div class="mt-1"><?= date('F d, Y', strtotime($user['birthDate'] ?? 'N/A')) ?></div>
                           </div>
                         </div>
                         <div class="col-md-4 my-3 view-mode">
                           <div class="info-row">
                             <strong>Age:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['age']) ?> years old</div>
+                            <div class="mt-1"><?= !empty($user['age']) ? htmlspecialchars($user['age']) . ' ' . ((int)$user['age'] === 1 ? 'year' : 'years') . ' old' : 'N/A' ?></div>
                           </div>
                         </div>
                         <div class="col-md-4 my-3 view-mode">
                           <div class="info-row">
                             <strong>Place of Birth:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['birthPlace']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['birthPlace'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-4 my-3 view-mode">
                           <div class="info-row">
                             <strong>Gender:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['gender']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['gender'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-4 my-3 view-mode">
                           <div class="info-row">
                             <strong>Blood Type:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['bloodType']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['bloodType'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-4 my-3 view-mode">
                           <div class="info-row">
                             <strong>Civil Status:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['civilStatus']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['civilStatus'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                       </div>
@@ -271,26 +275,26 @@ if (isset($_POST['confirmButton'])) {
                         <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
                             <strong>Citizenship:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['citizenship']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['citizenship'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
                             <strong>Occupation:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['occupation']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['occupation'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
                             <strong>Remarks:</strong>
-                            <div class="mt-1"><?= htmlspecialchars($user['remarks']) ?></div>
+                            <div class="mt-1"><?= htmlspecialchars($user['remarks'] ?? 'N/A') ?></div>
                           </div>
                         </div>
                         <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
                             <strong>Length Of Stay:</strong>
                             <div class="mt-1">
-                              <span><?= htmlspecialchars($user['lengthOfStay']) . ' ' . ((int)$user['lengthOfStay'] === 1 ? 'year' : 'years') ?></span>
+                              <span><?= !empty($user['lengthOfStay']) ? htmlspecialchars($user['lengthOfStay']) . ' ' . ((int)$user['lengthOfStay'] === 1 ? 'year' : 'years') : 'N/A' ?></span>
                             </div>
                           </div>
                         </div>
@@ -298,7 +302,7 @@ if (isset($_POST['confirmButton'])) {
                           <div class="info-row">
                             <strong >Residency Type:</strong>
                             <div class="mt-1">
-                              <span><?= htmlspecialchars($user['residencyType']) ?></span>
+                              <span><?= htmlspecialchars($user['residencyType'] ?? 'N/A') ?></span>
                             </div>
                           </div>
                         </div>
@@ -308,16 +312,17 @@ if (isset($_POST['confirmButton'])) {
                             <div class="mt-1">
                               <?php
                               $addressParts = array_filter([
-                                ucwords(strtolower($user['presentBlockLotNo'])),
-                                ucwords(strtolower($user['presentPurok'])),
-                                ucwords(strtolower($user['presentSubdivision'])),
-                                ucwords(strtolower($user['presentPhase'])),
-                                ucwords(strtolower($user['presentStreetName'])),
-                                ucwords(strtolower($user['presentBarangay'])),
-                                ucwords(strtolower($user['presentCity'])),
-                                ucwords(strtolower($user['presentProvince']))
+                                ucwords(strtolower($user['presentBlockLotNo'] ?? '')),
+                                ucwords(strtolower($user['presentPurok'] ?? '')),
+                                ucwords(strtolower($user['presentSubdivision'] ?? '')),
+                                ucwords(strtolower($user['presentPhase'] ?? '')),
+                                ucwords(strtolower($user['presentStreetName'] ?? '')),
+                                ucwords(strtolower($user['presentBarangay'] ?? '')),
+                                ucwords(strtolower($user['presentCity'] ?? '')),
+                                ucwords(strtolower($user['presentProvince'] ?? ''))
                               ]);
-                              echo htmlspecialchars(implode(' ', $addressParts));
+                              $address = implode(' ', $addressParts);
+                              echo htmlspecialchars(!empty($address) ? $address : 'N/A');
                               ?>
                             </div>
                           </div>
@@ -328,16 +333,17 @@ if (isset($_POST['confirmButton'])) {
                             <div class="mt-1">
                               <?php
                               $addressParts = array_filter([
-                                ucwords(strtolower($user['permanentBlockLotNo'])),
-                                ucwords(strtolower($user['permanentPurok'])),
-                                ucwords(strtolower($user['permanentSubdivision'])),
-                                ucwords(strtolower($user['permanentPhase'])),
-                                ucwords(strtolower($user['permanentStreetName'])),
-                                ucwords(strtolower($user['permanentBarangay'])),
-                                ucwords(strtolower($user['permanentCity'])),
-                                ucwords(strtolower($user['permanentProvince']))
+                                ucwords(strtolower($user['permanentBlockLotNo'] ?? '')),
+                                ucwords(strtolower($user['permanentPurok'] ?? '')),
+                                ucwords(strtolower($user['permanentSubdivision'] ?? '')),
+                                ucwords(strtolower($user['permanentPhase'] ?? '')),
+                                ucwords(strtolower($user['permanentStreetName'] ?? '')),
+                                ucwords(strtolower($user['permanentBarangay'] ?? '')),
+                                ucwords(strtolower($user['permanentCity'] ?? '')),
+                                ucwords(strtolower($user['permanentProvince'] ?? ''))
                               ]);
-                              echo htmlspecialchars(implode(' ', $addressParts));
+                              $address = implode(' ', $addressParts);
+                              echo htmlspecialchars(!empty($address) ? $address : 'N/A');
                               ?>
                             </div>
                           </div>
@@ -352,9 +358,9 @@ if (isset($_POST['confirmButton'])) {
 
                         <div style="position: relative; width: 250px; height: 250px;" onmouseover=" this.querySelector('img').style.filter='brightness(0.75)'; this.querySelector('.hoverBtn').style.opacity='1'; " onmouseout=" this.querySelector('img').style.filter='brightness(1)'; this.querySelector('.hoverBtn').style.opacity='0';  ">
 
-                            <?php if ($user['profilePicture'] == "defaultProfile.png") { ?>
+                            <?php if (empty($user['profilePicture'])) { ?>
 
-                              <img src="../../uploads/profiles/<?= htmlspecialchars($user['profilePicture']) ?>" id="profilePreview" style="width:250px; height:250px; object-fit:cover; transition:0.3s;" alt="Default Profile">
+                              <img src="../../uploads/profiles/defaultProfile.png" id="profilePreview" style="width:250px; height:250px; object-fit:cover; transition:0.3s;" alt="Default Profile">
 
                               <label type="button" name="addButton" class="hoverBtn" onclick="document.getElementById('profilePictureInput').click()" style=" opacity:0; transition:0.3s; width:40px; height:40px; color:white; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); border:none; background-color:#19AFA5; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; ">
                                   <i class="fa-solid fa-plus"></i>
@@ -364,7 +370,7 @@ if (isset($_POST['confirmButton'])) {
 
                             <?php } else { ?>
 
-                              <img src="../../uploads/profiles/defaultProfile.png" style="width:250px; height:250px; object-fit:cover; transition:0.3s;" alt="Resident Profile">
+                              <img src="../../uploads/profiles/<?= htmlspecialchars($user['profilePicture']) ?>" style="width:250px; height:250px; object-fit:cover; transition:0.3s;" alt="Resident Profile">
 
                               <button type="button" class="hoverBtn" onclick="deleteProfilePicture(<?= $user['userID'] ?>)" style=" opacity:0; transition:0.3s; width:40px; height:40px; color:white; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); border:none; background-color:#19AFA5; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;" data-bs-toggle="modal" data-bs-target="#removeProfileModal">
                                   <i class="fa-solid fa-trash"></i>
@@ -464,7 +470,7 @@ if (isset($_POST['confirmButton'])) {
                         <div class="col-md-3 mb-3 edit-mode d-none">
                           <div class="info-row">
                             <label for="birthDate" class="form-label"><strong>Birth Date:</strong></label>
-                            <input type="date" class="form-control <?= ($incomplete && empty($birthDate)) ? 'border border-warning' : ''; ?>" id="birthDate" name="birthDate" value="<?php echo $user['birthDate'] ?>" placeholder="Date of Birth">
+                            <input type="date" class="form-control <?= ($incomplete && empty($birthDate)) ? 'border border-warning' : ''; ?>" id="birthDate" name="birthDate" value="<?php echo $user['birthDate'] ?? '' ?>" placeholder="Date of Birth">
                           </div>
                         </div>
                         <div class="col-md-3 mb-3 edit-mode d-none">
@@ -475,13 +481,13 @@ if (isset($_POST['confirmButton'])) {
                             ?>
                             <label for="age" class="form-label"><strong>Age:</strong></label>
                             <input type="text" class="form-control" id="age" value="<?= $ageLabel  ?>" placeholder="Age" readonly>
-                            <input type="hidden" name="age" id="ageHidden" value="<?= $age ?>">
+                            <input type="hidden" name="age" id="ageHidden" value="<?= $age ?? '' ?>">
                           </div>
                         </div>
                         <div class="col-md-6 mb-3 edit-mode d-none">
                           <div class="info-row">
                             <label for="birthPlace" class="form-label"><strong>Birth Place:</strong></label>
-                            <input type="text" class="form-control" id="birthPlace" name="birthPlace" value="<?= $user['birthPlace'] ?>" placeholder="Place of Birth">
+                            <input type="text" class="form-control" id="birthPlace" name="birthPlace" value="<?= $user['birthPlace'] ?? '' ?>" placeholder="Place of Birth">
                           </div>
                         </div>
                       </div>
@@ -709,7 +715,7 @@ if (isset($_POST['confirmButton'])) {
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <div class="info-row">
                         <label for="occupation" class="form-label"><strong>Occupation:</strong></label>
-                        <input type="text" class="form-control" id="occupation" name="occupation" placeholder="Occupation" value="<?= $user['occupation'] ?>">
+                        <input type="text" class="form-control" id="occupation" name="occupation" placeholder="Occupation" value="<?= $user['occupation'] ?? '' ?>">
                       </div>
                     </div>
                     <div class="col-md-3 my-3 edit-mode d-none">
@@ -725,13 +731,13 @@ if (isset($_POST['confirmButton'])) {
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <div class="info-row">
                         <label for="lengthOfStay" class="form-label"><strong>Length of Stay:</strong></label>
-                        <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?= $user['lengthOfStay'] ?>">
+                        <input type="text" class="form-control" id="lengthOfStay" name="lengthOfStay" value="<?= $user['lengthOfStay'] ?? '' ?>">
                       </div>
                     </div>
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <div class="info-row">
                         <label for="residencyType" class="form-label"><strong>Residency Type:</strong></label>
-                        <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?= $user['residencyType'] ?>">
+                        <input type="text" class="form-control" id="residencyType" name="residencyType" value="<?= $user['residencyType'] ?? '' ?>">
                       </div>
                     </div>
                     <div class="col-md-3 my-3 edit-mode d-none">

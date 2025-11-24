@@ -93,10 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
 
   if ($documentTypeID == 4) {
     if ($educationStatus === "Not Studying") {
-        $update = $pdo->prepare("UPDATE userInfo SET isOSY = 'Yes' WHERE userID = ?");
+        $update = $pdo->prepare("UPDATE userinfo SET isOSY = 'Yes' WHERE userID = ?");
         $update->execute([$userID]);
     } else {
-        $update = $pdo->prepare("UPDATE userInfo SET isOSY = 'No' WHERE userID = ?");
+        $update = $pdo->prepare("UPDATE userinfo SET isOSY = 'No' WHERE userID = ?");
         $update->execute([$userID]);
     }
   }
@@ -162,8 +162,8 @@ $documentsQuery .= " ORDER BY d.requestDate DESC LIMIT $recordsPerPage OFFSET $o
 $documentsResults = executeQuery($documentsQuery);
 
 $usersQuery = "SELECT * FROM users 
-  LEFT JOIN userInfo ON users.userID = userInfo.userID 
-  LEFT JOIN addresses ON userInfo.userID = addresses.userInfoID
+  LEFT JOIN userinfo ON users.userID = userinfo.userID 
+  LEFT JOIN addresses ON userinfo.userID = addresses.userInfoID
   WHERE role = 'user'
   ORDER BY firstName";
 

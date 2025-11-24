@@ -9,7 +9,7 @@ if (isset($_POST['logout'])) {
 if (isset($_SESSION['userID'])) {
     $userID = $_SESSION['userID'];
 
-    $userQuery = "SELECT * FROM users LEFT JOIN userInfo ON users.userID = userInfo.userID WHERE users.userID = '$userID'";
+    $userQuery = "SELECT * FROM users LEFT JOIN userinfo ON users.userID = userinfo.userID WHERE users.userID = '$userID'";
     $userResult = executeQuery($userQuery);
 
     if ($userResult && mysqli_num_rows($userResult) > 0) {

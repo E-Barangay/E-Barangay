@@ -256,7 +256,7 @@ if (isset($_POST['verify'])) {
             if ($insertAccountResult) {
                 $userID = mysqli_insert_id($conn);
 
-                $insertUserQuery = "INSERT INTO userInfo (userID, firstName, middleName, lastName) VALUES('$userID', '$firstName', '$middleName', '$lastName')";
+                $insertUserQuery = "INSERT INTO userinfo (userID, firstName, middleName, lastName) VALUES('$userID', '$firstName', '$middleName', '$lastName')";
                 $insertUserResult = executeQuery($insertUserQuery);
 
                 if ($insertUserResult) {
@@ -265,7 +265,7 @@ if (isset($_POST['verify'])) {
                     $insertUserAddressQuery = "INSERT INTO addresses (userInfoID, blockLotNo, phase, subdivisionName, purok, streetName, barangayName, cityName, provinceName) VALUES('$userInfoID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
                     $insertUserAddressResult = executeQuery($insertUserAddressQuery);
 
-                    $insertUserPermanentAddressQuery = "INSERT INTO permanentAddresses (userInfoID, permanentBlockLotNo, permanentPhase, permanentSubdivisionName, permanentPurok, permanentStreetName, permanentBarangayName, permanentCityName, permanentProvinceName) VALUES('$userInfoID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
+                    $insertUserPermanentAddressQuery = "INSERT INTO permanentaddresses (userInfoID, permanentBlockLotNo, permanentPhase, permanentSubdivisionName, permanentPurok, permanentStreetName, permanentBarangayName, permanentCityName, permanentProvinceName, foreignPermanentAddress) VALUES('$userInfoID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)";
                     $insertUserPermanentAddressResult = executeQuery($insertUserPermanentAddressQuery);
                 }
 
@@ -304,7 +304,7 @@ if (isset($_POST['verify'])) {
     <!-- Style Sheets -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/signup/style.css">
+    <link rel="stylesheet" href="assets/css/signUp/style.css">
 </head>
 
 <body data-bs-theme="light">

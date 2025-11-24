@@ -160,7 +160,7 @@ JOIN documenttypes dt ON d.documentTypeID = dt.documentTypeID
 JOIN users u ON d.userID = u.userID
 JOIN userinfo ui ON u.userID = ui.userID
 LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
-LEFT JOiN permanentAddresses pa ON ui.userInfoID = a.userInfoID
+LEFT JOiN permanentaddresses pa ON ui.userInfoID = a.userInfoID
 WHERE d.documentID = '$documentID'";
 
 $documentResult = executeQuery($documentQuery);
