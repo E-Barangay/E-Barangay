@@ -39,7 +39,7 @@ html {
 }
 
 .contentCard {
-  height: 100vh;
+  height: 100%;
   border-radius: 20px;
   border: 1px solid #19AFA5;
 }
@@ -105,7 +105,17 @@ make complaint */
   background-color: #19AFA5 !important;
 }
 
+.viewButton {
+  background-color: transparent;
+  border-color: #19AFA5;
+  color: #19AFA5;
+}
 
+.viewButton:hover {
+  background-color: #19AFA5;
+  border-color: #19AFA5;
+  color: white;
+}
 
 /* printing style */
 

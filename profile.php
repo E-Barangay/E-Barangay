@@ -6,9 +6,9 @@ session_start();
 
 if (!isset($_SESSION['userID'])) {
     header("Location: login.php");
+} else {
+    $userID = $_SESSION['userID'];
 }
-
-$userID = $_SESSION['userID'];
 
 $userQuery = "SELECT * FROM users 
             LEFT JOIN userinfo ON users.userID = userinfo.userID 

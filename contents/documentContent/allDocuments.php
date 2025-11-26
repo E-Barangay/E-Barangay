@@ -35,7 +35,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
         $buttonDisabled = false;
         $expiryCountdown = '';
 
-        if ($documentsRow['documentTypeID'] == 6 && $remarks === "With Derogatory") {
+        if ($documentsRow['documentTypeID'] == 6 && $remarks === "With Derogatory Record") {
             $buttonDisabled = true;
             $expiryCountdown = '<br><small>Restricted due to derogatory record</small>';
         }
