@@ -5,7 +5,11 @@ session_start();
 
 $page = "complaintSection";
 
-$userID = $_SESSION['userID'];
+if (!isset($_SESSION['userID'])) {
+    header("Location: login.php");
+} else {
+    $userID = $_SESSION['userID'];
+}
 
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
@@ -130,7 +134,7 @@ if (isset($_GET['page'])) {
 
             <div class="col-12 col-lg-9 p-0">
                 <div class="contentCard card m-1 p-2">
-                    <div class="row  px-3 py-2" id="scrollable" style="max-height: 100vh; overflow-y: auto;">
+                    <div class="row  px-3 py-2" id="scrollable">
 
                         <?php include("contents/complaintContent/" . $page . ".php"); ?>
 

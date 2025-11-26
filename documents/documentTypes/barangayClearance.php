@@ -36,7 +36,6 @@
             <img src="../uploads/profiles/<?php echo $profilePicture ?>" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover; object-position: center;">
         </div>
         <div class="col-lg-12 col-6 d-flex flex-column justify-content-end align-items-center pt-5">
-            <img src="../uploads/profiles/<?php echo $profilePicture ?>" alt="Signature" style="width: 100%; max-width: 250px; height: auto; aspect-ratio: 5 / 1; object-fit: contain; object-position: center;">
             <div class="signature-label mt-2 text-center border-top w-100">Signature</div>
         </div>
     </div>

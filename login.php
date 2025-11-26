@@ -71,8 +71,8 @@ if (isset($_POST['next'])) {
                 $mail->Password   = 'jcal kski idji qghl';
                 $mail->SMTPSecure = 'tls';
                 $mail->Port       = 587;
-                $mail->AddEmbeddedImage('assets/images/logoSanAntonio.png', 'logoSanAntonio');
-                $mail->AddEmbeddedImage('assets/images/logoSantoTomas.png', 'logoSantoTomas');
+                $mail->AddEmbeddedImage('assets/images/logoSanAntonio.webp', 'logoSanAntonio');
+                $mail->AddEmbeddedImage('assets/images/logoSantoTomas.webp', 'logoSantoTomas');
 
                 $mail->setFrom('brgysanantonioputol@gmail.com', 'San Antonio e-Desk');
                 $mail->addAddress($email);
@@ -163,8 +163,8 @@ if (isset($_POST['next'])) {
                 $mail->Password   = 'jcal kski idji qghl';
                 $mail->SMTPSecure = 'tls';
                 $mail->Port       = 587;
-                $mail->AddEmbeddedImage('assets/images/logoSanAntonio.png', 'logoSanAntonio');
-                $mail->AddEmbeddedImage('assets/images/logoSantoTomas.png', 'logoSantoTomas');
+                $mail->AddEmbeddedImage('assets/images/logoSanAntonio.webp', 'logoSanAntonio');
+                $mail->AddEmbeddedImage('assets/images/logoSantoTomas.webp', 'logoSantoTomas');
 
                 $mail->setFrom('brgysanantonioputol@gmail.com', 'San Antonio e-Desk');
                 $mail->addAddress($email);
@@ -273,8 +273,8 @@ if (isset($_POST['resend'])) {
         $mail->Password   = 'jcal kski idji qghl';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
-        $mail->AddEmbeddedImage('assets/images/logoSanAntonio.png', 'logoSanAntonio');
-        $mail->AddEmbeddedImage('assets/images/logoSantoTomas.png', 'logoSantoTomas');
+        $mail->AddEmbeddedImage('assets/images/logoSanAntonio.webp', 'logoSanAntonio');
+        $mail->AddEmbeddedImage('assets/images/logoSantoTomas.webp', 'logoSantoTomas');
 
         $mail->setFrom('brgysanantonioputol@gmail.com', 'San Antonio e-Desk');
         $mail->addAddress($email);
@@ -519,8 +519,8 @@ if (isset($_POST['login'])) {
                 
                 <div class="row">
                     <div class="col d-flex justify-content-center">
-                        <img src="assets/images/logoSanAntonio.png" class="logoSanAntonio me-2" alt="Logo San Antonio">
-                        <img src="assets/images/logoSantoTomas.png" class="logoSantoTomas" alt="Logo Santo Tomas">
+                        <img src="assets/images/logoSanAntonio.webp" class="logoSanAntonio me-2" alt="Logo San Antonio">
+                        <img src="assets/images/logoSantoTomas.webp" class="logoSantoTomas" alt="Logo Santo Tomas">
                     </div>
                 </div>
                 <div class="row mt-1">

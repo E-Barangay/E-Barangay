@@ -27,38 +27,26 @@
                             class="footer-link p-0">Vision</a></li>
                     <li class="footer-item mb-3"><a href="javascript:void(0)"
                             onclick="showSection('executives-section')" class="footer-link p-0">Executives</a></li>
-                    <li class="footer-item mb-3"><a href="javascript:void(0)" onclick="showSection('staff-section')"
-                            class="footer-link p-0">Staffs</a></li>
                 </ul>
 
                 <div class="d-block d-lg-none">
                     <section id="mission-section-sm" class="container py-3" style="display: none;">
                         <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Mission</h2>
                         <p style="color: black;">
-                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus totam
-                            cupiditate cumque laborum adipisci, unde eos odio consectetur natus perferendis!
+                            To eradicate extreme poverty by raising the standard of living of the people and sustaining the people in their development towards the future.
                         </p>
                     </section>
 
                     <section id="vision-section-sm" class="container py-3" style="display: none;">
                         <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Vision</h2>
                         <p style="color: black;">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis dolor accusamus
-                            obcaecati consequuntur nesciunt, pariatur dicta vitae laboriosam dolores illum.
+                            A progressive, healthy and peaceful community where citizenz are united and participate together in change and decision-making towards good governance. Vibrant and genuine service as promised to achieve a strong foundation that will inspire every individual.
                         </p>
                     </section>
 
                     <section id="executives-section-sm" class="container py-3" style="display: none;">
                         <h2 class="mb-3" style="color:#19AFA5;">Executives</h2>
                         <img src="assets/images/executives.jpg" alt="Barangay Executives" class="img-fluid rounded">
-                    </section>
-
-                    <section id="staff-section-sm" class="container py-3" style="display: none;">
-                        <h2 class="mb-3" style="color:#19AFA5;">Staffs</h2>
-                        <p style="color: black;">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iusto ducimus
-                            libero dolorem amet minus velit aut molestiae ex corrupti.
-                        </p>
                     </section>
                 </div>
             </div>
@@ -89,30 +77,20 @@
                 <section id="mission-section" class="container py-3" style="display: none;">
                     <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Mission</h2>
                     <p style="color: black;">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus totam
-                        cupiditate cumque laborum adipisci, unde eos odio consectetur natus perferendis!
+                        To eradicate extreme poverty by raising the standard of living of the people and sustaining the people in their development towards the future.
                     </p>
                 </section>
 
                 <section id="vision-section" class="container py-3" style="display: none;">
                     <h2 class="mb-3" style="color:#19AFA5; font-weight: bold;">Vision</h2>
                     <p style="color: black;">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis dolor accusamus
-                        obcaecati consequuntur nesciunt, pariatur dicta vitae laboriosam dolores illum.
+                        A progressive, healthy and peaceful community where citizenz are united and participate together in change and decision-making towards good governance. Vibrant and genuine service as promised to achieve a strong foundation that will inspire every individual.
                     </p>
                 </section>
 
                 <section id="executives-section" class="container py-3" style="display: none;">
                     <h2 class="mb-3" style="color:#19AFA5;">Executives</h2>
                     <img src="assets/images/executives.jpg" alt="Barangay Executives" class="img-fluid rounded">
-                </section>
-
-                <section id="staff-section" class="container py-3" style="display: none;">
-                    <h2 class="mb-3" style="color:#19AFA5;">Staffs</h2>
-                    <p style="color: black;">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi iusto ducimus
-                        libero dolorem amet minus velit aut molestiae ex corrupti.
-                    </p>
                 </section>
             </div>
             
@@ -126,8 +104,8 @@
     </footer>
     <script>
         function showSection(sectionId) {
-            var sections = ['mission-section', 'vision-section', 'executives-section', 'staff-section',
-                            'mission-section-sm', 'vision-section-sm', 'executives-section-sm', 'staff-section-sm'];
+            var sections = ['mission-section', 'vision-section', 'executives-section',
+                            'mission-section-sm', 'vision-section-sm', 'executives-section-sm'];
             sections.forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.style.display = (id === sectionId || id === sectionId + '-sm') ? 'block' : 'none';

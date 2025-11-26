@@ -4,7 +4,7 @@ $complaints = [];
 if (isset($_SESSION['userID'])) {
   $userID = $_SESSION['userID'];
 
-  $sql = "SELECT * FROM complaints WHERE userID = '$userID' ORDER BY requestDate ASC";
+  $sql = "SELECT * FROM complaints WHERE userID = '$userID' ORDER BY requestDate DESC";
   $result = mysqli_query($conn, $sql);
 
   if ($result && mysqli_num_rows($result) > 0) {
@@ -25,10 +25,9 @@ if (isset($_SESSION['userID'])) {
 ?>
 
 
-<div class="content">
-  <div class="p-md-1 p-0">
+<div class="col p-1">
 
-  <div class="card py-3 mt-2 mb-2 text-center" style="background-color: #19AFA5; border: none; border-radius: 12px;">
+  <div class="card py-3 mt-2 text-center" style="background-color: #19AFA5; border: none; border-radius: 12px;">
         <span class="m-0" style="font-size: clamp(16px, 4vw, 20px); font-weight: bold; color: white;">Your Submitted Complaints</span>
     </div>
 
@@ -39,28 +38,34 @@ if (isset($_SESSION['userID'])) {
     </div> -->
 
     <div class="table-responsive">
-      <table class="mt-2 table table-striped text-center">
+      <table class="table table-striped">
         <thead>
           <tr>
-            <th>No.</th>
-            <th>Date Submitted</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Complaint Title</th>
+            <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Date Submitted</th>
+            <th class="align-middle py-3" scope="col"style="white-space: nowrap;">Status</th>
+            <th class="align-middle py-3 text-center" scope="col"style="white-space: nowrap;">Action</th>
           </tr>
         </thead>
         <tbody>
           <?php if (!empty($complaints)): ?>
             <?php foreach ($complaints as $index => $complaint): ?>
               <tr>
-                <td><?= $index + 1 ?></td>
-                <td><?= date("Y-m-d h:i A", strtotime($complaint['requestDate'])) ?></td>
-                <td><?= htmlspecialchars($complaint['complaintTitle']) ?></td>
-                <td><?= ucfirst($complaint['complaintStatus']) ?></td>
-                <td>
-                  <button class="btn btn-sm filterButton" data-bs-toggle="modal"
-                    data-bs-target="#complaintModal<?= $complaint['complaintID'] ?>">
-                    View
+                <td class="align-middle" style="white-space: nowrap;"><?= htmlspecialchars($complaint['complaintTitle']) ?></td>
+                <td class="align-middle" style="white-space: nowrap;">
+                    <?php 
+                        $date = date("F j, Y", strtotime($complaint['requestDate']));
+                        $time = date("h:i A", strtotime($complaint['requestDate']));
+                    ?>
+                    <div>
+                        <span><?= $date ?></span><br>
+                        <small class="text-muted"><?= $time ?></small>
+                    </div>
+                </td>
+                <td class="align-middle" style="white-space: nowrap;"><?= ucfirst($complaint['complaintStatus']) ?></td>
+                <td class="align-middle text-center" style="white-space: nowrap;">
+                  <button type="button" class="btn btn-sm viewButton" title="View Document" data-bs-toggle="modal" data-bs-target="#complaintModal<?= $complaint['complaintID'] ?>">
+                    <i class="fas fa-eye"></i>
                   </button>
                 </td>
               </tr>

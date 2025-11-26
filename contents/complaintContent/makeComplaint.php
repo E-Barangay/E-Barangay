@@ -121,7 +121,7 @@ if (isset($_POST['submit'])) {
 ?>
 
 
-<div class="content outline p-md-5 p-4">
+<div class="content outline py-md-5 py-4 px-0">
 
     <!-- Success Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
@@ -162,18 +162,18 @@ if (isset($_POST['submit'])) {
         <div class="col-4 col-md-4">
             <div class="d-flex justify-content-center align-items-center mb-3">
                 <a href="tel:09174528364" class="d-flex align-items-center text-decoration-none">
-                    <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #19AFA5;">
+                    <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #19AFA5; border: #19AFA5;">
                         <img src="assets/images/reports/call logo.png" alt="Call Logo" class="img-fluid"
                             style="width: 16px; height: 16px;">
                     </div>
-                    <div class="fs-6 ms-2 d-none d-md-block" style="color: #19AFA5;">0917 452 8364</div>
+                    <div class="fs-6 ms-2 d-none d-md-block" style="color: black;">0917 452 8364</div>
                 </a>
             </div>
         </div>
 
         <div class="col-4 col-md-4">
             <div class="d-flex justify-content-center mb-3">
-                <div class="card p-2 p-md-3 text-center" style="background-color: #19AFA5; border: none;">
+                <div class="card p-2 p-md-3 text-center" style="background-color: #19AFA5; border: #19AFA5;">
                     <h2 class="fw-bold fs-6 fs-md-5 text-light mb-0 d-none d-md-block">Make A Complaint</h2>
                     <h2 class="fw-bold text-light mb-0 d-block d-md-none complaint-text" style>Make A Complaint</h2>
                 </div>
@@ -184,11 +184,11 @@ if (isset($_POST['submit'])) {
             <div class="d-flex justify-content-center align-items-center mb-3">
                 <a href="https://www.facebook.com/sanantonioofficial" target="_blank"
                     class="d-flex align-items-center text-decoration-none">
-                    <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #19AFA5;">
+                    <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #19AFA5; border: #19AFA5;">
                         <img src="assets/images/reports/facebook logo.png" alt="Facebook Logo" class="img-fluid"
                             style="width: 16px; height: 16px;">
                     </div>
-                    <div class="fs-6 ms-2 d-none d-md-block" style="color: #19AFA5;">San Antonio</div>
+                    <div class="fs-6 ms-2 d-none d-md-block" style="color: black;">San Antonio</div>
                 </a>
             </div>
         </div>
@@ -204,7 +204,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-2">
                             <div class="d-flex align-items-center">
                                 <label for="title" class="form-label me-2"
-                                    style="color: #19AFA5; min-width: 80px;">Title:</label>
+                                    style="color: black; min-width: 80px;">Title:</label>
                                 <select class="form-select" id="title" name="title" required>
                                     <option value="" disabled selected>Select Complaint</option>
                                     <option value="Physical Assault and Threats">Physical Assault and Threats</option>
@@ -235,7 +235,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-2">
                             <div class=" d-flex align-items-center mt-md-0">
                                 <label for="address" class="form-label me-2"
-                                    style="color: #19AFA5; min-width: 80px;">Address:</label>
+                                    style="color: black; min-width: 80px;">Address:</label>
                                 <input type="text" class="form-control" id="address" name="address" required
                                     placeholder="Address">
                             </div>
@@ -244,7 +244,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-2">
                             <div class="d-flex align-items-center">
                                 <label for="victim" class="form-label me-2"
-                                    style="color: #19AFA5; min-width: 80px;">Victim:</label>
+                                    style="color: black; min-width: 80px;">Victim:</label>
                                 <input type="text" class="form-control" id="victim" name="victim"
                                     placeholder="Optional">
                             </div>
@@ -253,7 +253,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-2">
                             <div class="d-flex align-items-center">
                                 <label for="relationship" class="form-label me-2"
-                                    style="color: #19AFA5; min-width: 80px;">Relation:</label>
+                                    style="color: black; min-width: 80px;">Relation:</label>
                                 <input type="text" class="form-control" id="relationship" placeholder="Optional"
                                     name="relationship">
                             </div>
@@ -264,7 +264,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-2">
                             <div class="d-flex align-items-center">
                                 <label for="phone" class="form-label me-2"
-                                    style="color: #19AFA5; min-width: 80px;">Phone:</label>
+                                    style="color: black; min-width: 80px;">Phone:</label>
                                 <input type="number" class="form-control" id="phone" name="phoneNumber"
                                     value="<?php echo htmlspecialchars($userPhone ?? ''); ?>" required>
                             </div>
@@ -273,7 +273,7 @@ if (isset($_POST['submit'])) {
                         <div class="row mb-2">
                             <div class="d-flex align-items-center">
                                 <label for="accused" class="form-label me-2"
-                                    style="color: #19AFA5; min-width: 80px;">Accused:</label>
+                                    style="color: black; min-width: 80px;">Accused:</label>
                                 <input type="text" class="form-control" id="accused" name="accused"
                                     placeholder="Optional">
                             </div>
@@ -293,7 +293,7 @@ if (isset($_POST['submit'])) {
                     </div>
                 </div>
 
-                <div class="fs-6 fw-bold mb-2" style="color: #19AFA5">Write A Statement</div>
+                <div class="fs-6 fw-bold my-2" style="color: black">Write A Statement</div>
 
                 <!-- Textarea -->
                 <div class="mb-3">
@@ -303,7 +303,7 @@ if (isset($_POST['submit'])) {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold" style="color: #19AFA5 ">Upload Evidence</label>
+                    <label class="form-label fw-bold" style="color: black ">Upload Evidence</label>
                     <input type="file" id="fileInput" name="evidence[]" accept="image/*" multiple
                         style="display: none;">
                     <button type="button" class="btn text-light" style="background-color: #19AFA5" id="uploadBtn">Choose
@@ -315,7 +315,7 @@ if (isset($_POST['submit'])) {
                 </div>
 
                 <!-- Submit buttons -->
-                <div class="d-flex justify-content-center justify-content-md-end mt-2 gap-2">
+                <div class="d-flex justify-content-center justify-content-md-end mt-4 gap-2">
                     <a href="complaints.php?page=complaintSection.php" class="btn filterButton">Cancel</a>
 
                     <button type="button" class="btn filterButton" id="submitBtn">

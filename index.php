@@ -332,36 +332,40 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
             <?php } ?>
 
         </div>
+        
+        <?php if ($totalPages > 1): ?>
 
-        <div class="row">
-            <div class="col d-flex justify-content-center align-items-center mt-5">
+            <div class="row">
+                <div class="col d-flex justify-content-center align-items-center mt-5">
 
-                <nav aria-label="pageNavigation">
+                    <nav aria-label="pageNavigation">
 
-                    <ul class="pagination" id="pagination">
+                        <ul class="pagination" id="pagination">
 
-                        <li class="page-item previousButton me-2" onclick="previousPage()">
-                            <a class="page-link" aria-label="Previous">Previous</a>
-                        </li>
-
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li class="page-item pageNumber">
-                                <a class="page-link" href="javascript:void(0)" onclick="goToPage(<?php echo $i; ?>)">
-                                    <?php echo $i; ?>
-                                </a>
+                            <li class="page-item previousButton me-2" onclick="previousPage()">
+                                <a class="page-link" aria-label="Previous">Previous</a>
                             </li>
-                        <?php endfor; ?>
 
-                        <li class="page-item nextButton ms-2" onclick="nextPage()">
-                            <a class="page-link" aria-label="Next">Next</a>
-                        </li>
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li class="page-item pageNumber">
+                                    <a class="page-link" href="javascript:void(0)" onclick="goToPage(<?php echo $i; ?>)">
+                                        <?php echo $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
 
-                    </ul>
+                            <li class="page-item nextButton ms-2" onclick="nextPage()">
+                                <a class="page-link" aria-label="Next">Next</a>
+                            </li>
 
-                </nav>
+                        </ul>
 
+                    </nav>
+
+                </div>
             </div>
-        </div>
+
+        <?php endif; ?>
         
     </div>
 
