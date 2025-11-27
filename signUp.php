@@ -22,7 +22,7 @@ if (isset($_POST["register"])) {
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
 
-    $isWeak = !preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^\w\s]|_).{8,}$/', $password);
+    $isWeak = !preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[_\W]).{8,}$/', $password);
 
     $checkEmailQuery = "SELECT * FROM users WHERE email = '$email'";
     $checkEmailResult = executeQuery($checkEmailQuery);
@@ -378,7 +378,7 @@ if (isset($_POST['verify'])) {
 
                             <div class="col-lg-4 col-md-4 col-6 p-lg-0 p-md-0">
                                 <div class="form-floating mb-3">
-                                    <input type="text" name="middleName" value="<?php echo isset($_POST['middleName']) ? htmlspecialchars($_POST['middleName']) : ''; ?>" class="form-control" id="middleNameInput" placeholder="Middle Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')" required>
+                                    <input type="text" name="middleName" value="<?php echo isset($_POST['middleName']) ? htmlspecialchars($_POST['middleName']) : ''; ?>" class="form-control" id="middleNameInput" placeholder="Middle Name" pattern="[A-Za-z\s]+" oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
                                     <label for="middleNameInput">Middle Name</label>
                                 </div>
                             </div>

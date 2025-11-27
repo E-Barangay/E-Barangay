@@ -1000,7 +1000,7 @@ if (isset($_POST['confirmButton'])) {
                                     <input type="email"
                                         class="form-control <?php echo ($incomplete && empty($email)) ? 'border border-warning' : ''; ?>"
                                         id="email" name="email" value="<?php echo $email ?>" placeholder="Email Address"
-                                        disabled>
+                                        readonly disabled>
                                     <label for="email">Email Address</label>
                                 </div>
                             </div>
