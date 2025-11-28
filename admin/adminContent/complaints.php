@@ -96,7 +96,7 @@ $offset = ($currentPage - 1) * $perPage;
 // ✅ Base query
 $sql = "SELECT 
     r.*, 
-    COALESCE(CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName), r.complainantName) AS reporterName,
+    COALESCE(CONCAT_WS(' ', ui.firstName, ui.middleName, ui.lastName, ui.suffix), r.complainantName) AS reporterName,
     r.complaintID AS concernID,
     r.complaintTitle AS concernType,
     r.complaintPhoneNumber AS phoneNumber,
