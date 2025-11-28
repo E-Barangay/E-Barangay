@@ -362,7 +362,7 @@ if (in_array(strtolower($complaint['complaintStatus']), ['criminal', 'civil'])) 
                     <div class="mb-3">
                       <label class="form-label fw-semibold">Dispute Type:</label>
                       <div class="p-2 bg-light rounded">
-                        <?= htmlspecialchars($complaint['complaintType']) ?>
+                        <?= htmlspecialchars($complaint['complaintType'] ?? '')?>
                       </div>
                     </div>
 

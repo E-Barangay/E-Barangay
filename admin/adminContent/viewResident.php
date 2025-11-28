@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   $occupation = $_POST['occupation'];
   $residencyType = $_POST['residencyType'];
   $isVoter = $_POST['isVoter'];
+  $isOSY = $_POST['isOSY'];
   $remarks = $_POST['remarks'];
   $presentBlockLotNo = $_POST['presentBlockLotNo'];
   $presentStreetName = $_POST['presentStreetName'];
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   WHERE userID=$userID");
 
   //Update userInfo table
-  mysqli_query($conn, "UPDATE userinfo SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix', gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace', civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation', isVoter='$isVoter', remarks='$remarks', residencyType='$residencyType'  
+  mysqli_query($conn, "UPDATE userinfo SET firstName='$firstName', middleName='$middleName', lastName='$lastName', suffix='$suffix', gender='$gender', age='$age', birthDate='$birthDate', birthPlace='$birthPlace', civilStatus='$civilStatus', citizenship='$citizenship', occupation='$occupation', isVoter='$isVoter', remarks='$remarks', residencyType='$residencyType', isOSY='$isOSY'
   WHERE userID=$userID");
 
   $getInfo = mysqli_query($conn, "SELECT userInfoID FROM userinfo WHERE userID = $userID");
@@ -89,9 +90,9 @@ if (isset($_GET['userID'])) {
   $userID = intval($_GET['userID']);
   $sql = "SELECT 
   u.userID, u.phoneNumber, u.email, u.role, u.isNew,
-  i.userInfoID, CONCAT(i.firstName, ' ', i.middleName, ' ', i.lastName) AS fullname, i.firstName, i.middleName, i.lastName, i.suffix,
+  i.userInfoID, CONCAT(i.firstName, ' ', i.middleName, ' ', i.lastName, ' ', i.suffix) AS fullname, i.firstName, i.middleName, i.lastName, i.suffix,
   i.gender, i.age, i.bloodType, i.birthDate, i.birthPlace, i.profilePicture,
-  i.residencyType, i.lengthOfStay, i.civilStatus, i.citizenship, i.occupation, isVoter, remarks,
+  i.residencyType, i.lengthOfStay, i.civilStatus, i.citizenship, i.occupation, isVoter, remarks, isOSY,
 
   -- PRESENT ADDRESS
   a.blockLotNo AS presentBlockLotNo,
@@ -218,13 +219,13 @@ if (isset($_POST['confirmButton'])) {
                             <div class="mt-1"><?= htmlspecialchars($user['fullname'] ?? 'N/A') ?></div>
                           </div>
                         </div>
-                        <div class="col-md-5 mb-3 view-mode">
+                        <div class="col-md-4 mb-3 view-mode">
                           <div class="info-row">
                             <strong>Email:</strong>
                             <div class="mt-1"><?= htmlspecialchars($user['email'] ?? 'N/A') ?></div>
                           </div>
                         </div>
-                        <div class="col-md-3 mb-3 view-mode">
+                        <div class="col-md-4 mb-3 view-mode">
                           <div class="info-row">
                             <strong>Phone Number:</strong>
                             <div class="mt-1"><?= htmlspecialchars($user['phoneNumber'] ?? 'N/A') ?></div>
@@ -298,7 +299,7 @@ if (isset($_POST['confirmButton'])) {
                             </div>
                           </div>
                         </div>
-                        <div class="col-md-2 my-3 view-mode">
+                        <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
                             <strong >Residency Type:</strong>
                             <div class="mt-1">
@@ -306,7 +307,23 @@ if (isset($_POST['confirmButton'])) {
                             </div>
                           </div>
                         </div>
-                        <div class="col-5 my-3 view-mode">
+                        <div class="col-md-3 my-3 view-mode">
+                          <div class="info-row">
+                            <strong >isVoter:</strong>
+                            <div class="mt-1">
+                              <span><?= htmlspecialchars($user['isVoter'] ?? 'N/A') ?></span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-3 my-3 view-mode">
+                          <div class="info-row">
+                            <strong >isOSY:</strong>
+                            <div class="mt-1">
+                              <span><?= htmlspecialchars($user['isOSY'] ?? 'N/A') ?></span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-6 my-3 view-mode">
                           <div class="info-row">
                             <strong>Address:</strong>
                             <div class="mt-1">
@@ -327,7 +344,7 @@ if (isset($_POST['confirmButton'])) {
                             </div>
                           </div>
                         </div>
-                        <div class="col-5 my-3 view-mode">
+                        <div class="col-6 my-3 view-mode">
                           <div class="info-row">
                             <strong>Permanent Address:</strong>
                             <div class="mt-1">
@@ -744,6 +761,12 @@ if (isset($_POST['confirmButton'])) {
                       <div class="info-row">
                         <label for="isVoter" class="form-label"><strong>Registered Voter:</strong></label>
                         <input type="text" class="form-control" id="isVoter" name="isVoter" value="<?= $user['isVoter'] ?>">
+                      </div>
+                    </div>
+                    <div class="col-md-3 my-3 edit-mode d-none">
+                      <div class="info-row">
+                        <label for="isOSY" class="form-label"><strong>Out of School Youth:</strong></label>
+                        <input type="text" class="form-control" id="isOSY" name="isOSY" value="<?= $user['isOSY'] ?>">
                       </div>
                     </div>
                     <div class="col-md-3 my-3 edit-mode d-none">

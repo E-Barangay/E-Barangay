@@ -86,10 +86,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
       break;
   }
 
-  $insertQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, educationStatus, spouseName, marriageYear, childNo, soloParentSinceDate, documentStatus, requestDate) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())";
-  $stmt = $pdo->prepare($insertQuery);
-  $stmt->execute([$documentTypeID, $userID, $purpose, $businessName, $businessAddress, $businessNature, $controlNo, $ownership, $educationStatus, $spouseName, $marriageYear, $childNo, $soloParentSinceDate]);
+  if ($documentTypeID == 2) {
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, businessName, businessAddress, businessNature, controlNo, ownership, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', '$businessName', '$businessAddress', '$businessNature', $controlNo, '$ownership', NOW(), NULL, NULL, NULL, NULL)";
+  } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 8) {
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, '$purpose', NOW(), NULL, NULL, NULL, NULL)";
+  } elseif ($documentTypeID == 4) {
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, educationStatus, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$educationStatus', NOW(), NULL, NULL, NULL, NULL)";
+  } elseif ($documentTypeID == 7) {
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
+  } elseif ($documentTypeID == 9) {
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW(), NULL, NULL, NULL, NULL)";
+  } else {
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', NOW(), NULL, NULL, NULL, NULL)";
+  }
+
+  executeQuery($documentRequestQuery);
 
   if ($documentTypeID == 4) {
     if ($educationStatus === "Not Studying") {
@@ -120,7 +131,7 @@ $documentsQuery = "SELECT
     d.requestDate,
     d.documentTypeID,
     dt.documentName,
-    CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS fullname,
+    CONCAT_WS(' ', ui.firstName, ui.middleName, ui.lastName, ui.suffix) AS fullname,
     u.phoneNumber
 FROM documents d
 JOIN users u ON d.userID = u.userID
@@ -445,12 +456,12 @@ $docTypesResults = executeQuery($docTypesQuery);
                         };
                         ?>
                         <tr class="align-middle">
-                          <td><?= htmlspecialchars($row['fullname']) ?></td>
+                          <td><?= htmlspecialchars($row['fullname'] ?? '' ) ?></td>
                           <td><span><?= htmlspecialchars($row['documentName']) ?></span></td>
                           <td><?= date('M d, Y', strtotime($row['requestDate'])) ?></td>
                           <td><?= htmlspecialchars($row['purpose']) ?></td>
                           <td><?= htmlspecialchars($row['phoneNumber']) ?></td>
-                          <td><span class="badge rounded-pill <?= $badgeClass ?>"><?= $row['documentStatus'] ?></span></td>
+                          <td><span class="badge rounded-pill <?= $badgeClass ?>"><?= $row['documentStatus'] ?? '' ?></span></td>
                           <td>
                             <div class="d-flex gap-2 flex-wrap">
                               <a href="adminContent/viewDocument.php?id=<?= $row['documentID'] ?>"

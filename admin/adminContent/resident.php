@@ -396,7 +396,7 @@ $result = mysqli_query($conn, $sql);
                                         <?php if ($result->num_rows > 0): ?>
                                             <?php while ($row = $result->fetch_assoc()): ?>
                                                 <tr class="align-middle">
-                                                    <td><?= htmlspecialchars($row['fullname']) ?></td>
+                                                    <td><?= htmlspecialchars($row['fullname'] ?? '') ?></td>
                                                     <td><?= htmlspecialchars($row['email']); ?></td>
                                                     <td><?= htmlspecialchars($row['phoneNumber']); ?></td>
                                                     <td><?= !empty($row['birthDate']) ? date('F d, Y', strtotime($row['birthDate'])) : '' ?></td>
