@@ -508,13 +508,7 @@ if (isset($_POST['login'])) {
 
 <body data-bs-theme="light">
 
-    <div class="container-fluid loadingBarContainer">
-        <div class="row">
-            <div class="col">
-                <div class="loadingBar" id="loadingBar"></div>
-            </div>
-        </div>
-    </div>
+    <?php include("sharedAssets/loadingIndicator.php"); ?>
 
     <div class="container-fluid">
         <div class="row min-vh-100">
@@ -778,6 +772,8 @@ if (isset($_POST['login'])) {
         </script>
     <?php endif; ?>
 
+    <script src="assets/js/loadingIndicator/script.js"></script>
+
     <script>
         function togglePassword(inputId, icon) {
             var input = document.getElementById(inputId);
@@ -792,37 +788,6 @@ if (isset($_POST['login'])) {
                 icon.classList.add("fa-eye");
             }
         }
-
-        let bar = document.getElementById("loadingBar");
-        let progress = 0;
-
-        let interval = setInterval(() => {
-            
-            progress += Math.random() * 10;
-
-            if (progress >= 90) {
-                progress = 90;
-            }
-
-            bar.style.width = progress + "%";
-        }, 200);
-
-        window.addEventListener("load", () => {
-            progress = 100;
-            bar.style.width = "100%";
-
-            setTimeout(() => {
-                bar.style.opacity = "0";
-
-                setTimeout(() => {
-                    document.querySelector(".loadingBarContainer").style.display = "none";
-                }, 400);
-
-            }, 300);
-            
-            clearInterval(interval);
-        });
-
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>

@@ -142,23 +142,6 @@ html {
     border: 1px solid #11A1A1;
 }
 
-.loadingBar {
-    background-color: #19AFA5;
-    height: 5px;
-    width: 0%;
-    transition: width 0.4s ease;
-}
-
-.loadingBarContainer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 0;
-    margin: 0;
-}
-
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;

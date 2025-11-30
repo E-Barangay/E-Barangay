@@ -189,6 +189,8 @@ if (isset($_POST['yes'])) {
 </head>
 
 <body data-bs-theme="light">
+
+    <?php include("sharedAssets/loadingIndicator.php"); ?>
     
     <form method="POST">
         <div class="container d-flex justify-content-center align-items-center py-4" style="min-height:100vh;">
@@ -211,6 +213,8 @@ if (isset($_POST['yes'])) {
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+
+    <script src="assets/js/loadingIndicator/script.js"></script>
 
     <script>
 
