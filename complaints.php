@@ -100,6 +100,8 @@ if (isset($_GET['page'])) {
 </head>
 
 <body data-bs-theme="light">
+    
+    <?php include("sharedAssets/loadingIndicator.php"); ?>
 
     <?php
 
@@ -150,6 +152,9 @@ if (isset($_GET['page'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
         crossorigin="anonymous"></script>
+
+    <script src="assets/js/loadingIndicator/script.js"></script>
+
     <script src="assets/js/signUp/report.js"></script>
     
 </body>

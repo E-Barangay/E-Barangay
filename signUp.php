@@ -308,6 +308,8 @@ if (isset($_POST['verify'])) {
 </head>
 
 <body data-bs-theme="light">
+
+    <?php include("sharedAssets/loadingIndicator.php"); ?>
     
     <div class="container-fluid">
         <div class="row min-vh-100">
@@ -505,6 +507,8 @@ if (isset($_POST['verify'])) {
             </div>
         </div>
     </div>
+
+    <script src="assets/js/loadingIndicator/script.js"></script>
 
     <script>
         function togglePassword(inputId, icon) {

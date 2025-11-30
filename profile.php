@@ -347,6 +347,8 @@ if (isset($_POST['confirmButton'])) {
 
 <body data-bs-theme="light">
 
+    <?php include("sharedAssets/loadingIndicator.php"); ?>
+
     <?php
     if (isset($_SESSION['userID'])) {
         include("sharedAssets/navbarLoggedIn.php");
@@ -1225,6 +1227,8 @@ if (isset($_POST['confirmButton'])) {
     </form>
 
     <?php include("sharedAssets/footer.php") ?>
+
+    <script src="assets/js/loadingIndicator/script.js"></script>
 
     <script src="assets/js/profile/script.js"></script>
 
