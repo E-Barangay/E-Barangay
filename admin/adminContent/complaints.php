@@ -299,6 +299,18 @@ function getBorderClass($status)
       border-color: #11A1A1;
       color: white;
     }
+
+    .viewButton {
+      background-color: transparent;
+      border-color: #19AFA5;
+      color: #19AFA5;
+    }
+
+    .viewButton:hover {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+      color: white;
+    }
   </style>
 </head>
 
@@ -397,7 +409,7 @@ function getBorderClass($status)
                           <td>
                             <!-- View button -->
                             <a href="adminContent/viewComplaint.php?complaintID=<?= $row['concernID'] ?>"
-                              class="btn btn-sm btn-outline-primary" title="View Details">
+                              class="btn btn-sm btn-outline-primary viewButton" title="View Details">
                               <i class="fas fa-eye gap"></i>
                             </a>
                             <!-- Delete Button (trigger modal) -->

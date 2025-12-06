@@ -190,7 +190,7 @@ if (isset($_POST['yes'])) {
 
 <body data-bs-theme="light">
 
-    <?php include("sharedAssets/loadingIndicator.php"); ?>
+    <?php include("../sharedAssets/loadingIndicator.php"); ?>
     
     <form method="POST">
         <div class="container d-flex justify-content-center align-items-center py-4" style="min-height:100vh;">

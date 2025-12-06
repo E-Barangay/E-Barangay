@@ -8,6 +8,10 @@ include("sharedAssets/connect.php");
 
 session_start();
 
+if (!isset($_GET['token'])) {
+    unset($_SESSION['resetMode']);
+}
+
 $loginStep = 'email';
 
 use PHPMailer\PHPMailer\PHPMailer;
