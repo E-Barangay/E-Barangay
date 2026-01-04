@@ -3,7 +3,7 @@ include_once __DIR__ . '/../../sharedAssets/connect.php';
 
 $totalPopulation = $totalUsers = $totalDocuments = $totalComplaints = 0;
 $maleCount = $femaleCount = $kids = $teens = $adults = $seniors = 0;
-$bonafide = $migrant = $transient = 0;
+$bonafide = $migrant = $transient = $foreign = 0;
 
 if ($conn) {
     $q = "SELECT COUNT(*) AS total FROM users WHERE role = 'user'";
@@ -36,17 +36,20 @@ if ($conn) {
     $r = mysqli_fetch_assoc(mysqli_query($conn, "SELECT
         SUM(CASE WHEN residencyType='Bonafide' THEN 1 ELSE 0 END) AS bonafide,
         SUM(CASE WHEN residencyType='Migrant' THEN 1 ELSE 0 END) AS migrant,
-        SUM(CASE WHEN residencyType='Transient' THEN 1 ELSE 0 END) AS transient
+        SUM(CASE WHEN residencyType='Transient' THEN 1 ELSE 0 END) AS transient,
+        SUM(CASE WHEN residencyType='Foreign' THEN 1 ELSE 0 END) AS `foreign`
         FROM userinfo"));
     $bonafide = (int) ($r['bonafide'] ?? 0);
     $migrant = (int) ($r['migrant'] ?? 0);
     $transient = (int) ($r['transient'] ?? 0);
+    $foreign = (int) ($r['foreign'] ?? 0);
 }
 
 $totalResidency = $bonafide + $migrant + $transient;
 $bonafidePercent = $totalResidency > 0 ? round(($bonafide / $totalResidency) * 100) : 0;
 $migrantPercent = $totalResidency > 0 ? round(($migrant / $totalResidency) * 100) : 0;
 $transientPercent = $totalResidency > 0 ? round(($transient / $totalResidency) * 100) : 0;
+$foreignPercent = $totalResidency > 0 ? round(($foreign / $totalResidency) * 100) : 0;
 
 $totalGender = $maleCount + $femaleCount;
 $malePercent = $totalGender > 0 ? round(($maleCount / $totalGender) * 100, 1) : 0;
@@ -113,15 +116,18 @@ body { min-height: 100vh; background: #f5f7f8; font-family: 'Poppins', sans-seri
 #map { height: 300px; border-radius: 10px; }
 .residency-card { transition: .3s; border: 3px solid transparent; }
 .residency-card:hover { transform: translateY(-5px); }
-.residency-card.bonified { border-color: var(--primary-color); }
-.residency-card.migrant { border-color: #FF9800; }
-.residency-card.transient { border-color: #2196F3; }
-.residency-card.bonified:hover { box-shadow: 0 0 15px rgba(25,175,165,0.4); }
-.residency-card.migrant:hover { box-shadow: 0 0 15px rgba(255,152,0,0.4); }
-.residency-card.transient:hover { box-shadow: 0 0 15px rgba(33,150,243,0.4); }
-.percentage.bonified { color: var(--primary-color); }
-.percentage.migrant { color: #FF9800; }
-.percentage.transient { color: #2196F3; }
+.residency-card.bonified { border-color: #2DD4C9; }
+.residency-card.migrant { border-color: #19AFA5; }
+.residency-card.transient { border-color: #127D75; }
+.residency-card.foreign { border-color: #0A5C54; }
+.residency-card.bonified:hover { box-shadow: 0 0 15px rgba(45,212,201,0.4); }
+.residency-card.migrant:hover { box-shadow: 0 0 15px rgba(25,175,165,0.4); }
+.residency-card.transient:hover { box-shadow: 0 0 15px rgba(18,125,117,0.4); }
+.residency-card.foreign:hover { box-shadow: 0 0 15px rgba(10,92,84,0.4); }
+.percentage.bonified { color: #2DD4C9; }
+.percentage.migrant { color: #19AFA5; }
+.percentage.transient { color: #127D75; }
+.percentage.foreign { color: #0A5C54; }
 .chart-container { width: 120px; height: 120px; position: relative; }
 @media(min-width:768px) {
   .chart-container { width: 150px; height: 150px; }
@@ -166,7 +172,7 @@ body { min-height: 100vh; background: #f5f7f8; font-family: 'Poppins', sans-seri
 </div>
 
 <div class="row g-3 g-md-4">
-  <div class="col-12 col-md-4">
+  <div class="col-12 col-md-6 col-lg-3">
     <div class="residency-card bonified bg-white p-3 p-md-4 rounded-3 shadow-sm text-center">
       <div class="chart-container mx-auto mb-3"><canvas id="bonafideChart"></canvas></div>
       <h5 class="mb-2 text-dark">Bonafide</h5>
@@ -174,7 +180,7 @@ body { min-height: 100vh; background: #f5f7f8; font-family: 'Poppins', sans-seri
       <div class="text-muted small"><?= number_format($bonafide) ?> residents</div>
     </div>
   </div>
-  <div class="col-12 col-md-4">
+  <div class="col-12 col-md-6 col-lg-3">
     <div class="residency-card migrant bg-white p-3 p-md-4 rounded-3 shadow-sm text-center">
       <div class="chart-container mx-auto mb-3"><canvas id="migrantChart"></canvas></div>
       <h5 class="mb-2 text-dark">Migrant</h5>
@@ -182,12 +188,20 @@ body { min-height: 100vh; background: #f5f7f8; font-family: 'Poppins', sans-seri
       <div class="text-muted small"><?= number_format($migrant) ?> residents</div>
     </div>
   </div>
-  <div class="col-12 col-md-4">
+  <div class="col-12 col-md-6 col-lg-3">
     <div class="residency-card transient bg-white p-3 p-md-4 rounded-3 shadow-sm text-center">
       <div class="chart-container mx-auto mb-3"><canvas id="transientChart"></canvas></div>
       <h5 class="mb-2 text-dark">Transient</h5>
       <div class="percentage transient display-5 fw-bold mb-1"><?= $transientPercent ?>%</div>
       <div class="text-muted small"><?= number_format($transient) ?> residents</div>
+    </div>
+  </div>
+  <div class="col-12 col-md-6 col-lg-3">
+    <div class="residency-card foreign bg-white p-3 p-md-4 rounded-3 shadow-sm text-center">
+      <div class="chart-container mx-auto mb-3"><canvas id="foreignChart"></canvas></div>
+      <h5 class="mb-2 text-dark">Foreign</h5>
+      <div class="percentage foreign display-5 fw-bold mb-1"><?= $foreignPercent ?>%</div>
+      <div class="text-muted small"><?= number_format($foreign) ?> residents</div>
     </div>
   </div>
 </div>
@@ -229,9 +243,10 @@ function pie(id,val,color){
   });
 }
 document.addEventListener('DOMContentLoaded',()=>{
-  pie('bonafideChart',<?= $bonafidePercent ?>,'#19AFA5');
-  pie('migrantChart',<?= $migrantPercent ?>,'#FF9800');
-  pie('transientChart',<?= $transientPercent ?>,'#2196F3');
+  pie('bonafideChart',<?= $bonafidePercent ?>,'#2DD4C9');
+  pie('migrantChart',<?= $migrantPercent ?>,'#19AFA5');
+  pie('transientChart',<?= $transientPercent ?>,'#127D75');
+  pie('foreignChart',<?= $foreignPercent ?>,'#0A5C54');
 });
 </script>
 </body>
