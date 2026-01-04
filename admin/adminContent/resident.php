@@ -16,39 +16,156 @@ $modalNotif = '';
 $modalNotifType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
+    // Escape all inputs
+    $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
+    $middleName = mysqli_real_escape_string($conn, $_POST['middleName'] ?? '');
+    $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
+    $suffix = mysqli_real_escape_string($conn, $_POST['suffix'] ?? '');
+    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+    $birthDate = mysqli_real_escape_string($conn, $_POST['birthDate']);
+    $age = mysqli_real_escape_string($conn, $_POST['age']);
+    $birthPlace = mysqli_real_escape_string($conn, $_POST['birthPlace'] ?? '');
+    $bloodType = mysqli_real_escape_string($conn, $_POST['bloodType'] ?? '');
+    $civilStatus = mysqli_real_escape_string($conn, $_POST['civilStatus']);
+    $citizenship = mysqli_real_escape_string($conn, $_POST['citizenship']);
+    $occupation = mysqli_real_escape_string($conn, $_POST['occupation'] ?? '');
+    $lengthOfStay = mysqli_real_escape_string($conn, $_POST['lengthOfStay']);
+    $contactNumber = mysqli_real_escape_string($conn, $_POST['contactNumber'] ?? '');
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+
+    // Educational fields
+    $educationalLevel = isset($_POST['educationalLevel']) && !empty($_POST['educationalLevel'])
+        ? mysqli_real_escape_string($conn, $_POST['educationalLevel'])
+        : NULL;
+
+    $shsTrack = NULL;
+    $collegeCourse = NULL;
+
+    if ($educationalLevel !== NULL) {
+        $levelLower = strtolower($educationalLevel);
+
+        if (strpos($levelLower, 'senior high') !== false) {
+            if (isset($_POST['shsTrack']) && $_POST['shsTrack'] === 'Others') {
+                $shsTrack = isset($_POST['shsTrackOther']) && !empty($_POST['shsTrackOther'])
+                    ? mysqli_real_escape_string($conn, $_POST['shsTrackOther'])
+                    : NULL;
+            } else {
+                $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
+                    ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
+                    : NULL;
+            }
+        } else if (strpos($levelLower, 'college') !== false) {
+            if (isset($_POST['collegeCourse']) && $_POST['collegeCourse'] === 'Others') {
+                $collegeCourse = isset($_POST['collegeCourseOther']) && !empty($_POST['collegeCourseOther'])
+                    ? mysqli_real_escape_string($conn, $_POST['collegeCourseOther'])
+                    : NULL;
+            } else {
+                $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
+                    ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
+                    : NULL;
+            }
+        }
+    }
+
+    // Determine residency type
+    $currentProvince = strtoupper(mysqli_real_escape_string($conn, $_POST['provinceName']));
+    $currentCity = strtoupper(mysqli_real_escape_string($conn, $_POST['cityName']));
+    $currentBarangay = strtoupper(mysqli_real_escape_string($conn, $_POST['barangayName']));
+
+    $residencyType = '';
+    $isSpecificCurrentAddress =
+        $currentProvince === 'BATANGAS' &&
+        $currentCity === 'SANTO TOMAS' &&
+        $currentBarangay === 'SAN ANTONIO';
+
+    if (strtoupper($citizenship) !== 'FILIPINO') {
+        $residencyType = 'Foreign';
+    } else if ($isSpecificCurrentAddress && (int) $lengthOfStay === (int) $age) {
+        $residencyType = 'Bonafide';
+    } else if ($isSpecificCurrentAddress && (int) $lengthOfStay >= 3) {
+        $residencyType = 'Migrant';
+    } else if ($isSpecificCurrentAddress && (int) $lengthOfStay <= 2) {
+        $residencyType = 'Transient';
+    }
+
+    // Remarks
+    $remarksValue = (isset($_POST['remarks']) && $_POST['remarks'] === 'Yes')
+        ? 'With Derogatory Record'
+        : 'No Derogatory Record';
+
+    $isVoter = mysqli_real_escape_string($conn, $_POST['isVoter']);
+
+    // Insert user
     $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, isRestricted) 
-                   VALUES ('{$_POST['contactNumber']}', '{$_POST['email']}', 'user', 'No', 'No')";
+                   VALUES ('$contactNumber', '$email', 'user', 'No', 'No')";
 
     if (mysqli_query($conn, $insertUser)) {
         $userID = mysqli_insert_id($conn);
 
-        // Map remarks to full text
-        if (isset($_POST['remarks'])) {
-            $remarksValue = ($_POST['remarks'] === 'Yes') ? 'Derogatory Record' : 'No Derogatory Record';
-        } else {
-            $remarksValue = 'No Derogatory Record'; // default
-        }
-
-        $insertResident = "INSERT INTO userinfo
-                (userID, firstName, middleName, lastName, gender, birthDate, age, birthPlace, bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType, isVoter, remarks)
-                VALUES
-                ($userID, '{$_POST['firstName']}', '{$_POST['middleName']}', '{$_POST['lastName']}', '{$_POST['gender']}', '{$_POST['birthDate']}', '{$_POST['age']}', '{$_POST['birthPlace']}', '{$_POST['bloodType']}', '{$_POST['civilStatus']}', '{$_POST['citizenship']}', '{$_POST['occupation']}', '{$_POST['lengthOfStay']}', '{$_POST['residencyType']}', '{$_POST['isVoter']}', '$remarksValue')";
+        // Insert userinfo with educational fields
+        $insertResident = "INSERT INTO userinfo (
+            userID, firstName, middleName, lastName, suffix, gender, birthDate, age, birthPlace, 
+            bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType, 
+            isVoter, remarks, educationalLevel, shsTrack, collegeCourse
+        ) VALUES (
+            $userID, '$firstName', '$middleName', '$lastName', '$suffix', '$gender', '$birthDate', 
+            '$age', '$birthPlace', '$bloodType', '$civilStatus', '$citizenship', '$occupation', 
+            '$lengthOfStay', " . ($residencyType ? "'$residencyType'" : "NULL") . ", 
+            '$isVoter', '$remarksValue',
+            " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
+            " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
+            " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . "
+        )";
 
         if (mysqli_query($conn, $insertResident)) {
             $userInfoID = mysqli_insert_id($conn);
 
             // Current address
-            $insertAddress = "INSERT INTO addresses 
-                (userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName, purok)
-                VALUES
-                ($userInfoID, '{$_POST['blockLotNo']}', '{$_POST['streetName']}', '{$_POST['phase']}', '{$_POST['subdivisionName']}', '{$_POST['barangayName']}', '{$_POST['cityName']}', '{$_POST['provinceName']}', '{$_POST['purok']}')";
+            $blockLotNo = mysqli_real_escape_string($conn, $_POST['blockLotNo'] ?? '');
+            $streetName = mysqli_real_escape_string($conn, $_POST['streetName'] ?? '');
+            $phase = mysqli_real_escape_string($conn, $_POST['phase'] ?? '');
+            $subdivisionName = mysqli_real_escape_string($conn, $_POST['subdivisionName'] ?? '');
+            $purok = mysqli_real_escape_string($conn, $_POST['purok']);
+
+            $insertAddress = "INSERT INTO addresses (
+                userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName, purok
+            ) VALUES (
+                $userInfoID, '$blockLotNo', '$streetName', '$phase', '$subdivisionName', 
+                '$currentBarangay', '$currentCity', '$currentProvince', '$purok'
+            )";
             mysqli_query($conn, $insertAddress);
 
-            // Permanent address
-            $insertPermanent = "INSERT INTO permanentAddresses
-                (userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, permanentSubdivisionName, permanentBarangayName, permanentCityName, permanentProvinceName, permanentPurok)
-                VALUES
-                ($userInfoID, '{$_POST['blockLotNoPermanent']}', '{$_POST['streetNamePermanent']}', '{$_POST['phasePermanent']}', '{$_POST['subdivisionNamePermanent']}', '{$_POST['barangayNamePermanent']}', '{$_POST['cityNamePermanent']}', '{$_POST['provinceNamePermanent']}', '{$_POST['purokPermanent']}')";
+            // Permanent address - handle both Filipino and Foreign
+            if (strtoupper($citizenship) === 'FILIPINO') {
+                $permanentBlockLotNo = mysqli_real_escape_string($conn, $_POST['blockLotNoPermanent'] ?? '');
+                $permanentStreetName = mysqli_real_escape_string($conn, $_POST['streetNamePermanent'] ?? '');
+                $permanentPhase = mysqli_real_escape_string($conn, $_POST['phasePermanent'] ?? '');
+                $permanentSubdivisionName = mysqli_real_escape_string($conn, $_POST['subdivisionNamePermanent'] ?? '');
+                $permanentBarangayName = strtoupper(mysqli_real_escape_string($conn, $_POST['barangayNamePermanent']));
+                $permanentCityName = strtoupper(mysqli_real_escape_string($conn, $_POST['cityNamePermanent']));
+                $permanentProvinceName = strtoupper(mysqli_real_escape_string($conn, $_POST['provinceNamePermanent']));
+                $permanentPurok = mysqli_real_escape_string($conn, $_POST['purokPermanent']);
+
+                $insertPermanent = "INSERT INTO permanentAddresses (
+                    userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, 
+                    permanentSubdivisionName, permanentBarangayName, permanentCityName, 
+                    permanentProvinceName, permanentPurok, foreignPermanentAddress
+                ) VALUES (
+                    $userInfoID, '$permanentBlockLotNo', '$permanentStreetName', '$permanentPhase', 
+                    '$permanentSubdivisionName', '$permanentBarangayName', '$permanentCityName', 
+                    '$permanentProvinceName', '$permanentPurok', NULL
+                )";
+            } else {
+                $foreignPermanentAddress = mysqli_real_escape_string($conn, $_POST['foreignPermanentAddress']);
+
+                $insertPermanent = "INSERT INTO permanentAddresses (
+                    userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, 
+                    permanentSubdivisionName, permanentBarangayName, permanentCityName, 
+                    permanentProvinceName, permanentPurok, foreignPermanentAddress
+                ) VALUES (
+                    $userInfoID, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$foreignPermanentAddress'
+                )";
+            }
             mysqli_query($conn, $insertPermanent);
 
             $modalNotif = "Resident successfully added!";
@@ -71,10 +188,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['new
     $restrictionReason = $_POST['restrictionReason'] ?? NULL;
 
     if ($status === 'No') {
-        $unrestrictUserQuery = "UPDATE users SET isRestricted = '$status', restrictionStart = NULL, restrictionEnd = NULL, restrictionReason = NULL WHERE userID = '$userID'";
+        $unrestrictUserQuery = "UPDATE users SET isRestricted = '$status', restrictionStart = NULL, restrictionEnd = NULL,
+restrictionReason = NULL WHERE userID = '$userID'";
         executeQuery($unrestrictUserQuery);
     } else {
-        $restrictUserQuery = "UPDATE users SET isRestricted = '$status', restrictionStart = NOW(), restrictionEnd = DATE_ADD(NOW(), INTERVAL 7 DAY), restrictionReason = '$restrictionReason' WHERE userID = '$userID'";
+        $restrictUserQuery = "UPDATE users SET isRestricted = '$status', restrictionStart = NOW(), restrictionEnd =
+DATE_ADD(NOW(), INTERVAL 7 DAY), restrictionReason = '$restrictionReason' WHERE userID = '$userID'";
         executeQuery($restrictUserQuery);
     }
 }
@@ -93,46 +212,46 @@ $offset = ($currentPage - 1) * $limit;
 
 // Base queries
 $sql = "SELECT
-    u.email,
-    u.phoneNumber,
-    ui.userInfoID,
-    ui.userID,
-    CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS fullname,
-    ui.suffix,
-    ui.gender,
-    ui.birthDate,
-    ui.residencyType,
-    ui.isVoter,
-    a.cityName,
-    a.provinceName,
-    u.isRestricted
+u.email,
+u.phoneNumber,
+ui.userInfoID,
+ui.userID,
+CONCAT(ui.firstName, ' ', ui.middleName, ' ', ui.lastName) AS fullname,
+ui.suffix,
+ui.gender,
+ui.birthDate,
+ui.residencyType,
+ui.isVoter,
+a.cityName,
+a.provinceName,
+u.isRestricted
 FROM userinfo ui
 INNER JOIN users u ON ui.userID = u.userID
 LEFT JOIN addresses a ON ui.userInfoID = a.userInfoID
 WHERE u.role = 'user'";
 
 $countSql = "SELECT COUNT(*) AS total FROM userinfo ui
-             INNER JOIN users u ON ui.userID = u.userID
-             WHERE u.role = 'user'";
+INNER JOIN users u ON ui.userID = u.userID
+WHERE u.role = 'user'";
 
 // ===================== APPLY SEARCH =====================
 if ($search !== '') {
     $term = "%$search%";
     $sql .= " AND (
-        ui.firstName LIKE '$term' OR
-        ui.middleName LIKE '$term' OR
-        ui.lastName LIKE '$term' OR
-        ui.birthDate LIKE '$term' OR
-        ui.gender LIKE '$term' OR
-        CONCAT_WS(' ', a.blockLotNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE '$term'
-    )";
+ui.firstName LIKE '$term' OR
+ui.middleName LIKE '$term' OR
+ui.lastName LIKE '$term' OR
+ui.birthDate LIKE '$term' OR
+ui.gender LIKE '$term' OR
+CONCAT_WS(' ', a.blockLotNo, a.streetName, a.phase, a.subdivisionName, a.cityName, a.provinceName) LIKE '$term'
+)";
     $countSql .= " AND (
-        ui.firstName LIKE '$term' OR
-        ui.middleName LIKE '$term' OR
-        ui.lastName LIKE '$term' OR
-        ui.birthDate LIKE '$term' OR
-        ui.gender LIKE '$term'
-    )";
+ui.firstName LIKE '$term' OR
+ui.middleName LIKE '$term' OR
+ui.lastName LIKE '$term' OR
+ui.birthDate LIKE '$term' OR
+ui.gender LIKE '$term'
+)";
 }
 
 // ===================== APPLY RESTRICTED FILTER =====================
@@ -261,27 +380,27 @@ $result = mysqli_query($conn, $sql);
     }
 
     .viewButton {
-      background-color: transparent;
-      border-color: #19AFA5;
-      color: #19AFA5;
+        background-color: transparent;
+        border-color: #19AFA5;
+        color: #19AFA5;
     }
 
     .viewButton:hover {
-      background-color: #19AFA5;
-      border-color: #19AFA5;
-      color: white;
+        background-color: #19AFA5;
+        border-color: #19AFA5;
+        color: white;
     }
 
     .form-control:focus {
         box-shadow: none !important;
-        outline: none; 
-        border: 1px solid #19AFA5;       
+        outline: none;
+        border: 1px solid #19AFA5;
     }
 
     .form-select:focus {
-        box-shadow: none !important; 
-        outline: none; 
-        border: 1px solid #19AFA5; 
+        box-shadow: none !important;
+        outline: none;
+        border: 1px solid #19AFA5;
     }
 
     .filterButton {
@@ -399,7 +518,8 @@ $result = mysqli_query($conn, $sql);
                                                     <td><?= htmlspecialchars($row['fullname'] ?? '') ?></td>
                                                     <td><?= htmlspecialchars($row['email']); ?></td>
                                                     <td><?= htmlspecialchars($row['phoneNumber']); ?></td>
-                                                    <td><?= !empty($row['birthDate']) ? date('F d, Y', strtotime($row['birthDate'])) : '' ?></td>
+                                                    <td><?= !empty($row['birthDate']) ? date('F d, Y', strtotime($row['birthDate'])) : '' ?>
+                                                    </td>
                                                     <td><?= htmlspecialchars($row['gender'] ?? ''); ?></td>
                                                     <td><?= htmlspecialchars($row['residencyType'] ?? ''); ?>
                                                     <td><?= htmlspecialchars($row['isRestricted']); ?>
@@ -414,7 +534,8 @@ $result = mysqli_query($conn, $sql);
                                                             class="btn btn-sm <?= ($row['isRestricted'] === 'Yes') ? 'btn-success' : 'btn-danger' ?>"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#restrictUserModal<?= $row['userID'] ?>">
-                                                            <i class="fa-solid <?= ($row['isRestricted'] === 'Yes') ? 'fa-circle-check' : 'fa-ban' ?>"></i>
+                                                            <i
+                                                                class="fa-solid <?= ($row['isRestricted'] === 'Yes') ? 'fa-circle-check' : 'fa-ban' ?>"></i>
                                                         </button>
 
                                                         <form method="POST" style="display:inline;">
@@ -437,24 +558,40 @@ $result = mysqli_query($conn, $sql);
 
                                                                             <?php if ($row['isRestricted'] !== 'Yes'): ?>
                                                                                 <div class="mt-3">
-                                                                                    <label for="restrictionReason" class="form-label">Restriction Reason</label>
-                                                                                    <select name="restrictionReason" id="restrictionReason" class="form-select" required>
-                                                                                        <option value="" disabled selected>Select restriction reason</option>
-                                                                                        <option value="Multiple invalid attempts">Multiple invalid attempts</option>
-                                                                                        <option value="Providing invalid or false information">Providing invalid or false information</option>
-                                                                                        <option value="Abusive or inappropriate behavior">Abusive or inappropriate behavior</option>
-                                                                                        <option value="Suspicious or fraudulent activity">Suspicious or fraudulent activity</option>
-                                                                                        <option value="Violation of platform rules">Violation of platform rules</option>
+                                                                                    <label for="restrictionReason"
+                                                                                        class="form-label">Restriction
+                                                                                        Reason</label>
+                                                                                    <select name="restrictionReason"
+                                                                                        id="restrictionReason" class="form-select"
+                                                                                        required>
+                                                                                        <option value="" disabled selected>Select
+                                                                                            restriction reason</option>
+                                                                                        <option value="Multiple invalid attempts">
+                                                                                            Multiple invalid attempts</option>
+                                                                                        <option
+                                                                                            value="Providing invalid or false information">
+                                                                                            Providing invalid or false information
+                                                                                        </option>
+                                                                                        <option
+                                                                                            value="Abusive or inappropriate behavior">
+                                                                                            Abusive or inappropriate behavior
+                                                                                        </option>
+                                                                                        <option
+                                                                                            value="Suspicious or fraudulent activity">
+                                                                                            Suspicious or fraudulent activity
+                                                                                        </option>
+                                                                                        <option value="Violation of platform rules">
+                                                                                            Violation of platform rules</option>
                                                                                     </select>
                                                                                 </div>
                                                                             <?php endif; ?>
                                                                         </div>
 
-                                                                        
+
                                                                         <div class="modal-footer">
                                                                             <button type="button" class="btn btn-secondary"
                                                                                 data-bs-dismiss="modal">Cancel</button>
-                                                                            
+
                                                                             <input type="hidden" name="userID"
                                                                                 value="<?= $row['userID'] ?>">
                                                                             <input type="hidden" name="newStatus"
@@ -482,7 +619,7 @@ $result = mysqli_query($conn, $sql);
 
                         <div class="modal fade" id="addResidentModal" tabindex="-1"
                             aria-labelledby="addResidentModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
                                 <div class="modal-content shadow-lg">
                                     <div class="modal-header text-white" style="background-color: rgb(49, 175, 171);">
                                         <h5 class="modal-title fw-bold" id="addResidentModalLabel">
@@ -491,7 +628,7 @@ $result = mysqli_query($conn, $sql);
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
-                                    <div class="modal-body">
+                                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
                                         <?php if (!empty($modalNotif)): ?>
                                             <div class="alert alert-<?= $modalNotifType ?> mb-3">
                                                 <?= $modalNotif ?>
@@ -501,293 +638,360 @@ $result = mysqli_query($conn, $sql);
                                         <!-- Form to add resident -->
                                         <form id="addResidentForm" method="POST" action="">
                                             <input type="hidden" name="addResident" value="1">
-                                            <div class="row g-3">
-                                                <!-- Personal Information -->
-                                                <div class="col-md-4">
-                                                    <label class="form-label">First Name</label>
-                                                    <input type="text" class="form-control" name="firstName"
-                                                        value="<?= isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : '' ?>"
-                                                        required>
+
+                                            <!-- Personal Information -->
+                                            <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Personal
+                                                Information</h6>
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">First Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" name="firstName" required>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-3">
                                                     <label class="form-label">Middle Name</label>
-                                                    <input type="text" class="form-control" name="middleName"
-                                                        value="<?= isset($_POST['middleName']) ? htmlspecialchars($_POST['middleName']) : '' ?>">
+                                                    <input type="text" class="form-control" name="middleName">
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Last Name</label>
-                                                    <input type="text" class="form-control" name="lastName"
-                                                        value="<?= isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : '' ?>"
-                                                        required>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Last Name <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" name="lastName" required>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Gender</label>
-                                                    <select class="form-select" name="gender" required>
-                                                        <option value="" disabled <?= !isset($_POST['gender']) ? 'selected' : '' ?>>Select Gender</option>
-                                                        <option value="Male" <?= (isset($_POST['gender']) && $_POST['gender'] === 'Male') ? 'selected' : '' ?>>Male
-                                                        </option>
-                                                        <option value="Female" <?= (isset($_POST['gender']) && $_POST['gender'] === 'Female') ? 'selected' : '' ?>>Female
-                                                        </option>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Suffix</label>
+                                                    <select class="form-select" name="suffix">
+                                                        <option value="">None</option>
+                                                        <option value="Jr.">Jr.</option>
+                                                        <option value="Sr.">Sr.</option>
+                                                        <option value="II">II</option>
+                                                        <option value="III">III</option>
+                                                        <option value="IV">IV</option>
+                                                        <option value="V">V</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Phone Number</label>
-                                                    <input type="tel" class="form-control" name="phoneNumber"
-                                                        value="<?= isset($_POST['phoneNumber']) ? htmlspecialchars($_POST['phoneNumber']) : '' ?>">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Gender <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select" name="gender" required>
+                                                        <option value="" disabled selected>Select Gender</option>
+                                                        <option value="Male">Male</option>
+                                                        <option value="Female">Female</option>
+                                                    </select>
                                                 </div>
-
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Birth Date <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="date" id="addBirthDate" class="form-control"
+                                                        name="birthDate" required>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Age <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" id="addAge" class="form-control" name="age"
+                                                        readonly required>
+                                                </div>
                                                 <div class="col-md-4">
+                                                    <label class="form-label">Birth Place</label>
+                                                    <input type="text" class="form-control" name="birthPlace">
+                                                </div>
+                                                <div class="col-md-2">
                                                     <label class="form-label">Blood Type</label>
                                                     <select class="form-select" name="bloodType">
-                                                        <option value="" disabled <?= !isset($_POST['bloodType']) ? 'selected' : '' ?>>Select Blood Type</option>
-                                                        <?php foreach (['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bt): ?>
-                                                            <option value="<?= $bt ?>" <?= (isset($_POST['bloodType']) && $_POST['bloodType'] === $bt) ? 'selected' : '' ?>><?= $bt ?>
-                                                            </option>
+                                                        <option value="" selected>Select</option>
+                                                        <option value="A+">A+</option>
+                                                        <option value="A-">A-</option>
+                                                        <option value="B+">B+</option>
+                                                        <option value="B-">B-</option>
+                                                        <option value="AB+">AB+</option>
+                                                        <option value="AB-">AB-</option>
+                                                        <option value="O+">O+</option>
+                                                        <option value="O-">O-</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Civil Status <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select" name="civilStatus" required>
+                                                        <option value="" disabled selected>Select Status</option>
+                                                        <option value="Single">Single</option>
+                                                        <option value="Married">Married</option>
+                                                        <option value="Widowed">Widowed</option>
+                                                        <option value="Separated">Separated</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Citizenship <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select text-uppercase" id="addCitizenship"
+                                                        name="citizenship" required>
+                                                        <option value="FILIPINO" selected>FILIPINO</option>
+                                                        <?php
+                                                        $otherCitizenships = ['AMERICAN', 'BRITISH', 'CANADIAN', 'CHINESE', 'JAPANESE', 'KOREAN'];
+                                                        foreach ($otherCitizenships as $c):
+                                                            ?>
+                                                            <option value="<?= $c ?>"><?= $c ?></option>
                                                         <?php endforeach; ?>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Birth Place</label>
-                                                    <input type="text" class="form-control" name="birthPlace"
-                                                        value="<?= isset($_POST['birthPlace']) ? htmlspecialchars($_POST['birthPlace']) : '' ?>">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Occupation</label>
+                                                    <input type="text" class="form-control" name="occupation">
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Birth Date</label>
-                                                    <input type="date" id="birthDate" class="form-control"
-                                                        name="birthDate"
-                                                        value="<?= isset($_POST['birthDate']) ? htmlspecialchars($_POST['birthDate']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Age</label>
-                                                    <input type="number" id="age" class="form-control" name="age"
-                                                        value="<?= isset($_POST['age']) ? htmlspecialchars($_POST['age']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Years of Stay</label>
-                                                    <input type="number" class="form-control" name="lengthOfStay"
-                                                        value="<?= isset($_POST['lengthOfStay']) ? htmlspecialchars($_POST['lengthOfStay']) : '' ?>"
-                                                        required>
-                                                </div>
+                                            </div>
 
-                                                <!-- Address Section -->
-                                                <div class="col-12 mt-3">
-                                                    <h6 class="fw-bold text-uppercase border-bottom pb-2">Address</h6>
+                                            <!-- Educational Information -->
+                                            <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Educational
+                                                Information</h6>
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Educational Level</label>
+                                                    <select class="form-select" id="addEducationalLevel"
+                                                        name="educationalLevel">
+                                                        <option value="" selected>Select Level</option>
+                                                        <option value="None">None</option>
+                                                        <option value="Elementary Undergraduate">Elementary
+                                                            Undergraduate</option>
+                                                        <option value="Elementary Graduate">Elementary Graduate</option>
+                                                        <option value="High School Undergraduate">High School
+                                                            Undergraduate</option>
+                                                        <option value="High School Graduate">High School Graduate
+                                                        </option>
+                                                        <option value="Senior High Undergraduate">Senior High
+                                                            Undergraduate</option>
+                                                        <option value="Senior High Graduate">Senior High Graduate
+                                                        </option>
+                                                        <option value="College Undergraduate">College Undergraduate
+                                                        </option>
+                                                        <option value="College Graduate">College Graduate</option>
+                                                        <option value="ALS">ALS</option>
+                                                        <option value="TESDA">TESDA</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4" id="addShsTrackDiv" style="display:none;">
+                                                    <label class="form-label">Senior High Track</label>
+                                                    <select class="form-select" id="addShsTrack" name="shsTrack">
+                                                        <option value="">Select Track</option>
+                                                        <option value="STEM">STEM</option>
+                                                        <option value="ABM">ABM</option>
+                                                        <option value="HUMMS">HUMMS</option>
+                                                        <option value="ICT">ICT</option>
+                                                        <option value="GAS">GAS</option>
+                                                        <option value="TVL">TVL</option>
+                                                        <option value="Others">Others | Specify</option>
+                                                    </select>
+                                                    <input type="text" class="form-control mt-2 d-none"
+                                                        id="addShsTrackOther" name="shsTrackOther"
+                                                        placeholder="Specify track">
+                                                </div>
+                                                <div class="col-md-4" id="addCollegeCourseDiv" style="display:none;">
+                                                    <label class="form-label">College Course</label>
+                                                    <select class="form-select" id="addCollegeCourse"
+                                                        name="collegeCourse">
+                                                        <option value="">Select Course</option>
+                                                        <option value="BSIT">BSIT</option>
+                                                        <option value="BSECE">BSECE</option>
+                                                        <option value="BSEE">BSEE</option>
+                                                        <option value="BSBA">BSBA</option>
+                                                        <option value="BSTM">BSTM</option>
+                                                        <option value="BSHRM">BSHRM</option>
+                                                        <option value="BSED">BSED</option>
+                                                        <option value="BSCE">BSCE</option>
+                                                        <option value="BSME">BSME</option>
+                                                        <option value="Others">Others | Specify</option>
+                                                    </select>
+                                                    <input type="text" class="form-control mt-2 d-none"
+                                                        id="addCollegeCourseOther" name="collegeCourseOther"
+                                                        placeholder="Specify course">
+                                                </div>
+                                            </div>
+
+                                            <!-- Contact Information -->
+                                            <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Contact
+                                                Information</h6>
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Phone Number</label>
+                                                    <input type="tel" class="form-control" name="contactNumber"
+                                                        pattern="^09\d{9}$" maxlength="11" placeholder="09XXXXXXXXX">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Email <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="email" class="form-control" name="email" required>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Length of Stay (years) <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="number" id="addLengthOfStay" class="form-control"
+                                                        name="lengthOfStay" min="0" required>
+                                                </div>
+                                            </div>
+
+                                            <!-- Current Address -->
+                                            <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Current Address
+                                            </h6>
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Province <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select" id="addProvince" name="provinceName"
+                                                        required>
+                                                        <option value="">Select Province</option>
+                                                    </select>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Block & Lot | House no.</label>
-                                                    <input type="text" class="form-control" id="blockLotNo"
-                                                        name="blockLotNo"
-                                                        value="<?= isset($_POST['blockLotNo']) ? htmlspecialchars($_POST['blockLotNo']) : '' ?>"
+                                                    <label class="form-label">City <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select" id="addCity" name="cityName" required>
+                                                        <option value="">Select City</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Barangay <span
+                                                            class="text-danger">*</span></label>
+                                                    <select class="form-select" id="addBarangay" name="barangayName"
                                                         required>
+                                                        <option value="">Select Barangay</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Purok <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" name="purok" required>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Block & Lot / House No.</label>
+                                                    <input type="text" class="form-control" name="blockLotNo">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Street</label>
-                                                    <input type="text" class="form-control" id="streetName"
-                                                        name="streetName"
-                                                        value="<?= isset($_POST['streetName']) ? htmlspecialchars($_POST['streetName']) : '' ?>">
+                                                    <input type="text" class="form-control" name="streetName">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Phase</label>
-                                                    <input type="text" class="form-control" id="phase" name="phase"
-                                                        value="<?= isset($_POST['phase']) ? htmlspecialchars($_POST['phase']) : '' ?>">
+                                                    <input type="text" class="form-control" name="phase">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Subdivision</label>
-                                                    <input type="text" class="form-control" id="subdivisionName"
-                                                        name="subdivisionName"
-                                                        value="<?= isset($_POST['subdivisionName']) ? htmlspecialchars($_POST['subdivisionName']) : '' ?>">
+                                                    <input type="text" class="form-control" name="subdivisionName">
                                                 </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Purok</label>
-                                                    <input type="text" class="form-control" id="purok" name="purok"
-                                                        value="<?= isset($_POST['purok']) ? htmlspecialchars($_POST['purok']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Barangay</label>
-                                                    <input type="text" class="form-control" id="barangayName"
-                                                        name="barangayName"
-                                                        value="<?= isset($_POST['barangayName']) ? htmlspecialchars($_POST['barangayName']) : 'San Antonio' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">City</label>
-                                                    <input type="text" class="form-control" id="cityName"
-                                                        name="cityName"
-                                                        value="<?= isset($_POST['cityName']) ? htmlspecialchars($_POST['cityName']) : 'Sto. Tomas' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Province</label>
-                                                    <input type="text" class="form-control" id="provinceName"
-                                                        name="provinceName"
-                                                        value="<?= isset($_POST['provinceName']) ? htmlspecialchars($_POST['provinceName']) : 'Batangas' ?>"
-                                                        required>
-                                                </div>
+                                            </div>
 
-                                                <!-- Permanent Address Section -->
-                                                <div class="col-12 mt-3">
-                                                    <h6 class="fw-bold text-uppercase border-bottom pb-2">Permanent
-                                                        Address</h6>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Block & Lot | House no.</label>
-                                                    <input type="text" class="form-control" id="blockLotNoPermanent"
-                                                        name="blockLotNoPermanent"
-                                                        value="<?= isset($_POST['blockLotNo']) ? htmlspecialchars($_POST['blockLotNo']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Street</label>
-                                                    <input type="text" class="form-control" id="streetNamePermanent"
-                                                        name="streetNamePermanent"
-                                                        value="<?= isset($_POST['streetName']) ? htmlspecialchars($_POST['streetName']) : '' ?>">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Phase</label>
-                                                    <input type="text" class="form-control" id="phasePermanent"
-                                                        name="phasePermanent"
-                                                        value="<?= isset($_POST['phase']) ? htmlspecialchars($_POST['phase']) : '' ?>">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Subdivision</label>
-                                                    <input type="text" class="form-control"
-                                                        id="subdivisionNamePermanent" name="subdivisionNamePermanent"
-                                                        value="<?= isset($_POST['subdivisionName']) ? htmlspecialchars($_POST['subdivisionName']) : '' ?>">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Purok</label>
-                                                    <input type="text" class="form-control" id="purokPermanent"
-                                                        name="purokPermanent"
-                                                        value="<?= isset($_POST['purokPermanent']) ? htmlspecialchars($_POST['purokPermanent']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Barangay</label>
-                                                    <input type="text" class="form-control" id="barangayNamePermanent"
-                                                        name="barangayNamePermanent"
-                                                        value="<?= isset($_POST['barangayName']) ? htmlspecialchars($_POST['barangayName']) : 'San Antonio' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">City</label>
-                                                    <input type="text" class="form-control" id="cityNamePermanent"
-                                                        name="cityNamePermanent"
-                                                        value="<?= isset($_POST['cityName']) ? htmlspecialchars($_POST['cityName']) : 'Sto. Tomas' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Province</label>
-                                                    <input type="text" class="form-control" id="provinceNamePermanent"
-                                                        name="provinceNamePermanent"
-                                                        value="<?= isset($_POST['provinceName']) ? htmlspecialchars($_POST['provinceName']) : 'Batangas' ?>"
-                                                        required>
-                                                </div>
-
-                                                <!-- Permanent addresss checkbox -->
+                                            <!-- Permanent Address -->
+                                            <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Permanent Address
+                                            </h6>
+                                            <div class="row g-3 mb-4">
                                                 <div class="col-12 mb-2">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox"
-                                                            id="sameAsCurrent">
-                                                        <label class="form-check-label" for="sameAsCurrent">
-                                                            Permanent address is same as current address
+                                                            id="addSameAsCurrent">
+                                                        <label class="form-check-label" for="addSameAsCurrent">
+                                                            Same as current address
                                                         </label>
                                                     </div>
                                                 </div>
 
-                                                <!-- Other Details -->
-                                                <div class="col-12 mt-3">
-                                                    <h6 class="fw-bold text-uppercase border-bottom pb-2">Other Details
-                                                    </h6>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Residency Type</label>
-                                                    <select class="form-select" name="residencyType" required>
-                                                        <option value="" disabled <?= !isset($_POST['residencyType']) ? 'selected' : '' ?>>Select Type</option>
-                                                        <?php foreach (['Bonafide', 'Migrant', 'Transient', 'Foreign'] as $rt): ?>
-                                                            <option value="<?= $rt ?>" <?= (isset($_POST['residencyType']) && $_POST['residencyType'] === $rt) ? 'selected' : '' ?>>
-                                                                <?= $rt ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Citizenship</label>
-                                                    <input type="text" class="form-control" name="citizenship"
-                                                        value="<?= isset($_POST['citizenship']) ? htmlspecialchars($_POST['citizenship']) : 'Filipino' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Civil Status</label>
-                                                    <select class="form-select" name="civilStatus" required>
-                                                        <option value="" disabled <?= !isset($_POST['civilStatus']) ? 'selected' : '' ?>>Select Status</option>
-                                                        <?php foreach (['Single', 'Married', 'Widowed', 'Separated'] as $cs): ?>
-                                                            <option value="<?= $cs ?>" <?= (isset($_POST['civilStatus']) && $_POST['civilStatus'] === $cs) ? 'selected' : '' ?>><?= $cs ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <label class="form-label">Occupation</label>
-                                                    <input type="text" class="form-control" name="occupation"
-                                                        value="<?= isset($_POST['occupation']) ? htmlspecialchars($_POST['occupation']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Landlord Name</label>
-                                                    <input type="text" class="form-control" name="landlordName"
-                                                        value="<?= isset($_POST['landlordName']) ? htmlspecialchars($_POST['landlordName']) : '' ?>">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Company Name</label>
-                                                    <input type="text" class="form-control" name="companyName"
-                                                        value="<?= isset($_POST['companyName']) ? htmlspecialchars($_POST['companyName']) : '' ?>">
+                                                <!-- Filipino Permanent Address Fields -->
+                                                <div id="addFilipinoPermanentFields">
+                                                    <div class="row g-3">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Province <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select class="form-select" id="addPermanentProvince"
+                                                                name="provinceNamePermanent" required>
+                                                                <option value="">Select Province</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">City <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select class="form-select" id="addPermanentCity"
+                                                                name="cityNamePermanent" required>
+                                                                <option value="">Select City</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Barangay <span
+                                                                    class="text-danger">*</span></label>
+                                                            <select class="form-select" id="addPermanentBarangay"
+                                                                name="barangayNamePermanent" required>
+                                                                <option value="">Select Barangay</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Purok <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control"
+                                                                name="purokPermanent" id="addPermanentPurok" required>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Block & Lot / House No.</label>
+                                                            <input type="text" class="form-control"
+                                                                name="blockLotNoPermanent" id="addPermanentBlockLot">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Street</label>
+                                                            <input type="text" class="form-control"
+                                                                name="streetNamePermanent" id="addPermanentStreet">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Phase</label>
+                                                            <input type="text" class="form-control"
+                                                                name="phasePermanent" id="addPermanentPhase">
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label">Subdivision</label>
+                                                            <input type="text" class="form-control"
+                                                                name="subdivisionNamePermanent"
+                                                                id="addPermanentSubdivision">
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Contact Person</label>
-                                                    <input type="text" class="form-control" name="contactPerson"
-                                                        value="<?= isset($_POST['contactPerson']) ? htmlspecialchars($_POST['contactPerson']) : '' ?>"
-                                                        required>
+                                                <!-- Foreign Permanent Address Field -->
+                                                <div class="col-12 d-none" id="addForeignPermanentField">
+                                                    <label class="form-label">Foreign Permanent Address <span
+                                                            class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control"
+                                                        name="foreignPermanentAddress" id="addForeignAddress"
+                                                        placeholder="Enter complete foreign address">
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Contact Number</label>
-                                                    <input type="tel" class="form-control" name="contactNumber"
-                                                        value="<?= isset($_POST['contactNumber']) ? htmlspecialchars($_POST['contactNumber']) : '' ?>"
-                                                        required>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Email</label>
-                                                    <input type="email" class="form-control" name="email"
-                                                        value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"
-                                                        required>
+                                            </div>
+
+                                            <!-- Other Details -->
+                                            <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Other Details
+                                            </h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Residency Type</label>
+                                                    <input type="text" class="form-control" name="residencyType">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label d-block">Voter's List</label>
+                                                    <label class="form-label d-block">Voter's List <span
+                                                            class="text-danger">*</span></label>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="isVoter"
-                                                            id="voterYes" value="Yes" <?= (isset($_POST['isVoter']) && $_POST['isVoter'] === 'Yes') ? 'checked' : '' ?> required>
-                                                        <label class="form-check-label" for="voterYes">Yes</label>
+                                                            value="Yes" required>
+                                                        <label class="form-check-label">Yes</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="isVoter"
-                                                            id="voterNo" value="No" <?= (isset($_POST['isVoter']) && $_POST['isVoter'] === 'No') ? 'checked' : '' ?> required>
-                                                        <label class="form-check-label" for="voterNo">No</label>
+                                                            value="No" required>
+                                                        <label class="form-check-label">No</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label d-block">Derogatory Record</label>
+                                                    <label class="form-label d-block">Derogatory Record <span
+                                                            class="text-danger">*</span></label>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="remarks"
-                                                            id="remarksYes" value="Yes" <?= (isset($_POST['remarks']) && $_POST['remarks'] === 'Yes') ? 'checked' : '' ?> required>
-                                                        <label class="form-check-label" for="remarksYes">Yes</label>
+                                                            value="Yes" required>
+                                                        <label class="form-check-label">Yes</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="remarks"
-                                                            id="remarksNo" value="No" <?= (isset($_POST['remarks']) && $_POST['remarks'] === 'No') ? 'checked' : '' ?> required>
-                                                        <label class="form-check-label" for="remarksNo">No</label>
+                                                            value="No" required>
+                                                        <label class="form-check-label">No</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -950,6 +1154,236 @@ $result = mysqli_query($conn, $sql);
                             }
                         });
                 });
+            });
+        });
+    </script>
+
+    <script>
+        // ========== ADD RESIDENT MODAL JAVASCRIPT ==========
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load JSON for address dropdowns
+            // Path: admin/adminContent/resident.php -> ../../assets/json/...
+            // OR if accessed via admin/index.php -> ../assets/json/...
+            const jsonPath = '../assets/json/philippine_provinces_cities_municipalities_and_barangays_2019v2.json';
+
+            fetch(jsonPath)
+                .catch(err => {
+                    // Try alternative path if first one fails
+                    console.log('Trying alternative path...');
+                    return fetch('../../assets/json/philippine_provinces_cities_municipalities_and_barangays_2019v2.json');
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const addProvinceSelect = document.getElementById('addProvince');
+                    const addCitySelect = document.getElementById('addCity');
+                    const addBarangaySelect = document.getElementById('addBarangay');
+                    const addPermanentProvinceSelect = document.getElementById('addPermanentProvince');
+                    const addPermanentCitySelect = document.getElementById('addPermanentCity');
+                    const addPermanentBarangaySelect = document.getElementById('addPermanentBarangay');
+
+                    // Helper functions
+                    function normalize(s) {
+                        if (!s) return '';
+                        return s.toString().trim().toLowerCase()
+                            .replace(/\b(city|municipality|municipal|province|of|the)\b/g, '')
+                            .replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+                    }
+
+                    // Populate provinces
+                    const allProvinces = [];
+                    Object.keys(data).forEach(regionCode => {
+                        const provinces = data[regionCode].province_list;
+                        Object.keys(provinces).forEach(provinceKey => {
+                            allProvinces.push(provinceKey);
+                        });
+                    });
+                    allProvinces.sort((a, b) => a.localeCompare(b));
+
+                    // Add provinces to both selects
+                    allProvinces.forEach(provinceKey => {
+                        addProvinceSelect.add(new Option(provinceKey, provinceKey));
+                        addPermanentProvinceSelect.add(new Option(provinceKey, provinceKey));
+                    });
+
+                    // Populate cities
+                    function populateCities(provinceKey, citySelect) {
+                        citySelect.innerHTML = '<option value="">Select City</option>';
+                        if (!provinceKey) return;
+
+                        for (const rc of Object.keys(data)) {
+                            const provinces = data[rc].province_list;
+                            if (provinces[provinceKey]) {
+                                const cities = Object.keys(provinces[provinceKey].municipality_list).sort();
+                                cities.forEach(cityKey => {
+                                    citySelect.add(new Option(cityKey, cityKey));
+                                });
+                                break;
+                            }
+                        }
+                    }
+
+                    // Populate barangays
+                    function populateBarangays(provinceKey, cityKey, barangaySelect) {
+                        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                        if (!provinceKey || !cityKey) return;
+
+                        for (const rc of Object.keys(data)) {
+                            const provinces = data[rc].province_list;
+                            if (provinces[provinceKey]) {
+                                const cities = provinces[provinceKey].municipality_list;
+                                if (cities[cityKey]) {
+                                    const barangays = cities[cityKey].barangay_list.sort();
+                                    barangays.forEach(brgy => {
+                                        barangaySelect.add(new Option(brgy, brgy));
+                                    });
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    // Event listeners for current address
+                    addProvinceSelect.addEventListener('change', function () {
+                        populateCities(this.value, addCitySelect);
+                        addBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                    });
+
+                    addCitySelect.addEventListener('change', function () {
+                        populateBarangays(addProvinceSelect.value, this.value, addBarangaySelect);
+                    });
+
+                    // Event listeners for permanent address
+                    addPermanentProvinceSelect.addEventListener('change', function () {
+                        populateCities(this.value, addPermanentCitySelect);
+                        addPermanentBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+                    });
+
+                    addPermanentCitySelect.addEventListener('change', function () {
+                        populateBarangays(addPermanentProvinceSelect.value, this.value, addPermanentBarangaySelect);
+                    });
+
+                    // Same as current address
+                    document.getElementById('addSameAsCurrent').addEventListener('change', function () {
+                        if (this.checked) {
+                            addPermanentProvinceSelect.value = addProvinceSelect.value;
+                            populateCities(addProvinceSelect.value, addPermanentCitySelect);
+                            setTimeout(() => {
+                                addPermanentCitySelect.value = addCitySelect.value;
+                                populateBarangays(addProvinceSelect.value, addCitySelect.value, addPermanentBarangaySelect);
+                                setTimeout(() => {
+                                    addPermanentBarangaySelect.value = addBarangaySelect.value;
+                                    document.getElementById('addPermanentPurok').value = document.querySelector('[name="purok"]').value;
+                                    document.getElementById('addPermanentBlockLot').value = document.querySelector('[name="blockLotNo"]').value;
+                                    document.getElementById('addPermanentStreet').value = document.querySelector('[name="streetName"]').value;
+                                    document.getElementById('addPermanentPhase').value = document.querySelector('[name="phase"]').value;
+                                    document.getElementById('addPermanentSubdivision').value = document.querySelector('[name="subdivisionName"]').value;
+                                }, 100);
+                            }, 100);
+                        }
+                    });
+                });
+
+            // Auto-calculate age
+            document.getElementById('addBirthDate').addEventListener('change', function () {
+                const birthDate = new Date(this.value);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                document.getElementById('addAge').value = age;
+
+                // Update max for length of stay
+                const lengthOfStay = document.getElementById('addLengthOfStay');
+                lengthOfStay.max = age;
+                if (parseInt(lengthOfStay.value) > age) {
+                    lengthOfStay.value = age;
+                }
+            });
+
+            // Length of stay validation
+            document.getElementById('addLengthOfStay').addEventListener('input', function () {
+                const age = parseInt(document.getElementById('addAge').value) || 0;
+                const length = parseInt(this.value) || 0;
+                if (length > age) {
+                    this.value = age;
+                }
+                if (length < 0) {
+                    this.value = 0;
+                }
+            });
+
+            // Citizenship change - show/hide permanent address fields
+            document.getElementById('addCitizenship').addEventListener('change', function () {
+                const isFilipino = this.value.toUpperCase() === 'FILIPINO';
+                const filipinoFields = document.getElementById('addFilipinoPermanentFields');
+                const foreignField = document.getElementById('addForeignPermanentField');
+                const foreignInput = document.getElementById('addForeignAddress');
+
+                if (isFilipino) {
+                    filipinoFields.classList.remove('d-none');
+                    foreignField.classList.add('d-none');
+                    foreignInput.removeAttribute('required');
+
+                    // Re-enable Filipino fields
+                    document.getElementById('addPermanentProvince').setAttribute('required', 'required');
+                    document.getElementById('addPermanentCity').setAttribute('required', 'required');
+                    document.getElementById('addPermanentBarangay').setAttribute('required', 'required');
+                    document.getElementById('addPermanentPurok').setAttribute('required', 'required');
+                } else {
+                    filipinoFields.classList.add('d-none');
+                    foreignField.classList.remove('d-none');
+                    foreignInput.setAttribute('required', 'required');
+
+                    // Disable Filipino fields requirements
+                    document.getElementById('addPermanentProvince').removeAttribute('required');
+                    document.getElementById('addPermanentCity').removeAttribute('required');
+                    document.getElementById('addPermanentBarangay').removeAttribute('required');
+                    document.getElementById('addPermanentPurok').removeAttribute('required');
+                }
+            });
+
+            // Educational level change
+            document.getElementById('addEducationalLevel').addEventListener('change', function () {
+                const shsDiv = document.getElementById('addShsTrackDiv');
+                const collegeDiv = document.getElementById('addCollegeCourseDiv');
+                const value = this.value;
+
+                shsDiv.style.display = 'none';
+                collegeDiv.style.display = 'none';
+
+                if (value.includes('Senior High')) {
+                    shsDiv.style.display = 'block';
+                } else if (value.includes('College')) {
+                    collegeDiv.style.display = 'block';
+                }
+            });
+
+            // SHS Track - Others option
+            document.getElementById('addShsTrack').addEventListener('change', function () {
+                const otherInput = document.getElementById('addShsTrackOther');
+                if (this.value === 'Others') {
+                    otherInput.classList.remove('d-none');
+                    otherInput.setAttribute('required', 'required');
+                } else {
+                    otherInput.classList.add('d-none');
+                    otherInput.removeAttribute('required');
+                    otherInput.value = '';
+                }
+            });
+
+            // College Course - Others option
+            document.getElementById('addCollegeCourse').addEventListener('change', function () {
+                const otherInput = document.getElementById('addCollegeCourseOther');
+                if (this.value === 'Others') {
+                    otherInput.classList.remove('d-none');
+                    otherInput.setAttribute('required', 'required');
+                } else {
+                    otherInput.classList.add('d-none');
+                    otherInput.removeAttribute('required');
+                    otherInput.value = '';
+                }
             });
         });
     </script>
