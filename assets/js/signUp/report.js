@@ -115,6 +115,7 @@ map.on('click', function (e) {
     }
 
     currentMarker = L.marker([lat, lng]).addTo(map);
+    currentMarker.bindPopup("Loading address...").openPopup();
 
     fetch(`https://api.maptiler.com/geocoding/${lng},${lat}.json?key=ZnRwy10K33uDAz9hPMkT`)
         .then(res => res.json())
