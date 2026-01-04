@@ -826,8 +826,8 @@ if (isset($_POST['confirmButton'])) {
                             <div class="col-lg-4 col-md-6 col-6 mb-3">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="occupation" name="occupation"
-                                        placeholder="Occupation" value="<?php echo htmlspecialchars($occupation ?? ''); ?>"
-                                        disabled>
+                                        placeholder="Occupation"
+                                        value="<?php echo htmlspecialchars($occupation ?? ''); ?>" disabled>
                                     <label for="occupation">Occupation</label>
                                 </div>
                             </div>
@@ -1094,13 +1094,22 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-6 mb-4">
                                 <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control <?php echo ($incomplete && empty($purok)) ? 'border border-warning' : ''; ?>"
-                                        id="purok" name="purok" value="<?php echo $purok ?>" placeholder="Purok"
-                                        disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($purok)) ? 'border border-warning' : ''; ?>"
+                                        id="purok" name="purok" disabled>
+
+                                        <option value="">Select Purok</option>
+                                        <?php for ($i = 1; $i <= 7; $i++): ?>
+                                            <option value="Purok <?php echo $i; ?>" <?php echo ($purok === "Purok $i") ? 'selected' : ''; ?>>
+                                                Purok <?php echo $i; ?>
+                                            </option>
+                                        <?php endfor; ?>
+
+                                    </select>
                                     <label for="purok">Purok</label>
                                 </div>
                             </div>
+
 
                         </div>
 
@@ -1200,13 +1209,22 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-lg-3 col-6 mb-3">
                                 <div class="form-floating">
-                                    <input type="text"
-                                        class="form-control <?php echo ($incomplete && empty($permanentPurok)) ? 'border border-warning' : ''; ?>"
-                                        id="permanentPurok" name="permanentPurok" value="<?php echo $permanentPurok ?>"
-                                        placeholder="Purok" disabled>
+                                    <select
+                                        class="form-select <?php echo ($incomplete && empty($permanentPurok)) ? 'border border-warning' : ''; ?>"
+                                        id="permanentPurok" name="permanentPurok" disabled>
+
+                                        <option value="">Select Purok</option>
+                                        <?php for ($i = 1; $i <= 7; $i++): ?>
+                                            <option value="Purok <?php echo $i; ?>" <?php echo ($permanentPurok === "Purok $i") ? 'selected' : ''; ?>>
+                                                Purok <?php echo $i; ?>
+                                            </option>
+                                        <?php endfor; ?>
+
+                                    </select>
                                     <label for="permanentPurok">Purok</label>
                                 </div>
                             </div>
+
 
                             <div class="col-12 mb-3" id="foreignAddressDiv" style="display: none;">
                                 <div class="form-floating">
