@@ -250,6 +250,32 @@ if (isset($_POST['confirmButton'])) {
       font-family: 'Poppins', sans-serif;
       background-color: #f8f9fa;
     }
+
+    .editButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+    }
+
+    .editButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+    }
+
+    .saveButton {
+      background-color: #19AFA5;
+      border-color: #19AFA5;
+    }
+
+    .saveButton:hover {
+      background-color: #11A1A1;
+      border-color: #11A1A1;
+    }
+
+    .form-control:focus, .form-select:focus, .form-check-input:focus {
+      border: 1px solid #19AFA5;
+      outline: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 
@@ -293,7 +319,7 @@ if (isset($_POST['confirmButton'])) {
                   <div class="row g-3" style="color: black;">
                     <div class="col-3 view-mode">
                       <div class="info-row ">
-                        <?php if (empty($userDataRow['profilePicture'])) { ?>
+                        <?php if (empty($user['profilePicture'])) { ?>
                           <img src="../../uploads/profiles/defaultProfile.png"
                             style="width: 250px; height: 250px; object-fit: cover;" alt="Resident Profile">
                         <?php } else { ?>
@@ -427,7 +453,7 @@ if (isset($_POST['confirmButton'])) {
                         </div>
                         <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
-                            <strong>isVoter:</strong>
+                            <strong>Registered Voter:</strong>
                             <div class="mt-1">
                               <span><?= htmlspecialchars($user['isVoter'] ?? 'N/A') ?></span>
                             </div>
@@ -435,13 +461,13 @@ if (isset($_POST['confirmButton'])) {
                         </div>
                         <div class="col-md-3 my-3 view-mode">
                           <div class="info-row">
-                            <strong>isOSY:</strong>
+                            <strong>Out of School Youth:</strong>
                             <div class="mt-1">
                               <span><?= htmlspecialchars($user['isOSY'] ?? 'N/A') ?></span>
                             </div>
                           </div>
                         </div>
-                        <div class="col-3 my-3 view-mode">
+                        <div class="col-md-6 my-3 view-mode">
                           <div class="info-row">
                             <strong>Address:</strong>
                             <div class="mt-1">
@@ -462,7 +488,7 @@ if (isset($_POST['confirmButton'])) {
                             </div>
                           </div>
                         </div>
-                        <div class="col-3 my-3 view-mode">
+                        <div class="col-md-6 my-3 view-mode">
                           <div class="info-row">
                             <strong>Permanent Address:</strong>
                             <div class="mt-1">
@@ -587,7 +613,7 @@ if (isset($_POST['confirmButton'])) {
                           <div class="info-row">
                             <label for="suffix" class="form-label"><strong>Suffix:</strong></label>
                             <select class="form-select" id="suffix" name="suffix">
-                              <option value="" disabled <?= empty($user['suffix']) ? 'selected' : '' ?>>Suffix</option>
+                              <option value="" <?= empty($user['suffix']) ? 'selected' : '' ?>>Suffix</option>
 
                               <option value="Jr." <?= ($user['suffix'] === 'Jr.') ? 'selected' : '' ?>>Jr.</option>
                               <option value="Sr." <?= ($user['suffix'] === 'Sr.') ? 'selected' : '' ?>>Sr.</option>
@@ -595,37 +621,6 @@ if (isset($_POST['confirmButton'])) {
                               <option value="III" <?= ($user['suffix'] === 'III') ? 'selected' : '' ?>>III</option>
                               <option value="IV" <?= ($user['suffix'] === 'IV') ? 'selected' : '' ?>>IV</option>
                               <option value="V" <?= ($user['suffix'] === 'V') ? 'selected' : '' ?>>V</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div class="col-md-5 mb-3 edit-mode d-none">
-                          <div class="info-row">
-                            <label for="email" class="form-label"><strong>Email:</strong></label>
-                            <input class="form-control" type="email" id="email" name="email"
-                              value="<?= $user['email'] ?>">
-                          </div>
-                        </div>
-                        <div class="col-md-4 mb-3 edit-mode d-none">
-                          <div class="info-row">
-                            <label for="phoneNumber" class="form-label"><strong>Phone Number:</strong></label>
-                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
-                              value="<?= $user['phoneNumber'] ?>" placeholder="Phone Number" inputmode="numeric"
-                              pattern="^09\d{9}$" maxlength="11"
-                              title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)"
-                              oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-                          </div>
-                        </div>
-                        <div class="col-md-3 mb-3 edit-mode d-none">
-                          <div class="info-row">
-                            <label for="gender" class="form-label"><strong>Gender:</strong></label>
-                            <select class="form-select" id="gender" name="gender">
-                              <option value="" disabled <?= empty($user['gender']) ? 'selected' : '' ?>>Choose Gender
-                              </option>
-                              <option value="Male" <?= ($user['gender'] === 'Male.') ? 'selected' : '' ?>>Male</option>
-                              <option value="Female" <?= ($user['gender'] === 'Female.') ? 'selected' : '' ?>> Female
-                              </option>
-                              <option value="Other" <?= ($user['gender'] === 'Others.') ? 'selected' : '' ?>> Others
-                              </option>
                             </select>
                           </div>
                         </div>
@@ -657,44 +652,57 @@ if (isset($_POST['confirmButton'])) {
                               value="<?= $user['birthPlace'] ?? '' ?>" placeholder="Place of Birth">
                           </div>
                         </div>
+                        <div class="col-md-4 mb-3 edit-mode d-none">
+                          <div class="info-row">
+                            <label for="gender" class="form-label"><strong>Gender:</strong></label>
+                            <select class="form-select" id="gender" name="gender">
+                              <option value="" <?= empty($user['gender']) ? 'selected' : '' ?>>Choose Gender</option>
+
+                              <option value="Male" <?= ($user['gender'] === 'Male') ? 'selected' : '' ?>>Male</option>
+                              <option value="Female" <?= ($user['gender'] === 'Female') ? 'selected' : '' ?>>Female</option>
+                              <option value="Other" <?= ($user['gender'] === 'Other') ? 'selected' : '' ?>>Other</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-4 mb-3 edit-mode d-none">
+                          <div class="info-row">
+                            <label for="civilStatus" class="form-label"><strong>Civil Status:</strong></label>
+                            <select class="form-select" id="civilStatus" name="civilStatus">
+                              <option value="" <?= empty($user['civilStatus']) ? 'selected' : ''; ?>>Choose Civil
+                                Status</option>
+                              <option value="Single" <?= ($user['civilStatus'] === 'Single') ? 'selected' : ''; ?>>Single
+                              </option>
+                              <option value="Married" <?= ($user['civilStatus'] === 'Married') ? 'selected' : ''; ?>>Married
+                              </option>
+                              <option value="Divorced" <?= ($user['civilStatus'] === 'Divorced') ? 'selected' : ''; ?>>Divorced
+                              </option>
+                              <option value="Widowed" <?= ($user['civilStatus'] === 'Widowed') ? 'selected' : ''; ?>>Widowed
+                              </option>
+                              <option value="Separated" <?= ($user['civilStatus'] === 'Separated') ? 'selected' : ''; ?>>
+                                Separated</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-4 mb-3 edit-mode d-none">
+                          <label for="bloodType" class="form-label"><strong>Blood Type:</strong></label>
+                          <select class="form-select" id="bloodType" name="bloodType">
+                            <option value="" <?= empty($user['bloodType']) ? 'selected' : ''; ?>>Choose Blood Type
+                            </option>
+                            <option value="A+" <?= ($user['bloodType'] === 'A+') ? 'selected' : ''; ?>>A+</option>
+                            <option value="A-" <?= ($user['bloodType'] === 'A-') ? 'selected' : ''; ?>>A-</option>
+                            <option value="B+" <?= ($user['bloodType'] === 'B+') ? 'selected' : ''; ?>>B+</option>
+                            <option value="B-" <?= ($user['bloodType'] === 'B-') ? 'selected' : ''; ?>>B-</option>
+                            <option value="AB+" <?= ($user['bloodType'] === 'AB+') ? 'selected' : ''; ?>>AB+</option>
+                            <option value="AB-" <?= ($user['bloodType'] === 'AB-') ? 'selected' : ''; ?>>AB-</option>
+                            <option value="O+" <?= ($user['bloodType'] === 'O+') ? 'selected' : ''; ?>>O+</option>
+                            <option value="O-" <?= ($user['bloodType'] === 'O-') ? 'selected' : ''; ?>>O-</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
                   <div class="row g-3" style="color: black;">
-                    <div class="col-md-3 mb-3 edit-mode d-none">
-                      <div class="info-row">
-                        <label for="civilStatus" class="form-label"><strong>Civil Status:</strong></label>
-                        <select class="form-select" id="civilStatus" name="civilStatus">
-                          <option value="" disabled <?= empty($user['civilStatus']) ? 'selected' : ''; ?>>Choose Civil
-                            Status</option>
-                          <option value="Single" <?= ($user['civilStatus'] === 'Single') ? 'selected' : ''; ?>>Single
-                          </option>
-                          <option value="Married" <?= ($user['civilStatus'] === 'Married') ? 'selected' : ''; ?>>Married
-                          </option>
-                          <option value="Divorced" <?= ($user['civilStatus'] === 'Divorced') ? 'selected' : ''; ?>>Divorced
-                          </option>
-                          <option value="Widowed" <?= ($user['civilStatus'] === 'Widowed') ? 'selected' : ''; ?>>Widowed
-                          </option>
-                          <option value="Separated" <?= ($user['civilStatus'] === 'Separated') ? 'selected' : ''; ?>>
-                            Separated</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-md-3 mb-3 edit-mode d-none">
-                      <label for="bloodType" class="form-label"><strong>Blood Type:</strong></label>
-                      <select class="form-select" id="bloodType" name="bloodType">
-                        <option value="" disabled <?= empty($user['bloodType']) ? 'selected' : ''; ?>>Choose Blood Type
-                        </option>
-                        <option value="A+" <?= ($user['bloodType'] === 'A+') ? 'selected' : ''; ?>>A+</option>
-                        <option value="A-" <?= ($user['bloodType'] === 'A-') ? 'selected' : ''; ?>>A-</option>
-                        <option value="B+" <?= ($user['bloodType'] === 'B+') ? 'selected' : ''; ?>>B+</option>
-                        <option value="B-" <?= ($user['bloodType'] === 'B-') ? 'selected' : ''; ?>>B-</option>
-                        <option value="AB+" <?= ($user['bloodType'] === 'AB+') ? 'selected' : ''; ?>>AB+</option>
-                        <option value="AB-" <?= ($user['bloodType'] === 'AB-') ? 'selected' : ''; ?>>AB-</option>
-                        <option value="O+" <?= ($user['bloodType'] === 'O+') ? 'selected' : ''; ?>>O+</option>
-                        <option value="O-" <?= ($user['bloodType'] === 'O-') ? 'selected' : ''; ?>>O-</option>
-                      </select>
-                    </div>
+                    
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <div class="info-row">
                         <?php
@@ -893,7 +901,7 @@ if (isset($_POST['confirmButton'])) {
                           placeholder="Occupation" value="<?= $user['occupation'] ?? '' ?>">
                       </div>
                     </div>
-                    <div class="col-md-3 my-3 edit-mode d-none">
+                    <div class="col-md-3 mb-3 edit-mode d-none">
                       <div class="info-row">
                         <label for="remarks" class="form-label"><strong>Remarks:</strong></label>
                         <select class="form-select" id="remarks" name="remarks">
@@ -904,7 +912,7 @@ if (isset($_POST['confirmButton'])) {
                         </select>
                       </div>
                     </div>
-                    <div class="col-md-3 my-3 edit-mode d-none">
+                    <div class="col-md-3 mb-3 edit-mode d-none">
                       <div class="info-row">
                         <label for="lengthOfStay" class="form-label"><strong>Length of Stay:</strong></label>
                         <input type="number" class="form-control" id="lengthOfStay" name="lengthOfStay" min="0"
@@ -912,28 +920,54 @@ if (isset($_POST['confirmButton'])) {
                         <!-- <small class="text-muted">Cannot exceed age (<?= $user['age'] ?> years)</small> -->
                       </div>
                     </div>
-                    <div class="col-md-3 my-3 edit-mode d-none">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
                       <div class="info-row">
                         <label for="residencyType" class="form-label"><strong>Residency Type:</strong></label>
                         <input type="text" class="form-control" id="residencyType" name="residencyType"
                           value="<?= $user['residencyType'] ?? '' ?>">
                       </div>
                     </div>
-                    <div class="col-md-3 my-3 edit-mode d-none">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
                       <div class="info-row">
-                        <label for="isVoter" class="form-label"><strong>Registered Voter:</strong></label>
-                        <input type="text" class="form-control" id="isVoter" name="isVoter"
-                          value="<?= $user['isVoter'] ?>">
-                      </div>
-                    </div>
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <div class="info-row">
-                        <label for="isOSY" class="form-label"><strong>Out of School Youth:</strong></label>
-                        <input type="text" class="form-control" id="isOSY" name="isOSY" value="<?= $user['isOSY'] ?>">
+                        <label class="form-label"><strong>Registered Voter:</strong></label>
+
+                        <div>
+                          <div class="form-check form-check-inline mt-1">
+                            <input class="form-check-input" type="radio" name="isVoter" id="isVoterYes"
+                              value="Yes" <?= ($user['isVoter'] === 'Yes') ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="isVoterYes">Yes</label>
+                          </div>
+
+                          <div class="form-check form-check-inline mt-1">
+                            <input class="form-check-input" type="radio" name="isVoter" id="isVoterNo"
+                              value="No" <?= ($user['isVoter'] === 'No') ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="isVoterNo">No</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <div class="info-row">
+                        <label class="form-label"><strong>Out of School Youth:</strong></label>
+
+                        <div>
+                          <div class="form-check form-check-inline mt-1">
+                            <input class="form-check-input" type="radio" name="isOSY" id="isOSYYes"
+                              value="Yes" <?= ($user['isOSY'] === 'Yes') ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="isOSYYes">Yes</label>
+                          </div>
+
+                          <div class="form-check form-check-inline mt-1">
+                            <input class="form-check-input" type="radio" name="isOSY" id="isOSYNo"
+                              value="No" <?= ($user['isOSY'] === 'No') ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="isOSYNo">No</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
                       <div class="info-row">
                         <label for="occupation" class="form-label"><strong>Occupation:</strong></label>
                         <input type="text" class="form-control" id="occupation" name="occupation"
@@ -942,7 +976,7 @@ if (isset($_POST['confirmButton'])) {
                     </div>
 
                     <!-- ADD EDUCATIONAL FIELDS -->
-                    <div class="col-md-3 my-3 edit-mode d-none">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
                       <div class="info-row">
                         <label for="educationalLevel" class="form-label"><strong>Educational Level:</strong></label>
                         <select class="form-control" id="educationalLevel" name="educationalLevel">
@@ -979,7 +1013,7 @@ if (isset($_POST['confirmButton'])) {
                     $isCustomTrack = !empty($user['shsTrack']) && !in_array($user['shsTrack'], $predefinedTracks);
                     ?>
 
-                    <div class="col-md-3 my-3 edit-mode d-none" id="shsTrackDiv" style="display:none;">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none" id="shsTrackDiv" style="display:none;">
                       <div class="info-row">
                         <label for="shsTrack" class="form-label"><strong>Senior High Track:</strong></label>
                         <div class="position-relative">
@@ -1014,7 +1048,7 @@ if (isset($_POST['confirmButton'])) {
                     $isCustomCourse = !empty($user['collegeCourse']) && !in_array($user['collegeCourse'], $predefinedCourses);
                     ?>
 
-                    <div class="col-md-3 my-3 edit-mode d-none" id="collegeCourseDiv" style="display:none;">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none" id="collegeCourseDiv" style="display:none;">
                       <div class="info-row">
                         <label for="collegeCourse" class="form-label"><strong>College Course:</strong></label>
                         <div class="position-relative">
@@ -1046,18 +1080,48 @@ if (isset($_POST['confirmButton'])) {
                         </div>
                       </div>
                     </div>
+                    
+                    <!-- CONTACT INFORMATION -->
+                    <div class="col-12 mb-3 edit-mode d-none">
+                      <div class="contactInfo">
+                          <div style="font-size: 16px; font-weight: bold;">Contact Information</div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-5 mb-3 mt-0 edit-mode d-none">
+                      <div class="info-row">
+                        <label for="email" class="form-label"><strong>Email:</strong></label>
+                        <input class="form-control" type="email" id="email" name="email"
+                          value="<?= $user['email'] ?>">
+                      </div>
+                    </div>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <div class="info-row">
+                        <label for="phoneNumber" class="form-label"><strong>Phone Number:</strong></label>
+                        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                          value="<?= $user['phoneNumber'] ?>" placeholder="Phone Number" inputmode="numeric"
+                          pattern="^09\d{9}$" maxlength="11"
+                          title="Phone number must start with 09 and be exactly 11 digits (e.g., 09123456789)"
+                          oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                      </div>
+                    </div>
 
                     <!-- PRESENT ADDRESS -->
+                    <div class="col-12 mb-3 edit-mode d-none">
+                      <div class="addressInfo">
+                          <div style="font-size: 16px; font-weight: bold;">Address</div>
+                      </div>
+                    </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>House / Block & Lot No:</strong></label>
-                      <input type="text" class="form-control" name="presentBlockLotNo"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="presentBlockLotNo" class="form-label"><strong>House / Block & Lot No:</strong></label>
+                      <input type="text" id="presentBlockLotNo" class="form-control" name="presentBlockLotNo"
                         value="<?= $user['presentBlockLotNo'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Purok:</strong></label>
-                      <select class="form-select" name="presentPurok">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="presentPurok" class="form-label"><strong>Purok:</strong></label>
+                      <select class="form-select" name="presentPurok" id="presentPurok">
                         <option value="">Select Purok</option>
                         <?php for ($i = 1; $i <= 7; $i++): ?>
                           <option value="Purok <?= $i; ?>" <?= ($user['presentPurok'] === "Purok $i") ? 'selected' : ''; ?>>
@@ -1067,26 +1131,26 @@ if (isset($_POST['confirmButton'])) {
                       </select>
                     </div>
 
-
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Subdivision:</strong></label>
-                      <input type="text" class="form-control" name="presentSubdivision"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="presentSubdivision" class="form-label"><strong>Subdivision:</strong></label>
+                      <input type="text" class="form-control" id="presentSubdivision" name="presentSubdivision"
                         value="<?= $user['presentSubdivision'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Phase:</strong></label>
-                      <input type="text" class="form-control" name="presentPhase" value="<?= $user['presentPhase'] ?>">
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="presentPhase" class="form-label"><strong>Phase:</strong></label>
+                      <input type="text" class="form-control" id="presentPhase" name="presentPhase"
+                        value="<?= $user['presentPhase'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Street:</strong></label>
-                      <input type="text" class="form-control" name="presentStreetName"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="presentStreetName" class="form-label"><strong>Street:</strong></label>
+                      <input type="text" class="form-control" id="presentStreetName" name="presentStreetName"
                         value="<?= $user['presentStreetName'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Province:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="province" class="form-label"><strong>Province:</strong></label>
                       <select class="form-select" id="province" name="presentProvince">
                         <option value="<?= $user['presentProvince'] ?>" selected>
                           <?= $user['presentProvince'] ?>
@@ -1094,8 +1158,8 @@ if (isset($_POST['confirmButton'])) {
                       </select>
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>City:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="city" class="form-label"><strong>City:</strong></label>
                       <select class="form-select" id="city" name="presentCity">
                         <option value="<?= $user['presentCity'] ?>" selected>
                           <?= $user['presentCity'] ?>
@@ -1103,8 +1167,8 @@ if (isset($_POST['confirmButton'])) {
                       </select>
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Barangay:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="barangay" class="form-label"><strong>Barangay:</strong></label>
                       <select class="form-select" id="barangay" name="presentBarangay">
                         <option value="<?= $user['presentBarangay'] ?>" selected>
                           <?= $user['presentBarangay'] ?>
@@ -1113,15 +1177,20 @@ if (isset($_POST['confirmButton'])) {
                     </div>
 
                     <!-- PERMANENT ADDRESS -->
+                    <div class="col-12 mb-3 edit-mode d-none">
+                      <div class="permanentAddressInfo">
+                          <div style="font-size: 16px; font-weight: bold;">Permanent Address</div>
+                      </div>
+                    </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>House / Block & Lot No:</strong></label>
-                      <input type="text" class="form-control" name="permanentBlockLotNo"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentBlockLotNo" class="form-label"><strong>House / Block & Lot No:</strong></label>
+                      <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo"
                         value="<?= $user['permanentBlockLotNo'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Purok:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentPurok" class="form-label"><strong>Purok:</strong></label>
                       <select class="form-select" name="permanentPurok">
                         <option value="">Select Purok</option>
                         <?php for ($i = 1; $i <= 7; $i++): ?>
@@ -1133,26 +1202,26 @@ if (isset($_POST['confirmButton'])) {
                     </div>
 
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Subdivision:</strong></label>
-                      <input type="text" class="form-control" name="permanentSubdivision"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentSubdivision" class="form-label"><strong>Subdivision:</strong></label>
+                      <input type="text" class="form-control" id="permanentSubdivision" name="permanentSubdivision"
                         value="<?= $user['permanentSubdivision'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Phase:</strong></label>
-                      <input type="text" class="form-control" name="permanentPhase"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentPhase" class="form-label"><strong>Phase:</strong></label>
+                      <input type="text" class="form-control" id="permanentPhase" name="permanentPhase"
                         value="<?= $user['permanentPhase'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Street:</strong></label>
-                      <input type="text" class="form-control" name="permanentStreetName"
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentStreetName" class="form-label"><strong>Street:</strong></label>
+                      <input type="text" class="form-control" id="permanentStreetName" name="permanentStreetName"
                         value="<?= $user['permanentStreetName'] ?>">
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Province:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentProvince" class="form-label"><strong>Province:</strong></label>
                       <select class="form-select" id="permanentProvince" name="permanentProvince">
                         <option value="<?= $user['permanentProvince'] ?>" selected>
                           <?= $user['permanentProvince'] ?>
@@ -1160,8 +1229,8 @@ if (isset($_POST['confirmButton'])) {
                       </select>
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>City:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentCity" class="form-label"><strong>City:</strong></label>
                       <select class="form-select" id="permanentCity" name="permanentCity">
                         <option value="<?= $user['permanentCity'] ?>" selected>
                           <?= $user['permanentCity'] ?>
@@ -1169,8 +1238,8 @@ if (isset($_POST['confirmButton'])) {
                       </select>
                     </div>
 
-                    <div class="col-md-3 my-3 edit-mode d-none">
-                      <label><strong>Barangay:</strong></label>
+                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
+                      <label for="permanentBarangay" class="form-label"><strong>Barangay:</strong></label>
                       <select class="form-select" id="permanentBarangay" name="permanentBarangay">
                         <option value="<?= $user['permanentBarangay'] ?>" selected>
                           <?= $user['permanentBarangay'] ?>
@@ -1180,8 +1249,8 @@ if (isset($_POST['confirmButton'])) {
 
                     <!-- After permanentPurok field, add this: -->
                     <div class="col-12 edit-mode d-none" id="foreignAddressDiv" style="display: none;">
-                      <label><strong>Foreign Permanent Address:</strong></label>
-                      <input type="text" class="form-control" name="foreignPermanentAddress"
+                      <label for="foreignPermanentAddress" class="form-label"><strong>Foreign Permanent Address:</strong></label>
+                      <input type="text" class="form-control" id="foreignPermanentAddress" name="foreignPermanentAddress"
                         id="foreignPermanentAddress"
                         value="<?= htmlspecialchars($user['foreignPermanentAddress'] ?? '') ?>">
                     </div>
@@ -1200,19 +1269,19 @@ if (isset($_POST['confirmButton'])) {
                 </div>
                 <div class="card-body">
                   <div class="d-flex justify-content-end gap-2">
-                    <a href="../index.php?page=resident" class="btn btn-secondary w-100 w-md-auto">
+                    <a href="../index.php?page=resident" id="backBtn" class="btn btn-secondary w-100 w-md-auto">
                       <i class="fas fa-arrow-left me-1"></i> Back
                     </a>
-                    <button type="button" id="editBtn" class="btn btn-warning w-100 w-md-auto">
+                    <button type="button" id="editBtn" class="btn btn-primary editButton w-100 w-md-auto">
                       <i class="fas fa-edit me-1"></i> Edit
                     </button>
                   </div>
-                  <div id="editActions" class="d-none mt-3">
-                    <button type="submit" name="saveUser" class="btn btn-success me-2 w-100 w-md-auto">
-                      <i class="fas fa-save me-1"></i> Save Changes
-                    </button>
-                    <button type="button" id="cancelEditBtn" class="btn btn-danger w-100 w-md-auto mt-2 mt-md-0">
+                  <div id="editActions" class="d-none d-flex flex-row gap-2">
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary w-100 w-md-auto mt-3 mt-md-0">
                       <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" name="saveUser" class="btn btn-primary saveButton me-2 w-100 w-md-auto">
+                      <i class="fas fa-save me-1"></i> Save Changes
                     </button>
                   </div>
                 </div>
@@ -1230,6 +1299,7 @@ if (isset($_POST['confirmButton'])) {
       document.querySelectorAll('.view-mode').forEach(e => e.classList.add('d-none'));
       document.querySelectorAll('.edit-mode').forEach(e => e.classList.remove('d-none'));
       document.getElementById('editActions').classList.remove('d-none');
+      document.getElementById('backBtn').classList.add('d-none');
       this.classList.add('d-none');
     });
 
@@ -1238,6 +1308,7 @@ if (isset($_POST['confirmButton'])) {
       document.querySelectorAll('.edit-mode').forEach(e => e.classList.add('d-none'));
       document.getElementById('editActions').classList.add('d-none');
       document.getElementById('editBtn').classList.remove('d-none');
+      document.getElementById('backBtn').classList.remove('d-none');
     });
 
     function previewProfilePicture(event) {
