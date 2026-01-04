@@ -855,9 +855,17 @@ $result = mysqli_query($conn, $sql);
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Purok <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="purok" required>
+                                                    <label class="form-label">
+                                                        Purok <span class="text-danger">*</span>
+                                                    </label>
+                                                    <select class="form-select" name="purok" required>
+                                                        <option value="">Select Purok</option>
+                                                        <?php for ($i = 1; $i <= 7; $i++): ?>
+                                                            <option value="Purok <?= $i; ?>">Purok
+                                                                <?= $i; ?>
+                                                            </option>
+                                                        <?php endfor; ?>
+                                                    </select>
                                                 </div>
                                                 <div class="col-md-3">
                                                     <label class="form-label">Block & Lot / House No.</label>
@@ -919,10 +927,18 @@ $result = mysqli_query($conn, $sql);
                                                             </select>
                                                         </div>
                                                         <div class="col-md-3">
-                                                            <label class="form-label">Purok <span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control"
-                                                                name="purokPermanent" id="addPermanentPurok" required>
+                                                            <label class="form-label">
+                                                                Purok <span class="text-danger">*</span>
+                                                            </label>
+                                                            <select class="form-select" name="purokPermanent"
+                                                                id="addPermanentPurok" required>
+                                                                <option value="">Select Purok</option>
+                                                                <?php for ($i = 1; $i <= 7; $i++): ?>
+                                                                    <option value="Purok <?= $i; ?>">Purok
+                                                                        <?= $i; ?>
+                                                                    </option>
+                                                                <?php endfor; ?>
+                                                            </select>
                                                         </div>
                                                         <div class="col-md-3">
                                                             <label class="form-label">Block & Lot / House No.</label>

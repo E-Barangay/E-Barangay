@@ -1057,8 +1057,16 @@ if (isset($_POST['confirmButton'])) {
 
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <label><strong>Purok:</strong></label>
-                      <input type="text" class="form-control" name="presentPurok" value="<?= $user['presentPurok'] ?>">
+                      <select class="form-select" name="presentPurok">
+                        <option value="">Select Purok</option>
+                        <?php for ($i = 1; $i <= 7; $i++): ?>
+                          <option value="Purok <?= $i; ?>" <?= ($user['presentPurok'] === "Purok $i") ? 'selected' : ''; ?>>
+                            Purok <?= $i; ?>
+                          </option>
+                        <?php endfor; ?>
+                      </select>
                     </div>
+
 
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <label><strong>Subdivision:</strong></label>
@@ -1114,9 +1122,16 @@ if (isset($_POST['confirmButton'])) {
 
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <label><strong>Purok:</strong></label>
-                      <input type="text" class="form-control" name="permanentPurok"
-                        value="<?= $user['permanentPurok'] ?>">
+                      <select class="form-select" name="permanentPurok">
+                        <option value="">Select Purok</option>
+                        <?php for ($i = 1; $i <= 7; $i++): ?>
+                          <option value="Purok <?= $i; ?>" <?= ($user['permanentPurok'] === "Purok $i") ? 'selected' : ''; ?>>
+                            Purok <?= $i; ?>
+                          </option>
+                        <?php endfor; ?>
+                      </select>
                     </div>
+
 
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <label><strong>Subdivision:</strong></label>
@@ -2073,6 +2088,7 @@ if (isset($_POST['confirmButton'])) {
       });
     }
   });
+
 </script>
 
 </body>
