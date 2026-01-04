@@ -171,8 +171,8 @@ switch ($documentTypeID) {
     case 5: $layoutFile = 'goodHealth.php'; break;
     case 6: $layoutFile = 'goodMoral.php'; break;
     case 7: $layoutFile = 'jointCohabitation.php'; break;
-    case 9: $layoutFile = 'residency.php'; break;
-    case 10: $layoutFile = 'soloParent.php'; break;
+    case 8: $layoutFile = 'residency.php'; break;
+    case 9: $layoutFile = 'soloParent.php'; break;
     default: $layoutFile = null;
 }
 ?>
