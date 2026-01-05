@@ -16,168 +16,182 @@ $modalNotif = '';
 $modalNotifType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['addResident'])) {
-    // Escape all inputs
-    $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
-    $middleName = mysqli_real_escape_string($conn, $_POST['middleName'] ?? '');
-    $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
-    $suffix = mysqli_real_escape_string($conn, $_POST['suffix'] ?? '');
-    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
-    $birthDate = mysqli_real_escape_string($conn, $_POST['birthDate']);
-    $age = mysqli_real_escape_string($conn, $_POST['age']);
-    $birthPlace = mysqli_real_escape_string($conn, $_POST['birthPlace'] ?? '');
-    $bloodType = mysqli_real_escape_string($conn, $_POST['bloodType'] ?? '');
-    $civilStatus = mysqli_real_escape_string($conn, $_POST['civilStatus']);
-    $citizenship = mysqli_real_escape_string($conn, $_POST['citizenship']);
-    $occupation = mysqli_real_escape_string($conn, $_POST['occupation'] ?? '');
-    $lengthOfStay = mysqli_real_escape_string($conn, $_POST['lengthOfStay']);
-    $contactNumber = mysqli_real_escape_string($conn, $_POST['contactNumber'] ?? '');
+    // ✅ CHECK FOR DUPLICATE EMAIL FIRST
     $email = mysqli_real_escape_string($conn, $_POST['email']);
 
-    // Educational fields
-    $educationalLevel = isset($_POST['educationalLevel']) && !empty($_POST['educationalLevel'])
-        ? mysqli_real_escape_string($conn, $_POST['educationalLevel'])
-        : NULL;
+    // Check if email already exists
+    $emailCheckQuery = "SELECT userID FROM users WHERE email = '$email'";
+    $emailCheckResult = mysqli_query($conn, $emailCheckQuery);
 
-    $shsTrack = NULL;
-    $collegeCourse = NULL;
+    if (mysqli_num_rows($emailCheckResult) > 0) {
+        // Email already exists - show error
+        $modalNotif = "This email address is already registered in the system. Please use a different email.";
+        $modalNotifType = "danger";
+    } else {
+        // Email is unique - proceed with registration
 
-    if ($educationalLevel !== NULL) {
-        $levelLower = strtolower($educationalLevel);
+        // Escape all inputs
+        $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
+        $middleName = mysqli_real_escape_string($conn, $_POST['middleName'] ?? '');
+        $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
+        $suffix = mysqli_real_escape_string($conn, $_POST['suffix'] ?? '');
+        $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+        $birthDate = mysqli_real_escape_string($conn, $_POST['birthDate']);
+        $age = mysqli_real_escape_string($conn, $_POST['age']);
+        $birthPlace = mysqli_real_escape_string($conn, $_POST['birthPlace'] ?? '');
+        $bloodType = mysqli_real_escape_string($conn, $_POST['bloodType'] ?? '');
+        $civilStatus = mysqli_real_escape_string($conn, $_POST['civilStatus']);
+        $citizenship = mysqli_real_escape_string($conn, $_POST['citizenship']);
+        $occupation = mysqli_real_escape_string($conn, $_POST['occupation'] ?? '');
+        $lengthOfStay = mysqli_real_escape_string($conn, $_POST['lengthOfStay']);
+        $contactNumber = mysqli_real_escape_string($conn, $_POST['contactNumber'] ?? '');
 
-        if (strpos($levelLower, 'senior high') !== false) {
-            if (isset($_POST['shsTrack']) && $_POST['shsTrack'] === 'Others') {
-                $shsTrack = isset($_POST['shsTrackOther']) && !empty($_POST['shsTrackOther'])
-                    ? mysqli_real_escape_string($conn, $_POST['shsTrackOther'])
-                    : NULL;
-            } else {
-                $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
-                    ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
-                    : NULL;
-            }
-        } else if (strpos($levelLower, 'college') !== false) {
-            if (isset($_POST['collegeCourse']) && $_POST['collegeCourse'] === 'Others') {
-                $collegeCourse = isset($_POST['collegeCourseOther']) && !empty($_POST['collegeCourseOther'])
-                    ? mysqli_real_escape_string($conn, $_POST['collegeCourseOther'])
-                    : NULL;
-            } else {
-                $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
-                    ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
-                    : NULL;
+        // Educational fields
+        $educationalLevel = isset($_POST['educationalLevel']) && !empty($_POST['educationalLevel'])
+            ? mysqli_real_escape_string($conn, $_POST['educationalLevel'])
+            : NULL;
+
+        $shsTrack = NULL;
+        $collegeCourse = NULL;
+
+        if ($educationalLevel !== NULL) {
+            $levelLower = strtolower($educationalLevel);
+
+            if (strpos($levelLower, 'senior high') !== false) {
+                if (isset($_POST['shsTrack']) && $_POST['shsTrack'] === 'Others') {
+                    $shsTrack = isset($_POST['shsTrackOther']) && !empty($_POST['shsTrackOther'])
+                        ? mysqli_real_escape_string($conn, $_POST['shsTrackOther'])
+                        : NULL;
+                } else {
+                    $shsTrack = isset($_POST['shsTrack']) && !empty($_POST['shsTrack'])
+                        ? mysqli_real_escape_string($conn, $_POST['shsTrack'])
+                        : NULL;
+                }
+            } else if (strpos($levelLower, 'college') !== false) {
+                if (isset($_POST['collegeCourse']) && $_POST['collegeCourse'] === 'Others') {
+                    $collegeCourse = isset($_POST['collegeCourseOther']) && !empty($_POST['collegeCourseOther'])
+                        ? mysqli_real_escape_string($conn, $_POST['collegeCourseOther'])
+                        : NULL;
+                } else {
+                    $collegeCourse = isset($_POST['collegeCourse']) && !empty($_POST['collegeCourse'])
+                        ? mysqli_real_escape_string($conn, $_POST['collegeCourse'])
+                        : NULL;
+                }
             }
         }
-    }
 
-    // Determine residency type
-    $currentProvince = strtoupper(mysqli_real_escape_string($conn, $_POST['provinceName']));
-    $currentCity = strtoupper(mysqli_real_escape_string($conn, $_POST['cityName']));
-    $currentBarangay = strtoupper(mysqli_real_escape_string($conn, $_POST['barangayName']));
+        // Determine residency type
+        $currentProvince = strtoupper(mysqli_real_escape_string($conn, $_POST['provinceName']));
+        $currentCity = strtoupper(mysqli_real_escape_string($conn, $_POST['cityName']));
+        $currentBarangay = strtoupper(mysqli_real_escape_string($conn, $_POST['barangayName']));
 
-    $residencyType = '';
-    $isSpecificCurrentAddress =
-        $currentProvince === 'BATANGAS' &&
-        $currentCity === 'SANTO TOMAS' &&
-        $currentBarangay === 'SAN ANTONIO';
+        $residencyType = '';
+        $isSpecificCurrentAddress =
+            $currentProvince === 'BATANGAS' &&
+            $currentCity === 'SANTO TOMAS' &&
+            $currentBarangay === 'SAN ANTONIO';
 
-    if (strtoupper($citizenship) !== 'FILIPINO') {
-        $residencyType = 'Foreign';
-    } else if ($isSpecificCurrentAddress && (int) $lengthOfStay === (int) $age) {
-        $residencyType = 'Bonafide';
-    } else if ($isSpecificCurrentAddress && (int) $lengthOfStay >= 3) {
-        $residencyType = 'Migrant';
-    } else if ($isSpecificCurrentAddress && (int) $lengthOfStay <= 2) {
-        $residencyType = 'Transient';
-    }
+        if (strtoupper($citizenship) !== 'FILIPINO') {
+            $residencyType = 'Foreign';
+        } else if ($isSpecificCurrentAddress && (int) $lengthOfStay === (int) $age) {
+            $residencyType = 'Bonafide';
+        } else if ($isSpecificCurrentAddress && (int) $lengthOfStay >= 3) {
+            $residencyType = 'Migrant';
+        } else if ($isSpecificCurrentAddress && (int) $lengthOfStay <= 2) {
+            $residencyType = 'Transient';
+        }
 
-    // Remarks
-    $remarksValue = (isset($_POST['remarks']) && $_POST['remarks'] === 'Yes')
-        ? 'With Derogatory Record'
-        : 'No Derogatory Record';
+        // Remarks
+        $remarksValue = (isset($_POST['remarks']) && $_POST['remarks'] === 'Yes')
+            ? 'With Derogatory Record'
+            : 'No Derogatory Record';
 
-    $isVoter = mysqli_real_escape_string($conn, $_POST['isVoter']);
+        $isVoter = mysqli_real_escape_string($conn, $_POST['isVoter']);
 
-    // Insert user
-    $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, isRestricted) 
-                   VALUES ('$contactNumber', '$email', 'user', 'No', 'No')";
+        // Insert user
+        $insertUser = "INSERT INTO users (phoneNumber, email, role, isNew, isRestricted) 
+                       VALUES ('$contactNumber', '$email', 'user', 'No', 'No')";
 
-    if (mysqli_query($conn, $insertUser)) {
-        $userID = mysqli_insert_id($conn);
+        if (mysqli_query($conn, $insertUser)) {
+            $userID = mysqli_insert_id($conn);
 
-        // Insert userinfo with educational fields
-        $insertResident = "INSERT INTO userinfo (
-            userID, firstName, middleName, lastName, suffix, gender, birthDate, age, birthPlace, 
-            bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType, 
-            isVoter, remarks, educationalLevel, shsTrack, collegeCourse
-        ) VALUES (
-            $userID, '$firstName', '$middleName', '$lastName', '$suffix', '$gender', '$birthDate', 
-            '$age', '$birthPlace', '$bloodType', '$civilStatus', '$citizenship', '$occupation', 
-            '$lengthOfStay', " . ($residencyType ? "'$residencyType'" : "NULL") . ", 
-            '$isVoter', '$remarksValue',
-            " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
-            " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
-            " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . "
-        )";
-
-        if (mysqli_query($conn, $insertResident)) {
-            $userInfoID = mysqli_insert_id($conn);
-
-            // Current address
-            $blockLotNo = mysqli_real_escape_string($conn, $_POST['blockLotNo'] ?? '');
-            $streetName = mysqli_real_escape_string($conn, $_POST['streetName'] ?? '');
-            $phase = mysqli_real_escape_string($conn, $_POST['phase'] ?? '');
-            $subdivisionName = mysqli_real_escape_string($conn, $_POST['subdivisionName'] ?? '');
-            $purok = mysqli_real_escape_string($conn, $_POST['purok']);
-
-            $insertAddress = "INSERT INTO addresses (
-                userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName, purok
+            // Insert userinfo with educational fields
+            $insertResident = "INSERT INTO userinfo (
+                userID, firstName, middleName, lastName, suffix, gender, birthDate, age, birthPlace, 
+                bloodType, civilStatus, citizenship, occupation, lengthOfStay, residencyType, 
+                isVoter, remarks, educationalLevel, shsTrack, collegeCourse
             ) VALUES (
-                $userInfoID, '$blockLotNo', '$streetName', '$phase', '$subdivisionName', 
-                '$currentBarangay', '$currentCity', '$currentProvince', '$purok'
+                $userID, '$firstName', '$middleName', '$lastName', '$suffix', '$gender', '$birthDate', 
+                '$age', '$birthPlace', '$bloodType', '$civilStatus', '$citizenship', '$occupation', 
+                '$lengthOfStay', " . ($residencyType ? "'$residencyType'" : "NULL") . ", 
+                '$isVoter', '$remarksValue',
+                " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
+                " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
+                " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . "
             )";
-            mysqli_query($conn, $insertAddress);
 
-            // Permanent address - handle both Filipino and Foreign
-            if (strtoupper($citizenship) === 'FILIPINO') {
-                $permanentBlockLotNo = mysqli_real_escape_string($conn, $_POST['blockLotNoPermanent'] ?? '');
-                $permanentStreetName = mysqli_real_escape_string($conn, $_POST['streetNamePermanent'] ?? '');
-                $permanentPhase = mysqli_real_escape_string($conn, $_POST['phasePermanent'] ?? '');
-                $permanentSubdivisionName = mysqli_real_escape_string($conn, $_POST['subdivisionNamePermanent'] ?? '');
-                $permanentBarangayName = strtoupper(mysqli_real_escape_string($conn, $_POST['barangayNamePermanent']));
-                $permanentCityName = strtoupper(mysqli_real_escape_string($conn, $_POST['cityNamePermanent']));
-                $permanentProvinceName = strtoupper(mysqli_real_escape_string($conn, $_POST['provinceNamePermanent']));
-                $permanentPurok = mysqli_real_escape_string($conn, $_POST['purokPermanent']);
+            if (mysqli_query($conn, $insertResident)) {
+                $userInfoID = mysqli_insert_id($conn);
 
-                $insertPermanent = "INSERT INTO permanentAddresses (
-                    userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, 
-                    permanentSubdivisionName, permanentBarangayName, permanentCityName, 
-                    permanentProvinceName, permanentPurok, foreignPermanentAddress
+                // Current address
+                $blockLotNo = mysqli_real_escape_string($conn, $_POST['blockLotNo'] ?? '');
+                $streetName = mysqli_real_escape_string($conn, $_POST['streetName'] ?? '');
+                $phase = mysqli_real_escape_string($conn, $_POST['phase'] ?? '');
+                $subdivisionName = mysqli_real_escape_string($conn, $_POST['subdivisionName'] ?? '');
+                $purok = mysqli_real_escape_string($conn, $_POST['purok']);
+
+                $insertAddress = "INSERT INTO addresses (
+                    userInfoID, blockLotNo, streetName, phase, subdivisionName, barangayName, cityName, provinceName, purok
                 ) VALUES (
-                    $userInfoID, '$permanentBlockLotNo', '$permanentStreetName', '$permanentPhase', 
-                    '$permanentSubdivisionName', '$permanentBarangayName', '$permanentCityName', 
-                    '$permanentProvinceName', '$permanentPurok', NULL
+                    $userInfoID, '$blockLotNo', '$streetName', '$phase', '$subdivisionName', 
+                    '$currentBarangay', '$currentCity', '$currentProvince', '$purok'
                 )";
+                mysqli_query($conn, $insertAddress);
+
+                // Permanent address - handle both Filipino and Foreign
+                if (strtoupper($citizenship) === 'FILIPINO') {
+                    $permanentBlockLotNo = mysqli_real_escape_string($conn, $_POST['blockLotNoPermanent'] ?? '');
+                    $permanentStreetName = mysqli_real_escape_string($conn, $_POST['streetNamePermanent'] ?? '');
+                    $permanentPhase = mysqli_real_escape_string($conn, $_POST['phasePermanent'] ?? '');
+                    $permanentSubdivisionName = mysqli_real_escape_string($conn, $_POST['subdivisionNamePermanent'] ?? '');
+                    $permanentBarangayName = strtoupper(mysqli_real_escape_string($conn, $_POST['barangayNamePermanent']));
+                    $permanentCityName = strtoupper(mysqli_real_escape_string($conn, $_POST['cityNamePermanent']));
+                    $permanentProvinceName = strtoupper(mysqli_real_escape_string($conn, $_POST['provinceNamePermanent']));
+                    $permanentPurok = mysqli_real_escape_string($conn, $_POST['purokPermanent']);
+
+                    $insertPermanent = "INSERT INTO permanentAddresses (
+                        userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, 
+                        permanentSubdivisionName, permanentBarangayName, permanentCityName, 
+                        permanentProvinceName, permanentPurok, foreignPermanentAddress
+                    ) VALUES (
+                        $userInfoID, '$permanentBlockLotNo', '$permanentStreetName', '$permanentPhase', 
+                        '$permanentSubdivisionName', '$permanentBarangayName', '$permanentCityName', 
+                        '$permanentProvinceName', '$permanentPurok', NULL
+                    )";
+                } else {
+                    $foreignPermanentAddress = mysqli_real_escape_string($conn, $_POST['foreignPermanentAddress']);
+
+                    $insertPermanent = "INSERT INTO permanentAddresses (
+                        userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, 
+                        permanentSubdivisionName, permanentBarangayName, permanentCityName, 
+                        permanentProvinceName, permanentPurok, foreignPermanentAddress
+                    ) VALUES (
+                        $userInfoID, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$foreignPermanentAddress'
+                    )";
+                }
+                mysqli_query($conn, $insertPermanent);
+
+                $modalNotif = "Resident successfully added!";
+                $modalNotifType = "success";
+                $_POST = [];
             } else {
-                $foreignPermanentAddress = mysqli_real_escape_string($conn, $_POST['foreignPermanentAddress']);
-
-                $insertPermanent = "INSERT INTO permanentAddresses (
-                    userInfoID, permanentBlockLotNo, permanentStreetName, permanentPhase, 
-                    permanentSubdivisionName, permanentBarangayName, permanentCityName, 
-                    permanentProvinceName, permanentPurok, foreignPermanentAddress
-                ) VALUES (
-                    $userInfoID, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$foreignPermanentAddress'
-                )";
+                $modalNotif = "Error adding resident info: " . mysqli_error($conn);
+                $modalNotifType = "danger";
             }
-            mysqli_query($conn, $insertPermanent);
-
-            $modalNotif = "Resident successfully added!";
-            $modalNotifType = "success";
-            $_POST = [];
         } else {
-            $modalNotif = "Error adding resident info: " . mysqli_error($conn);
+            $modalNotif = "Error adding user account: " . mysqli_error($conn);
             $modalNotifType = "danger";
         }
-    } else {
-        $modalNotif = "Error adding user account: " . mysqli_error($conn);
-        $modalNotifType = "danger";
     }
 }
 
@@ -978,10 +992,20 @@ $result = mysqli_query($conn, $sql);
                                             <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">Other Details
                                             </h6>
                                             <div class="row g-3">
+                                                <!-- ADD THIS NEW FIELD - Live Residency Type Display -->
                                                 <div class="col-md-3">
                                                     <label class="form-label">Residency Type</label>
-                                                    <input type="text" class="form-control" name="residencyType">
+                                                    <input type="text" class="form-control" id="addResidencyTypeDisplay"
+                                                        readonly style="cursor: not-allowed;">
+                                                    <!-- Hidden input to submit the value -->
+                                                    <input type="hidden" name="residencyType"
+                                                        id="addResidencyTypeHidden">
+                                                    <!-- <small class="text-muted">
+                                                        <i class="fas fa-info-circle"></i> This updates automatically
+                                                        based on citizenship, address, age, and length of stay.
+                                                    </small> -->
                                                 </div>
+
                                                 <div class="col-md-3">
                                                     <label class="form-label d-block">Voter's List <span
                                                             class="text-danger">*</span></label>
@@ -996,6 +1020,7 @@ $result = mysqli_query($conn, $sql);
                                                         <label class="form-check-label">No</label>
                                                     </div>
                                                 </div>
+
                                                 <div class="col-md-3">
                                                     <label class="form-label d-block">Derogatory Record <span
                                                             class="text-danger">*</span></label>
@@ -1084,7 +1109,7 @@ $result = mysqli_query($conn, $sql);
             }, 5000); // removes alerts after 5 seconds
         });
     </script>
-    <script>
+    <!-- <script>
         const birthDateInput = document.getElementById('birthDate');
         const ageInput = document.getElementById('age');
 
@@ -1108,8 +1133,8 @@ $result = mysqli_query($conn, $sql);
         birthDateInput.addEventListener('input', function () {
             ageInput.value = calculateAge(this.value);
         });
-    </script>
-    <script>
+    </script> -->
+    <!-- <script>
         document.getElementById('sameAsCurrent').addEventListener('change', function () {
             const isChecked = this.checked;
 
@@ -1135,51 +1160,49 @@ $result = mysqli_query($conn, $sql);
                 }
             });
         });
-    </script>
+    </script> -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.toggle-restrict-btn').forEach(button => {
-                button.addEventListener('click', function () {
+            const restrictButtons = document.querySelectorAll('.toggle-restrict-btn');
 
-                    const userID = this.getAttribute('data-user-id');
-                    const currentStatus = this.getAttribute('data-status');
-                    const newStatus = currentStatus === 'Yes' ? 'No' : 'Yes';
+            // Only run if buttons exist
+            if (restrictButtons.length > 0) {
+                restrictButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        const userID = this.getAttribute('data-user-id');
+                        const currentStatus = this.getAttribute('data-status');
+                        const newStatus = currentStatus === 'Yes' ? 'No' : 'Yes';
 
-                    // Send AJAX request to update in backend
-                    fetch('restrictUserHandler.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: `userID=${userID}&newStatus=${newStatus}`
-                    })
-                        .then(response => response.text())
-                        .then(result => {
-                            if (result === 'success') {
+                        fetch('restrictUserHandler.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `userID=${userID}&newStatus=${newStatus}`
+                        })
+                            .then(response => response.text())
+                            .then(result => {
+                                if (result === 'success') {
+                                    this.setAttribute('data-status', newStatus);
 
-                                // ✅ Update button display (icon & color)
-                                this.setAttribute('data-status', newStatus);
-
-                                if (newStatus === 'Yes') {
-                                    this.classList.remove('btn-danger');
-                                    this.classList.add('btn-success');
-                                    this.innerHTML = '<i class="fas fa-check"></i>'; // ✅ Show check
-                                } else {
-                                    this.classList.remove('btn-success');
-                                    this.classList.add('btn-danger');
-                                    this.innerHTML = '<i class="fas fa-times"></i>'; // ❌ Show cross
+                                    if (newStatus === 'Yes') {
+                                        this.classList.remove('btn-danger');
+                                        this.classList.add('btn-success');
+                                        this.innerHTML = '<i class="fas fa-check"></i>';
+                                    } else {
+                                        this.classList.remove('btn-success');
+                                        this.classList.add('btn-danger');
+                                        this.innerHTML = '<i class="fas fa-times"></i>';
+                                    }
                                 }
-                            }
-                        });
+                            });
+                    });
                 });
-            });
+            }
         });
     </script>
 
     <script>
         // ========== ADD RESIDENT MODAL JAVASCRIPT ==========
         document.addEventListener('DOMContentLoaded', function () {
-            // Load JSON for address dropdowns
-            // Path: admin/adminContent/resident.php -> ../../assets/json/...
-            // OR if accessed via admin/index.php -> ../assets/json/...
             const jsonPath = '../assets/json/philippine_provinces_cities_municipalities_and_barangays_2019v2.json';
 
             fetch(jsonPath)
@@ -1293,8 +1316,18 @@ $result = mysqli_query($conn, $sql);
                                     document.getElementById('addPermanentStreet').value = document.querySelector('[name="streetName"]').value;
                                     document.getElementById('addPermanentPhase').value = document.querySelector('[name="phase"]').value;
                                     document.getElementById('addPermanentSubdivision').value = document.querySelector('[name="subdivisionName"]').value;
+
+                                    // ✅ Calculate residency type AFTER all fields are populated
+                                    setTimeout(() => {
+                                        updateAddResidencyType();
+                                    }, 50);
                                 }, 100);
                             }, 100);
+                        } else {
+                            // When unchecked, also recalculate
+                            setTimeout(() => {
+                                updateAddResidencyType();
+                            }, 50);
                         }
                     });
                 });
@@ -1401,6 +1434,212 @@ $result = mysqli_query($conn, $sql);
                     otherInput.value = '';
                 }
             });
+        });
+
+
+
+
+        function updateAddResidencyType() {
+            var ageInput = document.getElementById("addAge");
+            var lengthOfStayInput = document.getElementById("addLengthOfStay");
+
+            var age = parseInt(ageInput ? ageInput.value : 0) || 0;
+            var lengthOfStay = parseInt(lengthOfStayInput ? lengthOfStayInput.value : 0) || 0;
+
+            var address = {
+                barangay: document.getElementById("addBarangay") ? document.getElementById("addBarangay").value : "",
+                city: document.getElementById("addCity") ? document.getElementById("addCity").value : "",
+                province: document.getElementById("addProvince") ? document.getElementById("addProvince").value : ""
+            };
+
+            var permanentAddress = {
+                barangay: document.getElementById("addPermanentBarangay") ? document.getElementById("addPermanentBarangay").value : "",
+                city: document.getElementById("addPermanentCity") ? document.getElementById("addPermanentCity").value : "",
+                province: document.getElementById("addPermanentProvince") ? document.getElementById("addPermanentProvince").value : ""
+            };
+
+            var citizenshipSelect = document.getElementById("addCitizenship");
+            var citizenship = citizenshipSelect ? (citizenshipSelect.value || "") : "";
+            citizenship = citizenship.toString().toUpperCase();
+
+            let residencyType = "";
+
+            // Condition: current + permanent must both match for Bonafide
+            var isSpecificBonafide =
+                address.province.toUpperCase() === "BATANGAS" &&
+                address.city.toUpperCase() === "SANTO TOMAS" &&
+                address.barangay.toUpperCase() === "SAN ANTONIO" &&
+                permanentAddress.province.toUpperCase() === "BATANGAS" &&
+                permanentAddress.city.toUpperCase() === "SANTO TOMAS" &&
+                permanentAddress.barangay.toUpperCase() === "SAN ANTONIO" &&
+                age === lengthOfStay;
+
+            // Condition: ONLY current address must match for Migrant/Transient
+            var isSpecificCurrentAddress =
+                address.province.toUpperCase() === "BATANGAS" &&
+                address.city.toUpperCase() === "SANTO TOMAS" &&
+                address.barangay.toUpperCase() === "SAN ANTONIO";
+
+            if (citizenship !== "FILIPINO") {
+                residencyType = "Foreign";
+            } else if (isSpecificBonafide) {
+                residencyType = "Bonafide";
+            } else if (lengthOfStay >= 3 && isSpecificCurrentAddress) {
+                residencyType = "Migrant";
+            } else if (lengthOfStay <= 2 && isSpecificCurrentAddress) {
+                residencyType = "Transient";
+            } else {
+                residencyType = "";
+            }
+
+            console.log("Residency Type Calculated:", residencyType);
+
+            // Update the display field - plain text only
+            const displayField = document.getElementById('addResidencyTypeDisplay');
+            const hiddenField = document.getElementById('addResidencyTypeHidden');
+
+            if (displayField) {
+                displayField.value = residencyType || '(Not determined yet)';
+            }
+
+            if (hiddenField) {
+                hiddenField.value = residencyType;
+            }
+
+            return residencyType;
+        }
+
+        // Extend existing DOMContentLoaded - KEEP THIS AS IS
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add event listeners for residency type calculation
+            const addModalFields = [
+                "addAge", "addLengthOfStay",
+                "addBarangay", "addCity", "addProvince",
+                "addPermanentBarangay", "addPermanentCity", "addPermanentProvince",
+                "addCitizenship"
+            ];
+
+            addModalFields.forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem) {
+                    elem.addEventListener("input", updateAddResidencyType);
+                    elem.addEventListener("change", updateAddResidencyType);
+                }
+            });
+
+            // Update when birth date changes
+            const addBirthDateField = document.getElementById('addBirthDate');
+            if (addBirthDateField) {
+                addBirthDateField.addEventListener('change', function () {
+                    setTimeout(updateAddResidencyType, 100);
+                });
+            }
+
+            // Update when "Same as Current" is checked
+            const addSameAsCurrent = document.getElementById('addSameAsCurrent');
+            if (addSameAsCurrent) {
+                addSameAsCurrent.addEventListener('change', function () {
+                    setTimeout(updateAddResidencyType, 200);
+                });
+            }
+
+            // Initial calculation on modal open
+            const addResidentModal = document.getElementById('addResidentModal');
+            if (addResidentModal) {
+                addResidentModal.addEventListener('shown.bs.modal', function () {
+                    updateAddResidencyType();
+                });
+            }
+        });
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const emailInput = document.querySelector('input[name="email"]');
+
+            if (emailInput) {
+                // Create feedback element
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'invalid-feedback d-block';
+                feedbackDiv.style.display = 'none';
+                emailInput.parentElement.appendChild(feedbackDiv);
+
+                // Debounce function to avoid too many requests
+                let emailCheckTimeout;
+
+                emailInput.addEventListener('input', function () {
+                    clearTimeout(emailCheckTimeout);
+                    const email = this.value.trim();
+
+                    // Reset validation state
+                    this.classList.remove('is-invalid', 'is-valid');
+                    feedbackDiv.style.display = 'none';
+                    feedbackDiv.textContent = '';
+
+                    // Basic email format validation
+                    if (email === '') {
+                        return;
+                    }
+
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        this.classList.add('is-invalid');
+                        feedbackDiv.textContent = 'Please enter a valid email address';
+                        feedbackDiv.style.display = 'block';
+                        return;
+                    }
+
+                    // Show loading state
+                    feedbackDiv.textContent = 'Checking email...';
+                    feedbackDiv.className = 'text-muted d-block small';
+                    feedbackDiv.style.display = 'block';
+
+                    // Check email availability after 500ms of no typing
+                    emailCheckTimeout = setTimeout(() => {
+                        fetch('adminContent/check_email.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'email=' + encodeURIComponent(email)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.exists) {
+                                    emailInput.classList.add('is-invalid');
+                                    feedbackDiv.className = 'invalid-feedback d-block';
+                                    feedbackDiv.textContent = 'This email address is already registered';
+                                    feedbackDiv.style.display = 'block';
+                                } else {
+                                    emailInput.classList.add('is-valid');
+                                    feedbackDiv.className = 'valid-feedback d-block';
+                                    feedbackDiv.textContent = 'Email is available';
+                                    feedbackDiv.style.display = 'block';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error checking email:', error);
+                                feedbackDiv.className = 'text-danger d-block small';
+                                feedbackDiv.textContent = 'Error checking email availability';
+                                feedbackDiv.style.display = 'block';
+                            });
+                    }, 500);
+                });
+
+                // Prevent form submission if email exists
+                const form = document.getElementById('addResidentForm');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (emailInput.classList.contains('is-invalid')) {
+                            e.preventDefault();
+                            emailInput.focus();
+                            alert('Please use a different email address. This one is already registered.');
+                            return false;
+                        }
+                    });
+                }
+            }
         });
     </script>
 
