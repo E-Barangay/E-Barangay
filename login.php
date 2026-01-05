@@ -457,12 +457,6 @@ if (isset($_POST['setPassword'])) {
 }
 
 if (isset($_POST['login'])) {
-    // $conn = new mysqli("localhost", "u482770917_nnaes", "5-T79_Oo8Z", "u482770917_nnaes");
-
-    // if ($conn->connect_error) {
-    //     die("Connection failed: " . $conn->connect_error);
-    // }
-
     $email = $_SESSION['email'];
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirmPassword'] ?? '';

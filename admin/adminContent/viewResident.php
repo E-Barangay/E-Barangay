@@ -469,7 +469,7 @@ if (isset($_POST['confirmButton'])) {
                         </div>
                         <div class="col-md-6 my-3 view-mode">
                           <div class="info-row">
-                            <strong>Address:</strong>
+                            <strong>Current Address:</strong>
                             <div class="mt-1">
                               <?php
                               $addressParts = array_filter([
@@ -967,14 +967,6 @@ if (isset($_POST['confirmButton'])) {
                       </div>
                     </div>
 
-                    <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
-                      <div class="info-row">
-                        <label for="occupation" class="form-label"><strong>Occupation:</strong></label>
-                        <input type="text" class="form-control" id="occupation" name="occupation"
-                          placeholder="Occupation" value="<?= htmlspecialchars($user['occupation'] ?? ''); ?>">
-                      </div>
-                    </div>
-
                     <!-- ADD EDUCATIONAL FIELDS -->
                     <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
                       <div class="info-row">
@@ -1109,7 +1101,7 @@ if (isset($_POST['confirmButton'])) {
                     <!-- PRESENT ADDRESS -->
                     <div class="col-12 mb-3 edit-mode d-none">
                       <div class="addressInfo">
-                          <div style="font-size: 16px; font-weight: bold;">Address</div>
+                          <div style="font-size: 16px; font-weight: bold;">Current Address</div>
                       </div>
                     </div>
 

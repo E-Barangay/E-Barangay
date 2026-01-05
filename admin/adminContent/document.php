@@ -2,29 +2,26 @@
 
 include_once __DIR__ . '/../../sharedAssets/connect.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_POST['documentID'])) {
-  $documentID = $_POST['documentID'];
+if (isset($_POST['action']) && isset($_POST['documentID'])) {
 
-  switch ($_POST['action']) {
-    case 'done':
-      $newStatus = 'Approved';
-      break;
-    case 'archive':
-      $newStatus = 'Archived';
-      break;
-    case 'unarchive':
-      $newStatus = 'Pending';
-      break;
-    case 'restore':
-      $newStatus = 'Pending';
-      break;
-    default:
-      exit('Invalid action.');
+  $documentID = $_POST['documentID'];
+  $action = $_POST['action'];
+
+  if ($action === 'done') {
+    $newStatus = 'Approved';
+
+  } elseif ($action === 'archive') {
+    $newStatus = 'Archived';
+
+  } elseif ($action === 'unarchive' || $action === 'restore') {
+    $newStatus = 'Pending';
+
+  } else {
+    exit('Invalid action.');
   }
 
-  $updateQuery = "UPDATE documents SET documentStatus = ? WHERE documentID = ?";
-  $stmt = $pdo->prepare($updateQuery);
-  $stmt->execute([$newStatus, $documentID]);
+  $updateQuery = "UPDATE documents SET documentStatus = '$newStatus' WHERE documentID = '$documentID'";
+  executeQuery($updateQuery);
 
   echo "<script>window.location.href = 'index.php?page=document';</script>";
   exit();
@@ -95,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
   } elseif ($documentTypeID == 7) {
       $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
   } elseif ($documentTypeID == 9) {
-      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW(), NULL, NULL, NULL, NULL)";
+      $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', $childNo, '$soloParentSinceDate', NOW(), NULL, NULL, NULL, NULL)";
   } else {
       $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', NOW(), NULL, NULL, NULL, NULL)";
   }
@@ -104,12 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_document'])) {
 
   if ($documentTypeID == 4) {
     if ($educationStatus === "Not Studying") {
-        $update = $pdo->prepare("UPDATE userinfo SET isOSY = 'Yes' WHERE userID = ?");
-        $update->execute([$userID]);
+        $updateOSYQuery = "UPDATE userinfo SET isOSY = 'Yes' WHERE userID = $userID";
     } else {
-        $update = $pdo->prepare("UPDATE userinfo SET isOSY = 'No' WHERE userID = ?");
-        $update->execute([$userID]);
+        $updateOSYQuery = "UPDATE userinfo SET isOSY = 'No' WHERE userID = $userID";
     }
+    $updateOSYResult = executeQuery($updateOSYQuery);
   }
 
   echo "<script>window.location.href = 'index.php?page=document';</script>";
@@ -352,6 +348,11 @@ $docTypesResults = executeQuery($docTypesQuery);
       color: white;
     }
     
+    .form-control:focus, .form-select:focus, .form-check-input:focus {
+      border: 1px solid #19AFA5;
+      outline: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 

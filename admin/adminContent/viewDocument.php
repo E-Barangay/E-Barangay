@@ -8,98 +8,6 @@ if (!$documentID) {
   exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_document'])) {
-  $purpose = $_POST['purpose'];
-  $documentTypeID = $_POST['documentTypeID'];
-  $firstName = $_POST['firstName'];
-  $middleName = $_POST['middleName'];
-  $lastName = $_POST['lastName'];
-  $suffix = $_POST['suffix'];
-  $gender = $_POST['gender'];
-  $age = $_POST['age'];
-  $birthDate = $_POST['birthDate'];
-  $birthPlace = $_POST['birthPlace'];
-  $civilStatus = $_POST['civilStatus'];
-  $citizenship = $_POST['citizenship'];
-  $occupation = $_POST['occupation'];
-  $residencyType = $_POST['residencyType'];
-  $lengthOfStay = $_POST['lengthOfStay'];
-  $phoneNumber = $_POST['phoneNumber'];
-  $email = $_POST['email'];
-  $blockLotNo = $_POST['houseNo'];
-  $streetName = $_POST['streetName'];
-  $barangayName = $_POST['barangayName'];
-  $cityName = $_POST['cityName'];
-  $provinceName = $_POST['provinceName'];
-  $phase = $_POST['phase'];
-  $subdivisionName = $_POST['subdivisionName'];
-  $purok = $_POST['purok'];
-
-  $updateDocQuery = "UPDATE documents 
-                     SET purpose = '$purpose', documentTypeID = '$documentTypeID' 
-                     WHERE documentID = '$documentID'";
-  $updateDocResult = executeQuery($updateDocQuery);
-
-  $updateUserInfoQuery = "UPDATE userinfo ui 
-                         JOIN users u ON ui.userID = u.userID 
-                         JOIN documents d ON u.userID = d.userID 
-                         SET ui.firstName = '$firstName', ui.middleName = '$middleName', ui.lastName = '$lastName', 
-                             ui.suffix = '$suffix', ui.gender = '$gender', ui.age = '$age', 
-                             ui.birthDate = '$birthDate', ui.birthPlace = '$birthPlace', 
-                             ui.civilStatus = '$civilStatus', ui.citizenship = '$citizenship', 
-                             ui.occupation = '$occupation', ui.residencyType = '$residencyType', 
-                             ui.lengthOfStay = '$lengthOfStay'
-                         WHERE d.documentID = '$documentID'";
-  $updateUserInfoResult = executeQuery($updateUserInfoQuery);
-
-  $updateUserQuery = "UPDATE users u 
-                     JOIN documents d ON u.userID = d.userID 
-                     SET u.phoneNumber = '$phoneNumber', u.email = '$email'
-                     WHERE d.documentID = '$documentID'";
-  $updateUserResult = executeQuery($updateUserQuery);
-
-  $updateAddressQuery = "UPDATE addresses a 
-                        JOIN userinfo ui ON a.userInfoID = ui.userInfoID
-                        JOIN users u ON ui.userID = u.userID
-                        JOIN documents d ON u.userID = d.userID
-                        SET a.blockLotNo = '$blockLotNo', 
-                            a.streetName = '$streetName', 
-                            a.barangayName = '$barangayName', 
-                            a.cityName = '$cityName', 
-                            a.provinceName = '$provinceName', 
-                            a.phase = '$phase', 
-                            a.subdivisionName = '$subdivisionName', 
-                            a.purok = '$purok'
-                        WHERE d.documentID = '$documentID'";
-  $updateAddressResult = executeQuery($updateAddressQuery);
-
-  $_SESSION['success_message'] = "Document information updated successfully!";
-  header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $documentID);
-  exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_status'])) {
-  $newStatus = $_POST['new_status'];
-
-  if ($newStatus === 'Approved') {
-      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', approvalDate = NOW(), cancelledDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
-  } elseif ($newStatus === 'Cancelled') {
-      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', cancelledDate = NOW(), approvalDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
-  } elseif ($newStatus === 'Denied') {
-      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', deniedDate = NOW(), approvalDate = NULL, cancelledDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
-  } elseif ($newStatus === 'Archived') {
-      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', archiveDate = NOW(), approvalDate = NULL, cancelledDate = NULL, deniedDate = NULL WHERE documentID = '$documentID'";
-  } else {
-    $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', approvalDate = NULL, cancelledDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
-  }
-
-  $updateResult = executeQuery($updateQuery);
-
-  $_SESSION['success_message'] = "Status updated successfully!";
-  header("Location: ../index.php?page=document");
-  exit();
-}
-
 $documentQuery = "SELECT 
     d.documentID, 
     d.purpose, 
@@ -181,6 +89,76 @@ $documentTypes = [];
 while ($row = mysqli_fetch_assoc($documentTypesResult)) {
   $documentTypes[] = $row;
 }
+
+if (isset($_POST['update_document'])) {
+  $purpose = $_POST['purpose'] ?? '';
+  $businessName = $_POST['businessName'] ?? '';
+  $businessAddress = $_POST['businessAddress'] ?? '';
+  $businessNature = $_POST['businessNature'] ?? '';
+  $controlNo = $_POST['controlNo'] ?? '';
+  $ownership = $_POST['ownership'] ?? '';
+  $educationStatus = $_POST['educationStatus'] ?? '';
+  $spouseName = $_POST['spouseName'] ?? '';
+  $marriageYear = $_POST['marriageYear'] ?? '';
+  $childNo = $_POST['childNo'] ?? '';
+  $soloParentSinceDate = $_POST['soloParentSinceDate'] ?? '';
+
+  // 4, 6 Wala 
+
+  if ($documentTypeID == 2) {
+      $editRequestQuery = "UPDATE documents SET purpose = '$purpose', businessName = '$businessName', businessAddress = '$businessAddress', businessNature = '$businessNature', controlNo = $controlNo, ownership = '$ownership' WHERE documentID = $documentID";
+  } elseif ($documentTypeID == 1 || $documentTypeID == 3|| $documentTypeID == 5 || $documentTypeID == 8) {
+      $editRequestQuery = "UPDATE documents SET purpose = '$purpose' WHERE documentID = '$documentID'";
+  } elseif ($documentTypeID == 7) {
+      $editRequestQuery = "UPDATE documents SET spouseName = '$spouseName', marriageYear = $marriageYear WHERE documentID = $documentID";
+  } elseif ($documentTypeID == 9) {
+      $editRequestQuery = "UPDATE documents SET childNo = $childNo, soloParentSinceDate = '$soloParentSinceDate' WHERE documentID =$documentID";
+  } else {
+      die("Invalid document type ID: " . $documentTypeID);
+  }
+
+  $editRequestResult = executeQuery($editRequestQuery);
+    
+  header("Location: viewDocument.php?id=$documentID");
+  exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_document'])) {
+  $purpose = $_POST['purpose'];
+  $documentTypeID = $_POST['documentTypeID'];
+
+  $updateDocQuery = "UPDATE documents 
+                     SET purpose = '$purpose', documentTypeID = '$documentTypeID' 
+                     WHERE documentID = '$documentID'";
+  $updateDocResult = executeQuery($updateDocQuery);
+
+  $_SESSION['success_message'] = "Document information updated successfully!";
+  header("Location: viewDocument.php?id=$documentID");
+  exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_status'])) {
+  $newStatus = $_POST['new_status'];
+
+  if ($newStatus === 'Approved') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', approvalDate = NOW(), cancelledDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  } elseif ($newStatus === 'Cancelled') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', cancelledDate = NOW(), approvalDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  } elseif ($newStatus === 'Denied') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', deniedDate = NOW(), approvalDate = NULL, cancelledDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  } elseif ($newStatus === 'Archived') {
+      $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', archiveDate = NOW(), approvalDate = NULL, cancelledDate = NULL, deniedDate = NULL WHERE documentID = '$documentID'";
+  } else {
+    $updateQuery = "UPDATE documents SET documentStatus = '$newStatus', approvalDate = NULL, cancelledDate = NULL, deniedDate = NULL, archiveDate = NULL WHERE documentID = '$documentID'";
+  }
+
+  $updateResult = executeQuery($updateQuery);
+
+  $_SESSION['success_message'] = "Status updated successfully!";
+  header("Location: ../index.php?page=document");
+  exit();
+}
+
 ?>
 
 
@@ -245,6 +223,12 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
     .editing .view-mode {
       display: none;
     }
+
+    .form-control:focus, .form-select:focus, .form-check-input:focus {
+      border: 1px solid #19AFA5;
+      outline: none;
+      box-shadow: none;
+    }
   </style>
 </head>
 
@@ -279,9 +263,11 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                   <h5 class="card-title mb-0" style="color: black;">
                     <i class="fas fa-info-circle me-2"></i>Document Information
                   </h5>
-                  <button type="button" class="btn btn-primary btn-sm" id="editBtn">
-                    <i class="fas fa-edit me-2"></i>Edit
-                  </button>
+                  <?php if ($documentTypeID != 4 && $documentTypeID != 6) { ?>
+                    <button type="button" class="btn btn-primary btn-sm" id="editBtn">
+                      <i class="fas fa-edit me-2"></i>Edit
+                    </button>
+                  <?php } ?>
                 </div>
               </div>
               <div class="card-body" id="documentInfo">
@@ -580,7 +566,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                       <?php if ($documentTypeID == 2 || $documentTypeID == 7 || $documentTypeID == 9) { ?>
                         <div class="col-4">
                           <div class="info-row">
-                            <strong>Address:</strong>
+                            <strong>Current Address:</strong>
                             <div class="mt-1">
                               <?php
                               $addressParts = array_filter([
@@ -601,7 +587,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                       <?php } else { ?>
                         <div class="col-6">
                           <div class="info-row">
-                            <strong>Address:</strong>
+                            <strong>Current Address:</strong>
                             <div class="mt-1">
                               <?php
                               $addressParts = array_filter([
@@ -614,7 +600,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                 ucwords(strtolower($document['cityName'])),
                                 ucwords(strtolower($document['provinceName']))
                               ]);
-                              echo htmlspecialchars(implode(' ', $addressParts));
+                              echo htmlspecialchars(implode(', ', $addressParts));
                               ?>
                             </div>
                           </div>
@@ -638,7 +624,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                 ucwords(strtolower($document['permanentCityName'])),
                                 ucwords(strtolower($document['permanentProvinceName']))
                               ]);
-                              echo htmlspecialchars(implode(' ', $addressParts));
+                              echo htmlspecialchars(implode(', ', $addressParts));
                               ?>
                             </div>
                           </div>
@@ -659,7 +645,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                 ucwords(strtolower($document['permanentCityName'])),
                                 ucwords(strtolower($document['permanentProvinceName']))
                               ]);
-                              echo htmlspecialchars(implode(' ', $addressParts));
+                              echo htmlspecialchars(implode(', ', $addressParts));
                               ?>
                             </div>
                           </div>
@@ -959,7 +945,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                   ucwords(strtolower($document['cityName'])),
                                   ucwords(strtolower($document['provinceName']))
                                 ]);
-                                echo htmlspecialchars(implode(' ', $addressParts));
+                                echo htmlspecialchars(implode(', ', $addressParts));
                                 ?>
                               </div>
                             </div>
@@ -980,7 +966,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                   ucwords(strtolower($document['cityName'])),
                                   ucwords(strtolower($document['provinceName']))
                                 ]);
-                                echo htmlspecialchars(implode(' ', $addressParts));
+                                echo htmlspecialchars(implode(', ', $addressParts));
                                 ?>
                               </div>
                             </div>
@@ -1004,7 +990,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                   ucwords(strtolower($document['permanentCityName'])),
                                   ucwords(strtolower($document['permanentProvinceName']))
                                 ]);
-                                echo htmlspecialchars(implode(' ', $addressParts));
+                                echo htmlspecialchars(implode(', ', $addressParts));
                                 ?>
                               </div>
                             </div>
@@ -1025,7 +1011,7 @@ while ($row = mysqli_fetch_assoc($documentTypesResult)) {
                                   ucwords(strtolower($document['permanentCityName'])),
                                   ucwords(strtolower($document['permanentProvinceName']))
                                 ]);
-                                echo htmlspecialchars(implode(' ', $addressParts));
+                                echo htmlspecialchars(implode(', ', $addressParts));
                                 ?>
                               </div>
                             </div>
