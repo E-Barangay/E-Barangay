@@ -4,6 +4,13 @@ include("sharedAssets/connect.php");
 
 session_start();
 
+
+/* IF LOGGED IN AS ADMIN → SEND TO ADMIN */
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+    header("Location: /E-Barangay/admin/index.php");
+    exit();
+}
+
 $newAnnouncementQuery = "SELECT * FROM announcements WHERE dateTime >= NOW() - INTERVAL 7 DAY ORDER BY dateTime DESC";
 $newAnnouncementResult = executeQuery($newAnnouncementQuery);
 
@@ -33,7 +40,8 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
     <link rel="icon" href="assets/images/logoSanAntonio.png">
 
     <!-- Style Sheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="assets/css/navbar/style.css">
     <link rel="stylesheet" href="assets/css/index/style.css">
@@ -51,13 +59,15 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
         include("sharedAssets/navbar.php");
     }
     ?>
-        
+
     <div class="container-fluid p-0 pt-3 overflow-hidden">
         <div class="row m-0">
             <div class="col p-0">
 
                 <?php if (isset($_SESSION['success']) && $_SESSION['success'] === 'passwordResetted'): ?>
-                    <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your password has been reset successfully!</div>
+                    <div class="alert alert-success text-center mb-4" style="font-size: 14px; line-height: 1.4;"><i
+                            class="fa-solid fa-circle-check" style="margin-right:8px;"></i>Your password has been reset
+                        successfully!</div>
                     <?php unset($_SESSION['success']); ?>
                 <?php endif; ?>
 
@@ -109,9 +119,9 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
 
             <?php } else { ?>
 
-                <?php while($newAnnouncementRow = mysqli_fetch_assoc($newAnnouncementResult)) { ?>
-                    
-                    <?php if(!empty($newAnnouncementRow['image'])) { ?>
+                <?php while ($newAnnouncementRow = mysqli_fetch_assoc($newAnnouncementResult)) { ?>
+
+                    <?php if (!empty($newAnnouncementRow['image'])) { ?>
 
                         <div class="col-lg-4 col-md-6 col-12 pb-4">
                             <div class="card newCard">
@@ -120,13 +130,15 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                                         <img src="assets/images/logoSanAntonio.png" class="logo" alt="Logo">
                                         <div class="d-flex flex-column justify-content-center ps-2">
                                             <span class="barangay">Barangay San Antonio</span>
-                                            <span class="date"><?php echo date("F d, Y", strtotime($newAnnouncementRow['dateTime'])); ?></span>
+                                            <span
+                                                class="date"><?php echo date("F d, Y", strtotime($newAnnouncementRow['dateTime'])); ?></span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col">
-                                        <img src="assets/images/announcements/<?php echo $newAnnouncementRow['image']; ?>" class="newAnnouncementImage" alt="New Announcement Image">
+                                        <img src="assets/images/announcements/<?php echo $newAnnouncementRow['image']; ?>"
+                                            class="newAnnouncementImage" alt="New Announcement Image">
                                     </div>
                                 </div>
                                 <div class="row">
@@ -143,7 +155,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                                 </div>
                             </div>
                         </div>
-                    
+
                     <?php } else { ?>
 
                         <div class="col-lg-4 col-md-6 col-12 pb-4">
@@ -153,7 +165,8 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                                         <img src="assets/images/logoSanAntonio.png" class="logo" alt="Logo">
                                         <div class="d-flex flex-column justify-content-center ps-2">
                                             <span class="barangay">Barangay San Antonio</span>
-                                            <span class="date"><?php echo date("F d, Y", strtotime($newAnnouncementRow['dateTime'])); ?></span>
+                                            <span
+                                                class="date"><?php echo date("F d, Y", strtotime($newAnnouncementRow['dateTime'])); ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -178,7 +191,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
 
             <?php } ?>
 
-            
+
         </div>
 
         <div class="row">
@@ -190,16 +203,17 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
         </div>
 
         <div class="row gy-4 recentsRow">
-            
-            <?php while($recentAnnouncementRow = mysqli_fetch_assoc($recentAnnouncementResult)) { ?>
 
-                <?php if(!empty($recentAnnouncementRow['image'])) { ?>
+            <?php while ($recentAnnouncementRow = mysqli_fetch_assoc($recentAnnouncementResult)) { ?>
+
+                <?php if (!empty($recentAnnouncementRow['image'])) { ?>
 
                     <div class="col-lg-4 col-md-6 col-12">
                         <div class="card recentCard">
                             <div class="row">
                                 <div class="col">
-                                    <img src="assets/images/announcements/<?php echo $recentAnnouncementRow['image'] ?>" class="recentAnnouncementImage" alt="Recent Announcement Image">
+                                    <img src="assets/images/announcements/<?php echo $recentAnnouncementRow['image'] ?>"
+                                        class="recentAnnouncementImage" alt="Recent Announcement Image">
                                 </div>
                             </div>
                             <div class="row px-3 pt-3">
@@ -221,19 +235,24 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                             <div class="row px-3 pb-3">
                                 <div class="col">
                                     <input type="hidden" value="<?php echo $recentAnnouncementRow['announcementID']; ?>">
-                                    <button class="btn btn-primary viewDetailsButton" type="button" data-bs-toggle="modal" data-bs-target="#<?php echo $recentAnnouncementRow['announcementID']; ?>">View More Details</button>
+                                    <button class="btn btn-primary viewDetailsButton" type="button" data-bs-toggle="modal"
+                                        data-bs-target="#<?php echo $recentAnnouncementRow['announcementID']; ?>">View More
+                                        Details</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal fade" id="<?php echo $recentAnnouncementRow['announcementID']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="<?php echo $recentAnnouncementRow['announcementID']; ?>"
+                        data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="postModalLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-centered">
                             <div class="modal-content">
-                                <div class="modal-body p-0"> 
+                                <div class="modal-body p-0">
                                     <div class="row g-0">
                                         <div class="col-lg-7 col-12 d-flex align-items-center justify-content-center">
-                                            <img src="assets/images/announcements/<?php echo $recentAnnouncementRow['image'] ?>" class="modalRecentAnnouncementImage" alt="Recent Announcement Image">
+                                            <img src="assets/images/announcements/<?php echo $recentAnnouncementRow['image'] ?>"
+                                                class="modalRecentAnnouncementImage" alt="Recent Announcement Image">
                                         </div>
                                         <div class="col-lg-5 col-12 d-flex flex-column">
                                             <div class="row px-3 pt-3">
@@ -245,17 +264,20 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                                                             <?php echo date("F d, Y", strtotime($recentAnnouncementRow['dateTime'])); ?>
                                                         </span>
                                                     </div>
-                                                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
                                                 </div>
                                             </div>
                                             <div class="row px-3 py-3">
                                                 <div class="col">
-                                                    <span class="modalTitle"><?php echo $recentAnnouncementRow['title'] ?></span>
+                                                    <span
+                                                        class="modalTitle"><?php echo $recentAnnouncementRow['title'] ?></span>
                                                 </div>
                                             </div>
                                             <div class="row px-3 pb-3">
                                                 <div class="col">
-                                                    <span class="modalDescription"><?php echo $recentAnnouncementRow['description'] ?></span>
+                                                    <span
+                                                        class="modalDescription"><?php echo $recentAnnouncementRow['description'] ?></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -288,16 +310,20 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                             <div class="row px-3 pb-3 mt-auto">
                                 <div class="col">
                                     <input type="hidden" value="<?php echo $recentAnnouncementRow['announcementID']; ?>">
-                                    <button class="btn btn-primary viewDetailsButton" type="button" data-bs-toggle="modal" data-bs-target="#<?php echo $recentAnnouncementRow['announcementID']; ?>">View More Details</button>
+                                    <button class="btn btn-primary viewDetailsButton" type="button" data-bs-toggle="modal"
+                                        data-bs-target="#<?php echo $recentAnnouncementRow['announcementID']; ?>">View More
+                                        Details</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="modal fade" id="<?php echo $recentAnnouncementRow['announcementID']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="<?php echo $recentAnnouncementRow['announcementID']; ?>"
+                        data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="postModalLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
-                                <div class="modal-body p-0"> 
+                                <div class="modal-body p-0">
                                     <div class="row g-0">
                                         <div class="col d-flex flex-column">
                                             <div class="row px-3 pt-3">
@@ -309,17 +335,20 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
                                                             <?php echo date("F d, Y", strtotime($recentAnnouncementRow['dateTime'])); ?>
                                                         </span>
                                                     </div>
-                                                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
                                                 </div>
                                             </div>
                                             <div class="row px-3 py-3">
                                                 <div class="col">
-                                                    <span class="modalTitle"><?php echo $recentAnnouncementRow['title'] ?></span>
+                                                    <span
+                                                        class="modalTitle"><?php echo $recentAnnouncementRow['title'] ?></span>
                                                 </div>
                                             </div>
                                             <div class="row px-3 pb-3">
                                                 <div class="col">
-                                                    <span class="modalDescription"><?php echo $recentAnnouncementRow['description'] ?></span>
+                                                    <span
+                                                        class="modalDescription"><?php echo $recentAnnouncementRow['description'] ?></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -334,7 +363,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
             <?php } ?>
 
         </div>
-        
+
         <?php if ($totalPages > 1): ?>
 
             <div class="row">
@@ -368,7 +397,7 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
             </div>
 
         <?php endif; ?>
-        
+
     </div>
 
     <?php include("sharedAssets/footer.php") ?>
@@ -447,7 +476,9 @@ $totalPages = ceil($totalRecent / $cardsPerPage);
 
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+        crossorigin="anonymous"></script>
 
     <script src="assets/js/loadingIndicator/script.js"></script>
 
