@@ -134,7 +134,7 @@ if (isset($_POST['yes'])) {
     } elseif ($documentTypeID == 7) {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, spouseName, marriageYear, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', '$spouseName', $marriageYear, NOW(), NULL, NULL, NULL, NULL)";
     } elseif ($documentTypeID == 9) {
-        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, $childNo, $soloParentSinceDate, NOW(), NULL, NULL, NULL, NULL)";
+        $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, childNo, soloParentSinceDate, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', $childNo, $soloParentSinceDate, NOW(), NULL, NULL, NULL, NULL)";
     } else {
         $documentRequestQuery = "INSERT INTO documents (documentTypeID, userID, purpose, requestDate, approvalDate, cancelledDate, deniedDate, archiveDate) VALUES ($documentTypeID, $userID, 'General Request', NOW(), NULL, NULL, NULL, NULL)";
     }
