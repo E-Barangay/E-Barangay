@@ -1013,7 +1013,7 @@ if (isset($_POST['confirmButton'])) {
 
                             <div class="col-12 mb-3">
                                 <div class="addressInfo">
-                                    Address
+                                    Current Address
                                 </div>
                             </div>
 

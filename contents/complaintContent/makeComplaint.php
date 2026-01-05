@@ -316,7 +316,7 @@ if (isset($_POST['submit'])) {
 
                 <!-- Submit buttons -->
                 <div class="d-flex justify-content-center justify-content-md-end mt-4 gap-2">
-                    <a href="complaints.php?page=complaintSection.php" class="btn filterButton">Cancel</a>
+                    <a href="complaints.php?page=complaintSection.php" class="btn btn-secondary">Cancel</a>
 
                     <button type="button" class="btn filterButton" id="submitBtn">
                         Submit
@@ -338,7 +338,7 @@ if (isset($_POST['submit'])) {
                                 Are you sure you want to submit?
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn filterButton" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn filterButton" name="submit">Confirm</button>
                             </div>
                         </div>

@@ -63,12 +63,12 @@
             <div class="col-12 col-lg-3 text-center text-lg-start py-4">
                 <div class="h5 mb-3" style="color:#19AFA5;">Contacts</div>
                 <ul class="nav flex-column">
-                    <li class="footer-item mb-3"><a href="https://www.facebook.com/share/17jdW3fgcA/?mibextid=wwXIfr"
+                    <li class="footer-item mb-3"><a href="https://www.facebook.com/share/17jdW3fgcA/?mibextid=wwXIfr" target="_blank"
                             class="footer-link p-0"><i class="fa-brands fa-facebook"
                                 style="font-size: 20px; vertical-align: middle;"></i> Barangay San Antonio</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-envelope"
+                    <li class="footer-item mb-3"><a href="mailto:sanantonioputol@gmail.com" target="_blank" class="footer-link p-0"><i class="fa-solid fa-envelope"
                                 style="font-size: 20px; vertical-align: middle;"></i> sanantonioputol@gmail.com</a></li>
-                    <li class="footer-item mb-3"><a href="#" class="footer-link p-0"><i class="fa-solid fa-phone"
+                    <li class="footer-item mb-3"><a href="tel:+63437843812" target="_blank" class="footer-link p-0"><i class="fa-solid fa-phone"
                                 style="font-size: 20px; vertical-align: middle;"></i> (043) 784-3812</a></li>
                 </ul>
             </div>
