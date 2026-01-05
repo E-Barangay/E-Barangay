@@ -9,7 +9,12 @@ if (!$conn) {
   die("Database connection error: " . mysqli_connect_error());
 }
 
-// Rest of your code...
+if (isset($_GET['error']) && $_GET['error'] === 'email_exists') {
+  echo "<script>
+        alert('Error: This email address is already being used by another resident.');
+    </script>";
+}
+
 
 
 // ============================================
@@ -20,7 +25,7 @@ if (!$conn) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   $userID = intval($_POST['userID']);
 
-  // Escape all input values to prevent SQL injection and allow special characters
+  // Escape all input values
   $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
   $middleName = mysqli_real_escape_string($conn, $_POST['middleName']);
   $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
@@ -35,7 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   $citizenship = mysqli_real_escape_string($conn, $_POST['citizenship']);
   $occupation = mysqli_real_escape_string($conn, $_POST['occupation']);
 
-  // ADD THIS SECTION - Educational fields handling
+  // ============================================
+  // NEW: Email Validation - Check for duplicates
+  // ============================================
+  $emailCheckQuery = "SELECT userID FROM users WHERE email = '$email' AND userID != $userID";
+  $emailCheckResult = mysqli_query($conn, $emailCheckQuery);
+
+  if (mysqli_num_rows($emailCheckResult) > 0) {
+    header("Location: viewResident.php?userID=$userID&error=email_exists");
+    exit;
+  }
+
+  // ============================================
+
+  // Educational fields handling
   $educationalLevel = NULL;
   $shsTrack = NULL;
   $collegeCourse = NULL;
@@ -48,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
     $levelLower = strtolower($educationalLevel);
 
     if (strpos($levelLower, 'senior high') !== false) {
-      // Check if user selected "Others" option
       if (isset($_POST['shsTrack']) && $_POST['shsTrack'] === 'Others') {
         $shsTrack = isset($_POST['shsTrackOther']) && !empty($_POST['shsTrackOther'])
           ? mysqli_real_escape_string($conn, $_POST['shsTrackOther'])
@@ -70,16 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
       }
     }
   }
+
   $residencyType = mysqli_real_escape_string($conn, $_POST['residencyType']);
   $isVoter = mysqli_real_escape_string($conn, $_POST['isVoter']);
   $isOSY = mysqli_real_escape_string($conn, $_POST['isOSY']);
   $remarks = mysqli_real_escape_string($conn, $_POST['remarks']);
-
-  // NEW: Add blood type and length of stay
   $bloodType = mysqli_real_escape_string($conn, $_POST['bloodType']);
   $lengthOfStay = mysqli_real_escape_string($conn, $_POST['lengthOfStay']);
 
-  // Escape address fields (this allows commas and special characters)
+  // Escape address fields
   $presentBlockLotNo = mysqli_real_escape_string($conn, $_POST['presentBlockLotNo']);
   $presentStreetName = mysqli_real_escape_string($conn, $_POST['presentStreetName']);
   $presentPhase = mysqli_real_escape_string($conn, $_POST['presentPhase']);
@@ -101,36 +117,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveUser'])) {
   // Update user table
   mysqli_query($conn, "UPDATE users SET phoneNumber='$phoneNumber', email='$email' WHERE userID=$userID");
 
-  // FIXED: Update userInfo table - NOW INCLUDES bloodType and lengthOfStay
-  // FIXED: Update userInfo table - NOW INCLUDES bloodType, lengthOfStay, AND educational fields
+  // Update userInfo table
   mysqli_query($conn, "UPDATE userinfo SET 
-  firstName='$firstName', 
-  middleName='$middleName', 
-  lastName='$lastName', 
-  suffix='$suffix', 
-  gender='$gender', 
-  age='$age', 
-  birthDate='$birthDate', 
-  birthPlace='$birthPlace', 
-  bloodType='$bloodType',
-  civilStatus='$civilStatus', 
-  citizenship='$citizenship', 
-  occupation='$occupation', 
-  lengthOfStay='$lengthOfStay',
-  educationalLevel = " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
-  shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
-  collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
-  isVoter='$isVoter', 
-  remarks='$remarks', 
-  residencyType='$residencyType', 
-  isOSY='$isOSY'
-WHERE userID=$userID");
+    firstName='$firstName', 
+    middleName='$middleName', 
+    lastName='$lastName', 
+    suffix='$suffix', 
+    gender='$gender', 
+    age='$age', 
+    birthDate='$birthDate', 
+    birthPlace='$birthPlace', 
+    bloodType='$bloodType',
+    civilStatus='$civilStatus', 
+    citizenship='$citizenship', 
+    occupation='$occupation', 
+    lengthOfStay='$lengthOfStay',
+    educationalLevel = " . ($educationalLevel !== NULL ? "'$educationalLevel'" : "NULL") . ",
+    shsTrack = " . ($shsTrack !== NULL ? "'$shsTrack'" : "NULL") . ",
+    collegeCourse = " . ($collegeCourse !== NULL ? "'$collegeCourse'" : "NULL") . ",
+    isVoter='$isVoter', 
+    remarks='$remarks', 
+    residencyType='$residencyType', 
+    isOSY='$isOSY'
+  WHERE userID=$userID");
 
   $getInfo = mysqli_query($conn, "SELECT userInfoID FROM userinfo WHERE userID = $userID");
   $row = mysqli_fetch_assoc($getInfo);
   $userInfoID = $row['userInfoID'];
 
-  // Update Present Address (commas now work!)
+  // Update Present Address
   mysqli_query($conn, "UPDATE addresses SET 
     blockLotNo='$presentBlockLotNo', 
     streetName='$presentStreetName', 
@@ -147,24 +162,25 @@ WHERE userID=$userID");
 
   // Update Permanent Address
   mysqli_query($conn, "UPDATE permanentaddresses SET
-  permanentBlockLotNo=" . ($citizenship === 'FILIPINO' ? "'$permanentBlockLotNo'" : "NULL") . ",
-  permanentStreetName=" . ($citizenship === 'FILIPINO' ? "'$permanentStreetName'" : "NULL") . ",
-  permanentPhase=" . ($citizenship === 'FILIPINO' ? "'$permanentPhase'" : "NULL") . ",
-  permanentSubdivisionName=" . ($citizenship === 'FILIPINO' ? "'$permanentSubdivision'" : "NULL") . ",
-  permanentBarangayName=" . ($citizenship === 'FILIPINO' ? "'$permanentBarangay'" : "NULL") . ",
-  permanentCityName=" . ($citizenship === 'FILIPINO' ? "'$permanentCity'" : "NULL") . ",
-  permanentProvinceName=" . ($citizenship === 'FILIPINO' ? "'$permanentProvince'" : "NULL") . ",
-  permanentPurok=" . ($citizenship === 'FILIPINO' ? "'$permanentPurok'" : "NULL") . ",
-  foreignPermanentAddress=" . ($citizenship !== 'FILIPINO' ? "'$foreignPermanentAddress'" : "NULL") . "
-WHERE userInfoID = $userInfoID");
+    permanentBlockLotNo=" . ($citizenship === 'FILIPINO' ? "'$permanentBlockLotNo'" : "NULL") . ",
+    permanentStreetName=" . ($citizenship === 'FILIPINO' ? "'$permanentStreetName'" : "NULL") . ",
+    permanentPhase=" . ($citizenship === 'FILIPINO' ? "'$permanentPhase'" : "NULL") . ",
+    permanentSubdivisionName=" . ($citizenship === 'FILIPINO' ? "'$permanentSubdivision'" : "NULL") . ",
+    permanentBarangayName=" . ($citizenship === 'FILIPINO' ? "'$permanentBarangay'" : "NULL") . ",
+    permanentCityName=" . ($citizenship === 'FILIPINO' ? "'$permanentCity'" : "NULL") . ",
+    permanentProvinceName=" . ($citizenship === 'FILIPINO' ? "'$permanentProvince'" : "NULL") . ",
+    permanentPurok=" . ($citizenship === 'FILIPINO' ? "'$permanentPurok'" : "NULL") . ",
+    foreignPermanentAddress=" . ($citizenship !== 'FILIPINO' ? "'$foreignPermanentAddress'" : "NULL") . "
+  WHERE userInfoID = $userInfoID");
 
+  // Handle profile picture upload
   if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] === UPLOAD_ERR_OK) {
     $uploadProfilePicture = $_FILES['profilePicture']['name'];
     $targetPath = "../../uploads/profiles/" . basename($uploadProfilePicture);
 
     if (move_uploaded_file($_FILES['profilePicture']['tmp_name'], $targetPath)) {
       $profileUpdateQuery = "UPDATE userinfo SET profilePicture = '$uploadProfilePicture' WHERE userInfoID = $userInfoID";
-      $profileUpdateResult = executeQuery($profileUpdateQuery);
+      mysqli_query($conn, $profileUpdateQuery);
     }
   }
 
@@ -271,7 +287,9 @@ if (isset($_POST['confirmButton'])) {
       border-color: #11A1A1;
     }
 
-    .form-control:focus, .form-select:focus, .form-check-input:focus {
+    .form-control:focus,
+    .form-select:focus,
+    .form-check-input:focus {
       border: 1px solid #19AFA5;
       outline: none;
       box-shadow: none;
@@ -659,7 +677,8 @@ if (isset($_POST['confirmButton'])) {
                               <option value="" <?= empty($user['gender']) ? 'selected' : '' ?>>Choose Gender</option>
 
                               <option value="Male" <?= ($user['gender'] === 'Male') ? 'selected' : '' ?>>Male</option>
-                              <option value="Female" <?= ($user['gender'] === 'Female') ? 'selected' : '' ?>>Female</option>
+                              <option value="Female" <?= ($user['gender'] === 'Female') ? 'selected' : '' ?>>Female
+                              </option>
                               <option value="Other" <?= ($user['gender'] === 'Other') ? 'selected' : '' ?>>Other</option>
                             </select>
                           </div>
@@ -672,11 +691,14 @@ if (isset($_POST['confirmButton'])) {
                                 Status</option>
                               <option value="Single" <?= ($user['civilStatus'] === 'Single') ? 'selected' : ''; ?>>Single
                               </option>
-                              <option value="Married" <?= ($user['civilStatus'] === 'Married') ? 'selected' : ''; ?>>Married
+                              <option value="Married" <?= ($user['civilStatus'] === 'Married') ? 'selected' : ''; ?>>
+                                Married
                               </option>
-                              <option value="Divorced" <?= ($user['civilStatus'] === 'Divorced') ? 'selected' : ''; ?>>Divorced
+                              <option value="Divorced" <?= ($user['civilStatus'] === 'Divorced') ? 'selected' : ''; ?>>
+                                Divorced
                               </option>
-                              <option value="Widowed" <?= ($user['civilStatus'] === 'Widowed') ? 'selected' : ''; ?>>Widowed
+                              <option value="Widowed" <?= ($user['civilStatus'] === 'Widowed') ? 'selected' : ''; ?>>
+                                Widowed
                               </option>
                               <option value="Separated" <?= ($user['civilStatus'] === 'Separated') ? 'selected' : ''; ?>>
                                 Separated</option>
@@ -702,7 +724,7 @@ if (isset($_POST['confirmButton'])) {
                     </div>
                   </div>
                   <div class="row g-3" style="color: black;">
-                    
+
                     <div class="col-md-3 my-3 edit-mode d-none">
                       <div class="info-row">
                         <?php
@@ -933,14 +955,14 @@ if (isset($_POST['confirmButton'])) {
 
                         <div>
                           <div class="form-check form-check-inline mt-1">
-                            <input class="form-check-input" type="radio" name="isVoter" id="isVoterYes"
-                              value="Yes" <?= ($user['isVoter'] === 'Yes') ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="radio" name="isVoter" id="isVoterYes" value="Yes"
+                              <?= ($user['isVoter'] === 'Yes') ? 'checked' : '' ?>>
                             <label class="form-check-label" for="isVoterYes">Yes</label>
                           </div>
 
                           <div class="form-check form-check-inline mt-1">
-                            <input class="form-check-input" type="radio" name="isVoter" id="isVoterNo"
-                              value="No" <?= ($user['isVoter'] === 'No') ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="radio" name="isVoter" id="isVoterNo" value="No"
+                              <?= ($user['isVoter'] === 'No') ? 'checked' : '' ?>>
                             <label class="form-check-label" for="isVoterNo">No</label>
                           </div>
                         </div>
@@ -953,14 +975,14 @@ if (isset($_POST['confirmButton'])) {
 
                         <div>
                           <div class="form-check form-check-inline mt-1">
-                            <input class="form-check-input" type="radio" name="isOSY" id="isOSYYes"
-                              value="Yes" <?= ($user['isOSY'] === 'Yes') ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="radio" name="isOSY" id="isOSYYes" value="Yes"
+                              <?= ($user['isOSY'] === 'Yes') ? 'checked' : '' ?>>
                             <label class="form-check-label" for="isOSYYes">Yes</label>
                           </div>
 
                           <div class="form-check form-check-inline mt-1">
-                            <input class="form-check-input" type="radio" name="isOSY" id="isOSYNo"
-                              value="No" <?= ($user['isOSY'] === 'No') ? 'checked' : '' ?>>
+                            <input class="form-check-input" type="radio" name="isOSY" id="isOSYNo" value="No"
+                              <?= ($user['isOSY'] === 'No') ? 'checked' : '' ?>>
                             <label class="form-check-label" for="isOSYNo">No</label>
                           </div>
                         </div>
@@ -1072,19 +1094,18 @@ if (isset($_POST['confirmButton'])) {
                         </div>
                       </div>
                     </div>
-                    
+
                     <!-- CONTACT INFORMATION -->
                     <div class="col-12 mb-3 edit-mode d-none">
                       <div class="contactInfo">
-                          <div style="font-size: 16px; font-weight: bold;">Contact Information</div>
+                        <div style="font-size: 16px; font-weight: bold;">Contact Information</div>
                       </div>
                     </div>
 
                     <div class="col-md-5 mb-3 mt-0 edit-mode d-none">
                       <div class="info-row">
                         <label for="email" class="form-label"><strong>Email:</strong></label>
-                        <input class="form-control" type="email" id="email" name="email"
-                          value="<?= $user['email'] ?>">
+                        <input class="form-control" type="email" id="email" name="email" value="<?= $user['email'] ?>">
                       </div>
                     </div>
                     <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
@@ -1101,7 +1122,7 @@ if (isset($_POST['confirmButton'])) {
                     <!-- PRESENT ADDRESS -->
                     <div class="col-12 mb-3 edit-mode d-none">
                       <div class="addressInfo">
-                          <div style="font-size: 16px; font-weight: bold;">Current Address</div>
+                        <div style="font-size: 16px; font-weight: bold;">Current Address</div>
                       </div>
                     </div>
 
@@ -1171,12 +1192,13 @@ if (isset($_POST['confirmButton'])) {
                     <!-- PERMANENT ADDRESS -->
                     <div class="col-12 mb-3 edit-mode d-none">
                       <div class="permanentAddressInfo">
-                          <div style="font-size: 16px; font-weight: bold;">Permanent Address</div>
+                        <div style="font-size: 16px; font-weight: bold;">Permanent Address</div>
                       </div>
                     </div>
 
                     <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
-                      <label for="permanentBlockLotNo" class="form-label"><strong>House / Block & Lot No:</strong></label>
+                      <label for="permanentBlockLotNo" class="form-label"><strong>House / Block & Lot
+                          No:</strong></label>
                       <input type="text" class="form-control" id="permanentBlockLotNo" name="permanentBlockLotNo"
                         value="<?= $user['permanentBlockLotNo'] ?>">
                     </div>
@@ -1241,9 +1263,10 @@ if (isset($_POST['confirmButton'])) {
 
                     <!-- After permanentPurok field, add this: -->
                     <div class="col-12 edit-mode d-none" id="foreignAddressDiv" style="display: none;">
-                      <label for="foreignPermanentAddress" class="form-label"><strong>Foreign Permanent Address:</strong></label>
-                      <input type="text" class="form-control" id="foreignPermanentAddress" name="foreignPermanentAddress"
-                        id="foreignPermanentAddress"
+                      <label for="foreignPermanentAddress" class="form-label"><strong>Foreign Permanent
+                          Address:</strong></label>
+                      <input type="text" class="form-control" id="foreignPermanentAddress"
+                        name="foreignPermanentAddress" id="foreignPermanentAddress"
                         value="<?= htmlspecialchars($user['foreignPermanentAddress'] ?? '') ?>">
                     </div>
 
@@ -2149,6 +2172,210 @@ if (isset($_POST['confirmButton'])) {
         const originalEducationalLevel = educationalLevel ? educationalLevel.value : '';
         updateEducationalFields(originalEducationalLevel);
       });
+    }
+  });
+
+
+  function updateResidencyType() {
+    var ageInput = document.getElementById("ageHidden");
+    var lengthOfStayInput = document.getElementById("lengthOfStay");
+
+    var age = parseInt(ageInput ? ageInput.value : 0) || 0;
+    var lengthOfStay = parseInt(lengthOfStayInput ? lengthOfStayInput.value : 0) || 0;
+
+    var address = {
+      barangay: document.getElementById("barangay") ? document.getElementById("barangay").value : "",
+      city: document.getElementById("city") ? document.getElementById("city").value : "",
+      province: document.getElementById("province") ? document.getElementById("province").value : ""
+    };
+
+    var permanentAddress = {
+      barangay: document.getElementById("permanentBarangay") ? document.getElementById("permanentBarangay").value : "",
+      city: document.getElementById("permanentCity") ? document.getElementById("permanentCity").value : "",
+      province: document.getElementById("permanentProvince") ? document.getElementById("permanentProvince").value : ""
+    };
+
+    var citizenshipSelect = document.getElementById("citizenship");
+    var citizenship = citizenshipSelect ? (citizenshipSelect.value || "") : "";
+    citizenship = citizenship.toString().toUpperCase();
+
+    let residencyType = "";
+
+    // Condition: current + permanent must both match for Bonafide
+    var isSpecificBonafide =
+      address.province.toUpperCase() === "BATANGAS" &&
+      address.city.toUpperCase() === "SANTO TOMAS" &&
+      address.barangay.toUpperCase() === "SAN ANTONIO" &&
+      permanentAddress.province.toUpperCase() === "BATANGAS" &&
+      permanentAddress.city.toUpperCase() === "SANTO TOMAS" &&
+      permanentAddress.barangay.toUpperCase() === "SAN ANTONIO" &&
+      age === lengthOfStay;
+
+    // Condition: ONLY current address must match for Migrant/Transient
+    var isSpecificCurrentAddress =
+      address.province.toUpperCase() === "BATANGAS" &&
+      address.city.toUpperCase() === "SANTO TOMAS" &&
+      address.barangay.toUpperCase() === "SAN ANTONIO";
+
+    if (citizenship !== "FILIPINO") {
+      residencyType = "Foreign";
+    } else if (isSpecificBonafide) {
+      residencyType = "Bonafide";
+    } else if (lengthOfStay >= 3 && isSpecificCurrentAddress) {
+      residencyType = "Migrant";
+    } else if (lengthOfStay <= 2 && isSpecificCurrentAddress) {
+      residencyType = "Transient";
+    } else {
+      residencyType = "";
+    }
+
+    var residencyInput = document.getElementById("residencyType");
+    if (residencyInput) {
+      residencyInput.value = residencyType;
+    }
+  }
+
+  // Add event listeners for all fields that affect residency type
+  document.addEventListener('DOMContentLoaded', function () {
+    // Run once on load
+    updateResidencyType();
+
+    // Add listeners to relevant fields
+    const fieldsToWatch = [
+      "ageHidden", "lengthOfStay",
+      "barangay", "city", "province",
+      "permanentBarangay", "permanentCity", "permanentProvince",
+      "citizenship"
+    ];
+
+    fieldsToWatch.forEach(id => {
+      var elem = document.getElementById(id);
+      if (elem) {
+        elem.addEventListener("input", updateResidencyType);
+        elem.addEventListener("change", updateResidencyType);
+      }
+    });
+
+    // Also update when birthDate changes (since it affects age)
+    const birthDateField = document.getElementById('birthDate');
+    if (birthDateField) {
+      birthDateField.addEventListener('change', function () {
+        // Wait for age to be calculated first
+        setTimeout(updateResidencyType, 100);
+      });
+    }
+  });
+
+  // Call update when edit mode is activated
+  document.getElementById('editBtn').addEventListener('click', function () {
+    setTimeout(updateResidencyType, 200);
+  });
+
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const emailInput = document.getElementById('email');
+    const userID = <?= $user['userID'] ?>; // Get current user ID from PHP
+
+    if (emailInput) {
+      // Create feedback element
+      const feedbackDiv = document.createElement('div');
+      feedbackDiv.className = 'invalid-feedback d-block';
+      feedbackDiv.style.display = 'none';
+      emailInput.parentElement.appendChild(feedbackDiv);
+
+      // Store original email value to check if it changed
+      const originalEmail = emailInput.value.trim();
+
+      // Debounce function to avoid too many requests
+      let emailCheckTimeout;
+
+      emailInput.addEventListener('input', function () {
+        clearTimeout(emailCheckTimeout);
+        const email = this.value.trim();
+
+        // Reset validation state
+        this.classList.remove('is-invalid', 'is-valid');
+        feedbackDiv.style.display = 'none';
+        feedbackDiv.textContent = '';
+
+        // If email hasn't changed from original, skip validation
+        if (email === originalEmail) {
+          return;
+        }
+
+        // Basic email format validation
+        if (email === '') {
+          return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          this.classList.add('is-invalid');
+          feedbackDiv.textContent = 'Please enter a valid email address';
+          feedbackDiv.style.display = 'block';
+          return;
+        }
+
+        // Show loading state
+        feedbackDiv.textContent = 'Checking email...';
+        feedbackDiv.className = 'text-muted d-block small';
+        feedbackDiv.style.display = 'block';
+
+        // Check email availability after 500ms of no typing
+        emailCheckTimeout = setTimeout(() => {
+          fetch('check_email.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'email=' + encodeURIComponent(email) + '&userID=' + userID
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.exists) {
+                emailInput.classList.add('is-invalid');
+                feedbackDiv.className = 'invalid-feedback d-block';
+                feedbackDiv.textContent = 'This email address is already registered';
+                feedbackDiv.style.display = 'block';
+              } else {
+                emailInput.classList.add('is-valid');
+                feedbackDiv.className = 'valid-feedback d-block';
+                feedbackDiv.textContent = 'Email is available';
+                feedbackDiv.style.display = 'block';
+              }
+            })
+            .catch(error => {
+              console.error('Error checking email:', error);
+              feedbackDiv.className = 'text-danger d-block small';
+              feedbackDiv.textContent = 'Error checking email availability';
+              feedbackDiv.style.display = 'block';
+            });
+        }, 500);
+      });
+
+      // Prevent form submission if email exists
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          if (emailInput.classList.contains('is-invalid')) {
+            e.preventDefault();
+            emailInput.focus();
+            alert('Please use a different email address. This one is already registered.');
+            return false;
+          }
+        });
+      }
+
+      // Reset validation when canceling edit
+      const cancelBtn = document.getElementById('cancelEditBtn');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', function () {
+          emailInput.classList.remove('is-invalid', 'is-valid');
+          feedbackDiv.style.display = 'none';
+          emailInput.value = originalEmail; // Restore original email
+        });
+      }
     }
   });
 
