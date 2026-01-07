@@ -1851,6 +1851,7 @@ if (isset($_POST['confirmButton'])) {
     const foreignAddressInput = document.getElementById('foreignPermanentAddress');
 
     // Get all permanent address field containers (edit mode)
+    // FIXED: Added 'permanentPurok' to the list
     const phAddressFields = [
       'permanentBlockLotNo',
       'permanentPurok',
@@ -1958,7 +1959,7 @@ if (isset($_POST['confirmButton'])) {
     }
 
     // Hook into edit button to run toggle when entering edit mode
-    const editBtn = document.getElementById('editButton');
+    const editBtn = document.getElementById('editBtn');
     if (editBtn) {
       editBtn.addEventListener('click', function () {
         setTimeout(toggleForeignAddress, 100);
