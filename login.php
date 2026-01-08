@@ -457,28 +457,71 @@ if (isset($_POST['setPassword'])) {
 }
 
 if (isset($_POST['login'])) {
+
     $email = $_SESSION['email'];
     $password = $_POST['password'] ?? '';
-    $confirmPassword = $_POST['confirmPassword'] ?? '';
 
     $userCheckQuery = "SELECT * FROM users WHERE email = '$email'";
     $userCheckResult = executeQuery($userCheckQuery);
 
     if (mysqli_num_rows($userCheckResult) > 0) {
+
         $userRow = mysqli_fetch_assoc($userCheckResult);
 
-        if ($userRow['isNew'] === 'No') {
-            if (password_verify($password, $userRow['password'])) {
-                $_SESSION['userID'] = $userRow['userID'];
-                $_SESSION['role'] = $userRow['role'];
+        if (!empty($userRow['lockUntil'])) {
+            $now = new DateTime();
+            $lockUntil = new DateTime($userRow['lockUntil']);
 
-                if ($userRow['role'] === 'admin') {
-                    header("Location: admin/index.php");
-                } else {
-                    header("Location: index.php");
-                }
+            if ($now < $lockUntil) {
+                $_SESSION['alert'] = 'tooManyAttempts';
+                $_SESSION['lockUntil'] = $userRow['lockUntil'];
+                $loginStep = 'existingPassword';
+                return;
             } else {
+                $unlockQuery = "UPDATE users SET failedAttempts = 0, lockUntil = NULL WHERE email = '$email'";
+                $unlockResult = executeQuery($unlockQuery);
+
+                $userRow['failedAttempts'] = 0;
+            }
+        }
+
+        if (password_verify($password, $userRow['password'])) {
+
+            $unlockQuery = "UPDATE users SET failedAttempts = 0, lockUntil = NULL WHERE email = '$email'";
+            $unlockResult = executeQuery($unlockQuery);
+
+            $_SESSION['userID'] = $userRow['userID'];
+            $_SESSION['role'] = $userRow['role'];
+
+            if ($userRow['role'] === 'admin') {
+                header("Location: admin/index.php");
+            } else {
+                header("Location: index.php");
+            }
+            exit;
+
+        } else {
+
+            $attempts = ((int)$userRow['failedAttempts']) + 1;
+
+            if ($attempts >= 3) {
+
+                $lockUntil = date('Y-m-d H:i:s', time() + (5 * 60));
+
+                $lockQuery = "UPDATE users SET failedAttempts = $attempts, lockUntil = '$lockUntil' WHERE email = '$email'";
+                $lockResult = executeQuery($lockQuery);
+
+                $_SESSION['alert'] = 'tooManyAttempts';
+                $_SESSION['lockUntil'] = $lockUntil;
+                $loginStep = 'existingPassword';
+
+            } else {
+
+                $attemptsQuery = "UPDATE users SET failedAttempts = $attempts WHERE email = '$email'";
+                $attemptsResult = executeQuery($attemptsQuery);
+
                 $_SESSION['alert'] = 'invalidPassword';
+                $_SESSION['attemptsLeft'] = 3 - $attempts;
                 $loginStep = 'existingPassword';
             }
         }
@@ -584,11 +627,22 @@ if (isset($_POST['login'])) {
                                 <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Passwords do not match.</div>
                                 <?php unset($_SESSION['alert']); ?>
                             <?php endif; ?>
-                            <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidPassword'): ?>
-                                <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>Invalid Password.</div>
-                                <?php unset($_SESSION['alert']); ?>
+                            <?php if ($loginStep === 'existingPassword'): ?>
+                                <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'invalidPassword'): ?>
+                                    <div class="alert alert-danger" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>
+                                        Invalid Password. You have <strong><?php echo $_SESSION['attemptsLeft']; ?></strong> more attempt<?php echo $_SESSION['attemptsLeft'] == 1 ? '' : 's'; ?>. Please try again carefully.
+                                    </div>
+                                    <?php 
+                                        unset($_SESSION['alert']); 
+                                        unset($_SESSION['attemptsLeft']);
+                                    ?>
+                                <?php endif; ?>
+                                <?php if (isset($_SESSION['alert']) && $_SESSION['alert'] === 'tooManyAttempts'): ?>
+                                    <div class="alert alert-danger" id="lockAlert" style="font-size: 14px; line-height: 1.4;"><i class="fa-solid fa-lock" style="margin-right:8px;"></i> Too many failed login attempts. Please try again in <strong><span id="lockCountdown"></span></strong>. </div>
+                                    <?php unset($_SESSION['alert']); ?>
+                                <?php endif; ?>
                             <?php endif; ?>
-                        </div>
+                        </div> 
 
                         <?php if ($loginStep == "email") { ?>
 
@@ -762,6 +816,50 @@ if (isset($_POST['login'])) {
                 }
 
                 timeString += seconds + "s";
+                countdownElement.innerHTML = timeString;
+            }
+
+            updateCountdown();
+            var timer = setInterval(updateCountdown, 1000);
+        </script>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['lockUntil'])): ?>
+        <script>
+            var lockUntil = new Date("<?php echo $_SESSION['lockUntil']; ?>").getTime();
+            var countdownElement = document.getElementById('lockCountdown');
+            var alertBox = document.getElementById('lockAlert');
+            var loginButton = document.querySelector('.loginButton');
+
+            var now = new Date().getTime();
+            if (lockUntil - now > 0 && loginButton) loginButton.disabled = true;
+
+            function updateCountdown() {
+                var now = new Date().getTime();
+                var distance = lockUntil - now;
+
+                if (distance < 0) {
+                    clearInterval(timer);
+
+                    alertBox.classList.remove('alert-danger');
+                    alertBox.classList.add('alert-success');
+                    alertBox.innerHTML = `
+                        <i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>
+                        Login unlocked. You may now try again.
+                    `;
+                    loginButton.disabled = false;
+                    return;
+                }
+
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                var timeString = "";
+                if (minutes > 0) {
+                    timeString += minutes + "m ";
+                }
+                timeString += seconds + "s";
+
                 countdownElement.innerHTML = timeString;
             }
 
