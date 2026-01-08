@@ -509,7 +509,7 @@ if (isset($_POST['login'])) {
 
             $attempts = ((int)$userRow['failedAttempts']) + 1;
 
-            if ($attempts >= 3) {
+            if ($attempts >= 5) {
 
                 $lockUntil = date('Y-m-d H:i:s', time() + (5 * 60));
 
@@ -526,7 +526,7 @@ if (isset($_POST['login'])) {
                 $attemptsResult = executeQuery($attemptsQuery);
 
                 $_SESSION['alert'] = 'invalidPassword';
-                $_SESSION['attemptsLeft'] = 3 - $attempts;
+                $_SESSION['attemptsLeft'] = 5 - $attempts;
                 $loginStep = 'existingPassword';
             }
         }
