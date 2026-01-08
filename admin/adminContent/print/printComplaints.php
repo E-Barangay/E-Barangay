@@ -17,11 +17,13 @@ if (!valid_date($from))
 if (!valid_date($to))
   $to = null;
 
+// FIXED: Added complaintType to the query
 if ($from && $to) {
   $complaintsQuery = "
         SELECT 
             complaintID,
             complaintTitle,
+            complaintType,
             complaintStatus,
             DATE(requestDate) AS requestDate
         FROM complaints
@@ -33,6 +35,7 @@ if ($from && $to) {
         SELECT 
             complaintID,
             complaintTitle,
+            complaintType,
             complaintStatus,
             DATE(requestDate) AS requestDate
         FROM complaints
@@ -64,19 +67,21 @@ $dismissed = 0;
 $certified = 0;
 $referred = 0;
 
+// FIXED: Separate logic for complaintType and complaintStatus
 foreach ($complaintsData as $row) {
+  $type = strtolower(trim($row['complaintType'] ?? ''));
   $status = strtolower(trim($row['complaintStatus'] ?? ''));
 
-  if ($status === 'criminal') {
+  // Count by COMPLAINT TYPE (Nature of Dispute)
+  if (stripos($type, 'criminal') !== false) {
     $criminal++;
-  } elseif ($status === 'civil') {
+  } elseif (stripos($type, 'civil') !== false) {
     $civil++;
-  } elseif (in_array($status, ['mediation', 'conciliation', 'arbitration', 'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified', 'referred'])) {
-
   } else {
     $others++;
   }
 
+  // Count by COMPLAINT STATUS (Settled Cases)
   if ($status === 'mediation') {
     $mediation++;
   } elseif ($status === 'conciliation') {
@@ -85,6 +90,7 @@ foreach ($complaintsData as $row) {
     $arbitration++;
   }
 
+  // Count by COMPLAINT STATUS (Unsettled Cases)
   if ($status === 'repudiated') {
     $repudiated++;
   } elseif ($status === 'withdrawn') {
@@ -103,7 +109,7 @@ foreach ($complaintsData as $row) {
 $totalDispute = $criminal + $civil + $others;
 $settledTotal = $mediation + $conciliation + $arbitration;
 $unsettledTotal = $repudiated + $withdrawn + $pending + $dismissed + $certified + $referred;
-$estimatedSavings = $settledTotal * 15000;
+$estimatedSavings = $settledTotal * 0;
 ?>
 <!doctype html>
 <html lang="en">
@@ -224,19 +230,15 @@ $estimatedSavings = $settledTotal * 15000;
                 <th rowspan="3" style="width:80px; font-weight:bold;">PROVINCE<br>CITY<br>(1)</th>
                 <th rowspan="3" style="width:40px; font-weight:bold;">C/M</th>
 
-                <th colspan="4" class="wrap-center" style="background:#ffc7ce; font-weight:bold;">NATURE OF DISPUTE (2)
-                </th>
+                <th colspan="4" class="wrap-center" style="background:#ffc7ce; font-weight:bold;">NATURE OF DISPUTE (2)</th>
 
                 <th colspan="4" class="wrap-center" style="background:#bdd7ee; font-weight:bold;">SETTLED CASES (3)</th>
 
-                <th colspan="7" class="wrap-center" style="background:#e2efda; font-weight:bold;">UNSETTLED CASES (4)
-                </th>
+                <th colspan="5" class="wrap-center" style="background:#e2efda; font-weight:bold;">UNSETTLED CASES (4)</th>
 
-                <th rowspan="3" style="width:90px; background:#e2efda; font-weight:bold;">REFERRED
-                  TO<br>CONCERNED<br>AGENCY<br>(4g)</th>
+                <th rowspan="3" style="width:90px; background:#e2efda; font-weight:bold;">REFERRED TO<br>CONCERNED<br>AGENCY<br>(4f)</th>
                 <th rowspan="3" style="width:60px; background:#e2efda; font-weight:bold;">TOTAL<br>(4g)</th>
-                <th rowspan="3" style="width:110px; background:#e2efda; font-weight:bold;">ESTIMATED<br>GOVT<br>SAVINGS
-                </th>
+                <th rowspan="3" style="width:110px; background:#fff; font-weight:bold;">ESTIMATED<br>GOVT<br>SAVINGS</th>
               </tr>
 
               <tr>
@@ -255,8 +257,6 @@ $estimatedSavings = $settledTotal * 15000;
                 <th style="background:#e2efda; font-weight:bold;">PENDING<br>(4c)</th>
                 <th style="background:#e2efda; font-weight:bold;">DISMISSED<br>(4d)</th>
                 <th style="background:#e2efda; font-weight:bold;">CERTIFIED<br>(4e)</th>
-                <th style="background:#e2efda; font-weight:bold;">(4f)</th>
-                <th style="background:#e2efda; font-weight:bold;">(4g)</th>
               </tr>
 
               <tr>
@@ -270,8 +270,6 @@ $estimatedSavings = $settledTotal * 15000;
                 <th style="background:#bdd7ee;">&nbsp;</th>
                 <th style="background:#bdd7ee;">&nbsp;</th>
 
-                <th style="background:#e2efda;">&nbsp;</th>
-                <th style="background:#e2efda;">&nbsp;</th>
                 <th style="background:#e2efda;">&nbsp;</th>
                 <th style="background:#e2efda;">&nbsp;</th>
                 <th style="background:#e2efda;">&nbsp;</th>
@@ -300,16 +298,15 @@ $estimatedSavings = $settledTotal * 15000;
                 <td style="font-weight:bold;"><?php echo $pending; ?></td>
                 <td style="font-weight:bold;"><?php echo $dismissed; ?></td>
                 <td style="font-weight:bold;"><?php echo $certified; ?></td>
+
                 <td style="font-weight:bold;"><?php echo $referred; ?></td>
                 <td style="font-weight:bold;"><?php echo $unsettledTotal; ?></td>
-
-                <td style="font-weight:bold;">&nbsp;</td>
                 <td style="font-weight:bold;">₱<?php echo number_format($estimatedSavings, 2); ?></td>
               </tr>
 
               <?php for ($i = 0; $i < 7; $i++): ?>
                 <tr>
-                  <?php for ($c = 0; $c < 19; $c++): ?>
+                  <?php for ($c = 0; $c < 18; $c++): ?>
                     <td>&nbsp;</td>
                   <?php endfor; ?>
                 </tr>

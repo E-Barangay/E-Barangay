@@ -17,11 +17,13 @@ if (!valid_date($from))
 if (!valid_date($to))
   $to = null;
 
+// FIXED: Added complaintType to the query
 if ($from && $to) {
   $complaintsQuery = "
         SELECT 
             complaintID,
             complaintTitle,
+            complaintType,
             complaintStatus,
             DATE(requestDate) AS requestDate
         FROM complaints
@@ -33,6 +35,7 @@ if ($from && $to) {
         SELECT 
             complaintID,
             complaintTitle,
+            complaintType,
             complaintStatus,
             DATE(requestDate) AS requestDate
         FROM complaints
@@ -49,22 +52,36 @@ if ($complaintsResults) {
   }
 }
 
-$criminal = $civil = $others = 0;
-$mediation = $conciliation = $arbitration = 0;
-$repudiated = $withdrawn = $pending = $dismissed = $certified = $referred = 0;
+$criminal = 0;
+$civil = 0;
+$others = 0;
 
+$mediation = 0;
+$conciliation = 0;
+$arbitration = 0;
+
+$repudiated = 0;
+$withdrawn = 0;
+$pending = 0;
+$dismissed = 0;
+$certified = 0;
+$referred = 0;
+
+// FIXED: Separate logic for complaintType and complaintStatus
 foreach ($complaintsData as $row) {
+  $type = strtolower(trim($row['complaintType'] ?? ''));
   $status = strtolower(trim($row['complaintStatus'] ?? ''));
 
-  if ($status === 'criminal') {
+  // Count by COMPLAINT TYPE (Nature of Dispute)
+  if (stripos($type, 'criminal') !== false) {
     $criminal++;
-  } elseif ($status === 'civil') {
+  } elseif (stripos($type, 'civil') !== false) {
     $civil++;
-  } elseif (in_array($status, ['mediation', 'conciliation', 'arbitration', 'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified', 'referred'])) {
   } else {
     $others++;
   }
 
+  // Count by COMPLAINT STATUS (Settled Cases)
   if ($status === 'mediation') {
     $mediation++;
   } elseif ($status === 'conciliation') {
@@ -73,6 +90,7 @@ foreach ($complaintsData as $row) {
     $arbitration++;
   }
 
+  // Count by COMPLAINT STATUS (Unsettled Cases)
   if ($status === 'repudiated') {
     $repudiated++;
   } elseif ($status === 'withdrawn') {
@@ -220,28 +238,26 @@ echo '<?xml version="1.0"?>
    <Column ss:Width="80"/>
    <Column ss:Width="80"/>
    <Column ss:Width="80"/>
-   <Column ss:Width="60"/>
    <Column ss:Width="90"/>
-   <Column ss:Width="60"/>
    <Column ss:Width="110"/>
    
    <!-- Title Row 1 -->
    <Row ss:Height="18">
-    <Cell ss:MergeAcross="18" ss:StyleID="s69">
+    <Cell ss:MergeAcross="17" ss:StyleID="s69">
      <Data ss:Type="String">CONSOLIDATED KATARUNGANG PAMBARANGAY</Data>
     </Cell>
    </Row>
    
    <!-- Title Row 2 -->
    <Row ss:Height="18">
-    <Cell ss:MergeAcross="18" ss:StyleID="s69">
+    <Cell ss:MergeAcross="17" ss:StyleID="s69">
      <Data ss:Type="String">COMPLIANCE REPORT ON THE ACTION TAKEN BY THE LUPONG TAGAPAMAYAPA</Data>
     </Cell>
    </Row>
    
    <!-- Date Period Row -->
    <Row ss:Height="20">
-    <Cell ss:MergeAcross="18" ss:StyleID="s70">
+    <Cell ss:MergeAcross="17" ss:StyleID="s70">
      <Data ss:Type="String">';
 
 if ($from && $to) {
@@ -259,7 +275,7 @@ echo '</Data>
    
    <!-- Section Title -->
    <Row ss:Height="15">
-    <Cell ss:MergeAcross="18" ss:StyleID="s71">
+    <Cell ss:MergeAcross="17" ss:StyleID="s71">
      <Data ss:Type="String">CONSOLIDATED KATARUNGANG PAMBARANGAY</Data>
     </Cell>
    </Row>
@@ -273,10 +289,10 @@ echo '</Data>
     <Cell ss:MergeDown="2" ss:StyleID="s62"><Data ss:Type="String">C/M</Data></Cell>
     <Cell ss:MergeAcross="3" ss:StyleID="s63"><Data ss:Type="String">NATURE OF DISPUTE (2)</Data></Cell>
     <Cell ss:MergeAcross="3" ss:StyleID="s64"><Data ss:Type="String">SETTLED CASES (3)</Data></Cell>
-    <Cell ss:MergeAcross="6" ss:StyleID="s65"><Data ss:Type="String">UNSETTLED CASES (4)</Data></Cell>
-    <Cell ss:MergeDown="2" ss:StyleID="s62"><Data ss:Type="String">REFERRED&#10;TO&#10;CONCERNED&#10;AGENCY&#10;(4g)</Data></Cell>
-    <Cell ss:MergeDown="2" ss:StyleID="s62"><Data ss:Type="String">TOTAL&#10;(4g)</Data></Cell>
-    <Cell ss:MergeDown="2" ss:StyleID="s62"><Data ss:Type="String">ESTIMATED&#10;GOVT&#10;SAVINGS</Data></Cell>
+    <Cell ss:MergeAcross="4" ss:StyleID="s65"><Data ss:Type="String">UNSETTLED CASES (4)</Data></Cell>
+    <Cell ss:MergeDown="2" ss:StyleID="s65"><Data ss:Type="String">REFERRED TO CONCERNED AGENCY&#10;(4f)</Data></Cell>
+    <Cell ss:MergeDown="2" ss:StyleID="s65"><Data ss:Type="String">TOTAL&#10;(4g)</Data></Cell>
+    <Cell ss:MergeDown="2" ss:StyleID="s62"><Data ss:Type="String">ESTIMATED GOVT SAVINGS</Data></Cell>
    </Row>
    
    <!-- Header Row 2 -->
@@ -294,8 +310,6 @@ echo '</Data>
     <Cell ss:StyleID="s65"><Data ss:Type="String">PENDING&#10;(4c)</Data></Cell>
     <Cell ss:StyleID="s65"><Data ss:Type="String">DISMISSED&#10;(4d)</Data></Cell>
     <Cell ss:StyleID="s65"><Data ss:Type="String">CERTIFIED&#10;(4e)</Data></Cell>
-    <Cell ss:StyleID="s65"><Data ss:Type="String">(4f)</Data></Cell>
-    <Cell ss:StyleID="s65"><Data ss:Type="String">(4g)</Data></Cell>
    </Row>
    
    <!-- Header Row 3 (Empty cells with colors) -->
@@ -308,8 +322,6 @@ echo '</Data>
     <Cell ss:StyleID="s64"><Data ss:Type="String"></Data></Cell>
     <Cell ss:StyleID="s64"><Data ss:Type="String"></Data></Cell>
     <Cell ss:StyleID="s64"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="s65"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="s65"><Data ss:Type="String"></Data></Cell>
     <Cell ss:StyleID="s65"><Data ss:Type="String"></Data></Cell>
     <Cell ss:StyleID="s65"><Data ss:Type="String"></Data></Cell>
     <Cell ss:StyleID="s65"><Data ss:Type="String"></Data></Cell>
@@ -336,13 +348,12 @@ echo '</Data>
     <Cell ss:StyleID="s66"><Data ss:Type="Number">' . $certified . '</Data></Cell>
     <Cell ss:StyleID="s66"><Data ss:Type="Number">' . $referred . '</Data></Cell>
     <Cell ss:StyleID="s66"><Data ss:Type="Number">' . $unsettledTotal . '</Data></Cell>
-    <Cell ss:StyleID="s66"><Data ss:Type="String"></Data></Cell>
     <Cell ss:StyleID="s66"><Data ss:Type="String">₱' . number_format($estimatedSavings, 2) . '</Data></Cell>
    </Row>';
 
 for ($i = 0; $i < 7; $i++) {
   echo '<Row ss:Height="20">';
-  for ($c = 0; $c < 19; $c++) {
+  for ($c = 0; $c < 18; $c++) {
     echo '<Cell ss:StyleID="s68"><Data ss:Type="String"></Data></Cell>';
   }
   echo '</Row>';
