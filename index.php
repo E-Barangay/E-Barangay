@@ -4,10 +4,8 @@ include("sharedAssets/connect.php");
 
 session_start();
 
-
-/* IF LOGGED IN AS ADMIN → SEND TO ADMIN */
 if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
-    header("Location: /E-Barangay/admin/index.php");
+    header("Location: admin/index.php");
     exit();
 }
 

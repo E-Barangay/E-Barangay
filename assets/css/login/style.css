@@ -107,6 +107,15 @@ html {
     border: 1px solid #11A1A1;
 }
 
+.loginButton.disabled,
+.loginButton:disabled {
+    background-color: #19AFA5;
+    border-color: #19AFA5;
+    color: white;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .resetPasswordButton {
     font-size: 16px; 
     color: #19AFA5;
