@@ -9,7 +9,9 @@ include("sharedAssets/connect.php");
 session_start();
 
 if (!isset($_GET['token'])) {
-    unset($_SESSION['resetMode']);
+    if (!isset($_POST['next']) && !isset($_POST['verify']) && !isset($_POST['setPassword'])) {
+        unset($_SESSION['resetMode']);
+    }
 }
 
 $loginStep = 'email';
@@ -437,6 +439,9 @@ if (isset($_POST['setPassword'])) {
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 $updatePasswordQuery = "UPDATE users SET password = '$hashedPassword', isNew = 'No' WHERE email = '$email'";
                 executeQuery($updatePasswordQuery);
+
+                $unlockQuery = "UPDATE users SET failedAttempts = 0, lockUntil = NULL WHERE email = '$email'";
+                $unlockResult = executeQuery($unlockQuery);
 
                 $userCheckResult = executeQuery($userCheckQuery);
                 $user = mysqli_fetch_assoc($userCheckResult);
