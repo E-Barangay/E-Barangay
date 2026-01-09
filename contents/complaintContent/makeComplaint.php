@@ -41,7 +41,6 @@ if (isset($_POST['submit'])) {
     $phoneNumber = $_POST['phoneNumber'];
     $complaintDescription = $_POST['complaintDescription'];
     $requestStatus = 'pending';
-    $isDeleted = 'NO';
     $isAction = 'NO';
     $latitude = mysqli_real_escape_string($conn, $_POST['latitude']);
     $longitude = mysqli_real_escape_string($conn, $_POST['longitude']);
@@ -76,9 +75,9 @@ if (isset($_POST['submit'])) {
         $userID = $_SESSION['userID'];
 
         $sql = "INSERT INTO complaints 
-                (userID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complainantName, complaintVictim, victimAge, isDeleted, victimRelationship, ActionTaken, complaintLatitude, complaintLongitude, complaintType)
+                (userID, complaintTitle, complaintDescription, requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, complainantName, complaintVictim, victimAge, victimRelationship, ActionTaken, complaintLatitude, complaintLongitude, complaintType)
                 VALUES 
-                ('$userID', '$complaintTitle', '$complaintDescription', NOW(), '$requestStatus', '$phoneNumber', '$complaintAccused', '$complaintAddress', '$userName', '$complaintVictim', '$userAge', '$isDeleted', '$relationshipVictim', '$isAction', '$latitude', '$longitude', '$complaintType')";
+                ('$userID', '$complaintTitle', '$complaintDescription', NOW(), '$requestStatus', '$phoneNumber', '$complaintAccused', '$complaintAddress', '$userName', '$complaintVictim', '$userAge', '$relationshipVictim', '$isAction', '$latitude', '$longitude', '$complaintType')";
         if (mysqli_query($conn, $sql)) {
 
             $complaintID = mysqli_insert_id($conn);
@@ -161,12 +160,12 @@ if (isset($_POST['submit'])) {
     <div class="row">
         <div class="col-4 col-md-4">
             <div class="d-flex justify-content-center align-items-center mb-3">
-                <a href="tel:09174528364" class="d-flex align-items-center text-decoration-none">
+                <a href="tel:(043) 784-3812" class="d-flex align-items-center text-decoration-none">
                     <div class="card p-2 p-md-3 text-center rounded-4" style="background-color: #19AFA5; border: #19AFA5;">
                         <img src="assets/images/reports/call logo.png" alt="Call Logo" class="img-fluid"
                             style="width: 16px; height: 16px;">
                     </div>
-                    <div class="fs-6 ms-2 d-none d-md-block" style="color: black;">0917 452 8364</div>
+                    <div class="fs-6 ms-2 d-none d-md-block" style="color: black;">(043) 784-3812</div>
                 </a>
             </div>
         </div>

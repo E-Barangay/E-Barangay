@@ -59,7 +59,7 @@ if(mysqli_num_rows($documentsResult) > 0)   {
     ?>
     <div class="col-12 col-md-6 col-lg-4 p-1 mb-2 mb-md-5 mb-lg-4">
         <div class="documentCard card mb-5 mb-md-3 mb-lg-4">
-            <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top" style="width: 100%; height: 500px; object-fit: cover; pointer-events:none;" alt="Document">
+            <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top" style="width: 100%; height: 200px; object-fit: cover; pointer-events:none;" alt="Document">
             <div class="mt-auto">
 
                 <?php
