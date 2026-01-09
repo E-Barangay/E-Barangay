@@ -12,9 +12,7 @@
                     Barangay<span style="color:#19AFA5;"> San Antonio</span>
                 </div>
                 <p class="text-adapt" style="color: black;">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Non tempore officia inventore minima ipsam
-                    quis facilis. Aut vel quae excepturi ad, magni omnis cupiditate incidunt est eveniet vitae! Illum,
-                    rerum!
+                    A digital platform for Barangay San Antonio that simplifies transactions, improves public service, and strengthens communication between the barangay and its residents.
                 </p>
             </div>
             <hr class="d-block d-lg-none">
@@ -56,7 +54,7 @@
                 <ul class="nav flex-column">
                     <li class="footer-item mb-3"><a href="index.php" class="footer-link p-0">Announcements</a></li>
                     <li class="footer-item mb-3"><a href="documents.php" class="footer-link p-0">Documents</a></li>
-                    <li class="footer-item mb-3"><a href="reports.php" class="footer-link p-0">Complaints</a></li>
+                    <li class="footer-item mb-3"><a href="complaints.php" class="footer-link p-0">Complaints</a></li>
                 </ul>
             </div>
             <hr class="d-block d-lg-none">
