@@ -8,7 +8,7 @@ if (!isset($_SESSION['userID']) || $_SESSION['role'] !== 'admin') {
 }
 
 if (!isset($_GET['documentID'])) {
-    header("Location: ../adminContent/document.php");
+    header("Location: index.php?page=document");
     exit();
 }
 
@@ -50,6 +50,7 @@ $userQuery = "
         permanentAddresses.permanentBarangayName,
         permanentAddresses.permanentCityName,
         permanentAddresses.permanentProvinceName,
+        permanentAddresses.foreignPermanentAddress,
 
         documents.documentID,
         documents.documentTypeID,
@@ -79,7 +80,7 @@ $userQuery = "
 $userResult = mysqli_query($conn, $userQuery);
 
 if (!$userResult || mysqli_num_rows($userResult) === 0) {
-    echo "<script>alert('Document not found or not yet approved!'); window.location.href='../adminContent/document.php';</script>";
+    echo "<script>alert('Document not found or not yet approved!'); window.location.href='../index.php?page=document';</script>";
     exit();
 }
 
@@ -137,6 +138,7 @@ $permanentStreetName = formatAddress($userRow['permanentStreetName']);
 $permanentBarangayName = formatAddress($userRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userRow['permanentProvinceName']);
+$foreignAddress = $userRow['foreignPermanentAddress'];
 
 $permanentAddressParts = array_filter([
     $permanentBlockLotNo, $permanentPhase, $permanentSubdivisionName, $permanentStreetName,

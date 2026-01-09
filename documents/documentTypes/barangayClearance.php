@@ -13,7 +13,13 @@
         <div class="col">
             <p><strong>Name:</strong> <?php echo $fullName ?></p>
             <p><strong>Address:</strong> <?php echo implode(', ', array_filter([$blockLotNo, $subdivisionName, $phase, $purok, $streetName, $barangayName, $cityName, $provinceName])) ?></p>
-            <p><strong>Permanent Address:</strong> <?php echo implode(', ', array_filter([$permanentBlockLotNo, $permanentSubdivisionName, $permanentPhase, $permanentPurok, $permanentStreetName, $permanentBarangayName, $permanentCityName, $permanentProvinceName])) ?></p>
+            <p><strong>Permanent Address:</strong>
+                <?php if($residencyType === 'FILIPINO') { ?>
+                    <?php echo implode(', ', array_filter([$permanentBlockLotNo, $permanentSubdivisionName, $permanentPhase, $permanentPurok, $permanentStreetName, $permanentBarangayName, $permanentCityName, $permanentProvinceName])) ?>
+                <?php } else { ?>
+                    <?php echo $foreignAddress ?>
+                <?php } ?>
+            </p>
             <p><strong>Place of Birth:</strong> <?php echo $birthPlace ?></p>
             <p><strong>Date of Birth:</strong> <?php echo date("F j, Y", strtotime($birthDate)); ?></p>
             <p><strong>Age: </strong> <?php echo $age . " years old"; ?></p>

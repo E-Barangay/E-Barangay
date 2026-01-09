@@ -909,7 +909,7 @@ if (isset($_POST['confirmButton'])) {
                         <label for="citizenship" class="form-label"><strong>Citizenship:</strong></label>
                         <select class="form-select text-uppercase" id="citizenship" name="citizenship">
                           <?php foreach ($citizenships as $country): ?>
-                            <option value="<?= $country; ?>" <?= (!empty($citizenship) && strtoupper($citizenship) === $country) || (empty($citizenship) && $country === 'FILIPINO') ? 'selected' : ''; ?>>
+                            <option value="<?= $country; ?>" <?= (isset($user['citizenship']) && strtoupper($user['citizenship']) === $country) ? 'selected' : ''; ?>>
                               <?= $country; ?>
                             </option>
                           <?php endforeach; ?>
@@ -1205,7 +1205,7 @@ if (isset($_POST['confirmButton'])) {
 
                     <div class="col-md-3 mb-3 mt-0 edit-mode d-none">
                       <label for="permanentPurok" class="form-label"><strong>Purok:</strong></label>
-                      <select class="form-select" name="permanentPurok">
+                      <select class="form-select" name="permanentPurok" id="permanentPurok">
                         <option value="">Select Purok</option>
                         <?php for ($i = 1; $i <= 7; $i++): ?>
                           <option value="Purok <?= $i; ?>" <?= ($user['permanentPurok'] === "Purok $i") ? 'selected' : ''; ?>>
