@@ -69,6 +69,7 @@ $permanentStreetName = $userDataRow['permanentStreetName'];
 $permanentBarangayName = formatAddress($userDataRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userDataRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
+$foreignAddress = $userDataRow['foreignPermanentAddress'];
 
 $userInfoIDQuery = "SELECT userInfoID FROM userinfo WHERE userID = $userID";
 $userInfoIDResult = executeQuery($userInfoIDQuery);
@@ -80,6 +81,8 @@ $educationalLevel = $userDataRow['educationalLevel'] ?? '';
 $shsTrack = $userDataRow['shsTrack'] ?? '';
 $collegeCourse = $userDataRow['collegeCourse'] ?? '';
 
+
+// Replace the $isProfileComplete section with this corrected logic:
 
 $isProfileComplete = !(
     empty($firstName)
@@ -98,11 +101,23 @@ $isProfileComplete = !(
     || empty($barangayName)
     || empty($cityName)
     || empty($provinceName)
-    || empty($permanentPurok)
-    || empty($permanentBarangayName)
-    || empty($permanentCityName)
-    || empty($permanentProvinceName)
 );
+
+// Additional check for permanent address based on citizenship
+if ($isProfileComplete) {
+    if (strtoupper($citizenship) === 'FILIPINO') {
+        // For Filipinos, require Philippine permanent address fields
+        $isProfileComplete = !(
+            empty($permanentPurok)
+            || empty($permanentBarangayName)
+            || empty($permanentCityName)
+            || empty($permanentProvinceName)
+        );
+    } else {
+        // For foreigners, require foreign permanent address
+        $isProfileComplete = !empty($foreignAddress);
+    }
+}
 
 $incomplete = (!$isProfileComplete && isset($_SESSION['warning']) && ($_SESSION['warning'] === 'incompleteInformation1' || $_SESSION['warning'] === 'incompleteInformation2'));
 

@@ -5,6 +5,16 @@ $complaintID = $_GET['complaintID'] ?? $_POST['complaintID'] ?? '';
 $successMessage = '';
 $errorMessage = '';
 
+if (!empty($complaintID)) {
+    $checkQuery = "SELECT complaintID FROM complaints WHERE complaintID = " . (int)$complaintID;
+    $checkResult = mysqli_query($conn, $checkQuery);
+    
+    if (!$checkResult || mysqli_num_rows($checkResult) === 0) {
+        header("Location: ../index.php?page=complaints");
+        exit();
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['saveComplaint'])) {
   $complaintID = (int) $_POST['complaintID'];
   $isVawcCase = isset($_POST['isVawcCase']) ? 1 : 0;
@@ -221,7 +231,7 @@ if (in_array(strtolower($complaint['complaintStatus']), ['criminal', 'civil'])) 
                     <strong class="text-muted d-block mb-2">Complainant:</strong>
                     <span class="view-mode"><?= htmlspecialchars($complaint['complainantName']) ?></span>
                     <input type="text" class="form-control d-none edit-mode" name="complainantName"
-                      value="<?= htmlspecialchars($complaint['complainantName']) ?>" disabled>
+                      value="<?= htmlspecialchars($complaint['complainantName']) ?>" readonly>
                   </div>
                 </div>
 

@@ -29,28 +29,63 @@ if (isset($_GET['page'])) {
 
             $userDataRow = mysqli_fetch_assoc($userResult);
 
+            $firstName = $userDataRow['firstName'] ?? null;
+            $lastName = $userDataRow['lastName'] ?? null;
+            $profilePicture = $userDataRow['profilePicture'] ?? null;
+            $gender = $userDataRow['gender'] ?? null;
+            $birthDate = $userDataRow['birthDate'] ?? null;
+            $birthPlace = $userDataRow['birthPlace'] ?? null;
+            $civilStatus = $userDataRow['civilStatus'] ?? null;
+            $citizenship = $userDataRow['citizenship'] ?? null;
+            $lengthOfStay = $userDataRow['lengthOfStay'] ?? null;
+            $residencyType = $userDataRow['residencyType'] ?? null;
+            $phoneNumber = $userDataRow['phoneNumber'] ?? null;
+            $email = $userDataRow['email'] ?? null;
+
+            $purok = $userDataRow['purok'] ?? null;
+            $barangayName = $userDataRow['barangayName'] ?? null;
+            $cityName = $userDataRow['cityName'] ?? null;
+            $provinceName = $userDataRow['provinceName'] ?? null;
+
+            $permanentPurok = $userDataRow['permanentPurok'] ?? null;
+            $permanentBarangayName = $userDataRow['permanentBarangayName'] ?? null;
+            $permanentCityName = $userDataRow['permanentCityName'] ?? null;
+            $permanentProvinceName = $userDataRow['permanentProvinceName'] ?? null;
+
+            $foreignAddress = $userDataRow['foreignPermanentAddress'] ?? null;
+
+
             $isProfileComplete = !(
-                empty($userDataRow['firstName'])
-                || empty($userDataRow['lastName'])
-                || empty($userDataRow['profilePicture'])
-                || empty($userDataRow['gender'])
-                || empty($userDataRow['birthDate'])
-                || empty($userDataRow['birthPlace'])
-                || empty($userDataRow['civilStatus'])
-                || empty($userDataRow['citizenship'])
-                || empty($userDataRow['lengthOfStay'])
-                || empty($userDataRow['residencyType'])
-                || empty($userDataRow['phoneNumber'])
-                || empty($userDataRow['email'])
-                || empty($userDataRow['purok'])
-                || empty($userDataRow['barangayName'])
-                || empty($userDataRow['cityName'])
-                || empty($userDataRow['provinceName'])
-                || empty($userDataRow['permanentPurok'])
-                || empty($userDataRow['permanentBarangayName'])
-                || empty($userDataRow['permanentCityName'])
-                || empty($userDataRow['permanentProvinceName'])
+                empty($firstName)
+                || empty($lastName)
+                || empty($profilePicture)
+                || empty($gender)
+                || empty($birthDate)
+                || empty($birthPlace)
+                || empty($civilStatus)
+                || empty($citizenship)
+                || empty($lengthOfStay)
+                || empty($residencyType)
+                || empty($phoneNumber)
+                || empty($email)
+                || empty($purok)
+                || empty($barangayName)
+                || empty($cityName)
+                || empty($provinceName)
             );
+
+            if ($isProfileComplete) {
+                if (strtoupper($citizenship) === 'FILIPINO') {
+                    $isProfileComplete = !(
+                        empty($permanentPurok)
+                        || empty($permanentBarangayName)
+                        || empty($permanentCityName)
+                        || empty($permanentProvinceName)
+                    );
+                } else {
+                    $isProfileComplete = !empty($foreignAddress);
+                }
+            }
 
             if (!$isProfileComplete) {
                 $_SESSION['warning'] = 'incompleteInformation2';
@@ -100,7 +135,7 @@ if (isset($_GET['page'])) {
 </head>
 
 <body data-bs-theme="light">
-    
+
     <?php include("sharedAssets/loadingIndicator.php"); ?>
 
     <?php
@@ -116,7 +151,7 @@ if (isset($_GET['page'])) {
     <div class="container pt-3">
         <div class="row">
             <div class="col-12 col-lg-3 p-0">
-                
+
                 <div class="filterCard card m-1 p-3">
                     <div class="row">
                         <div class="col d-flex flex-column align-items-center">
@@ -156,5 +191,5 @@ if (isset($_GET['page'])) {
     <script src="assets/js/loadingIndicator/script.js"></script>
 
     <script src="assets/js/signUp/report.js"></script>
-    
+
 </body>

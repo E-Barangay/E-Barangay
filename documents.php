@@ -76,6 +76,7 @@ $permanentStreetName = $userDataRow['permanentStreetName'];
 $permanentBarangayName = formatAddress($userDataRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userDataRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userDataRow['permanentProvinceName']);
+$foreignAddress = $userDataRow['foreignPermanentAddress'];
 
 $searchTerm = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
@@ -88,6 +89,7 @@ if (!empty($searchTerm)) {
 $documentsResult = executeQuery($documentsQuery);
 
 $searchDisplay = !empty($searchTerm) ? htmlspecialchars($searchTerm) : 'document';
+
 
 $isProfileComplete = !(
     empty($firstName)
@@ -106,11 +108,20 @@ $isProfileComplete = !(
     || empty($barangayName)
     || empty($cityName)
     || empty($provinceName)
-    || empty($permanentPurok)
-    || empty($permanentBarangayName)
-    || empty($permanentCityName)
-    || empty($permanentProvinceName)
 );
+
+if ($isProfileComplete) {
+    if (strtoupper($citizenship) === 'FILIPINO') {
+        $isProfileComplete = !(
+            empty($permanentPurok)
+            || empty($permanentBarangayName)
+            || empty($permanentCityName)
+            || empty($permanentProvinceName)
+        );
+    } else {
+        $isProfileComplete = !empty($foreignAddress);
+    }
+}
 
 if (isset($_POST['documentButton'])) {
     if (!$isProfileComplete) {

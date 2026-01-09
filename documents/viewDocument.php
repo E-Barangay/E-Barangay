@@ -103,6 +103,7 @@ $permanentStreetName = $userRow['permanentStreetName'];
 $permanentBarangayName = formatAddress($userRow['permanentBarangayName']);
 $permanentCityName = formatAddress($userRow['permanentCityName']);
 $permanentProvinceName = formatAddress($userRow['permanentProvinceName']);
+$foreignAddress = $userRow['foreignPermanentAddress'];
 
 $documentQuery = "SELECT * FROM documenttypes WHERE documentTypeID = $documentTypeID";
 $documentResult = executeQuery($documentQuery);

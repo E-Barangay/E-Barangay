@@ -8,6 +8,16 @@ if (!$documentID) {
   exit();
 }
 
+if (!empty($documentID)) {
+    $checkQuery = "SELECT documentID FROM documents WHERE documentID = " . (int)$documentID;
+    $checkResult = mysqli_query($conn, $checkQuery);
+    
+    if (!$checkResult || mysqli_num_rows($checkResult) === 0) {
+        header("Location: ../index.php?page=document");
+        exit();
+    }
+}
+
 $documentQuery = "SELECT 
     d.documentID, 
     d.purpose, 
