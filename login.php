@@ -14,6 +14,11 @@ if (!isset($_GET['token'])) {
     }
 }
 
+if (!isset($_POST['email']) && !isset($_POST['next']) ) {
+    unset($_SESSION['alert']);
+    unset($_SESSION['lockUntil']);
+}
+
 $loginStep = 'email';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -37,8 +42,25 @@ if (isset($_POST['next'])) {
         $restrictionEnd = $user['restrictionEnd'];
         $restrictionReason = $user['restrictionReason'];
 
+        if (!empty($user['lockUntil'])) {
+            $now = new DateTime();
+            $lockUntil = new DateTime($user['lockUntil']);
+
+            if ($now < $lockUntil) {
+                $_SESSION['alert'] = 'tooManyAttempts';
+                $_SESSION['lockUntil'] = $user['lockUntil'];
+                $_SESSION['lockedEmail'] = $email;
+                $loginStep = 'existingPassword';
+            } else {
+                $unlockQuery = "UPDATE users SET failedAttempts = 0, lockUntil = NULL WHERE email = '$email'";
+                $unlockResult = executeQuery($unlockQuery);
+
+                $user['failedAttempts'] = 0;
+            }
+        }
+
         if ($user['isRestricted'] === 'Yes' && !empty($restrictionEnd)) {
-            
+
             date_default_timezone_set('Asia/Manila');
             $currentTime = date('Y-m-d H:i:s');
 
@@ -480,6 +502,7 @@ if (isset($_POST['login'])) {
             if ($now < $lockUntil) {
                 $_SESSION['alert'] = 'tooManyAttempts';
                 $_SESSION['lockUntil'] = $userRow['lockUntil'];
+                $_SESSION['lockedEmail'] = $email;
                 $loginStep = 'existingPassword';
                 return;
             } else {
@@ -518,6 +541,7 @@ if (isset($_POST['login'])) {
 
                 $_SESSION['alert'] = 'tooManyAttempts';
                 $_SESSION['lockUntil'] = $lockUntil;
+                $_SESSION['lockedEmail'] = $email;
                 $loginStep = 'existingPassword';
 
             } else {
@@ -829,7 +853,7 @@ if (isset($_POST['login'])) {
         </script>
     <?php endif; ?>
 
-    <?php if (isset($_SESSION['lockUntil'])): ?>
+    <?php if (isset($_SESSION['lockUntil'], $_SESSION['lockedEmail'], $_SESSION['email']) && $_SESSION['lockedEmail'] === $_SESSION['email']): ?>
         <script>
             var lockUntil = new Date("<?php echo $_SESSION['lockUntil']; ?>").getTime();
             var countdownElement = document.getElementById('lockCountdown');

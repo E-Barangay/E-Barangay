@@ -3,12 +3,34 @@ const API_BASE = basePath + "api/";
 const EXPORT_BASE = basePath + "export/";
 const PRINT_BASE = basePath + "print/";
 
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value ?? 0;
+}
+
+function getCtx(id) {
+    const el = document.getElementById(id);
+    return el ? el.getContext('2d') : null;
+}
+
 function formatMonthLabelsOrdered(obj) {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const map = new Map();
-    for (const k in obj) map.set(k, obj[k]);
-    const labels = months.filter(m => map.has(m));
-    const data = labels.map(l => map.get(l) || 0);
+    const monthOrder = {
+        Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+        Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+    };
+
+    const labels = Object.keys(obj).sort((a, b) => {
+        // a and b are like "2025-Dec"
+        const [yearA, monthA] = a.split('-');
+        const [yearB, monthB] = b.split('-');
+
+        // Compare year first
+        if (yearA !== yearB) return Number(yearA) - Number(yearB);
+        // If same year, compare month
+        return monthOrder[monthA] - monthOrder[monthB];
+    });
+
+    const data = labels.map(m => obj[m] || 0);
     return { labels, data };
 }
 
@@ -88,7 +110,7 @@ function initCharts() {
             datasets: [{ 
                 label: 'Requests', 
                 data: [], 
-                backgroundColor: '#0d6efd' 
+                backgroundColor: '#31afab' 
             }] 
         }, 
         options: { 
@@ -110,7 +132,7 @@ function initCharts() {
                 tension: 0.2, 
                 fill: true, 
                 backgroundColor: 'rgba(13,110,253,0.08)', 
-                borderColor: '#0d6efd' 
+                borderColor: '#31afab' 
             }] 
         }, 
         options: { 
@@ -124,15 +146,62 @@ function initCharts() {
     incidentPieChart = new Chart(document.getElementById('incidentPieChart'), { 
         type: 'pie', 
         data: { 
-            labels: [], 
+            labels: [
+                "Noise Complaints",
+                "Boundary and Land Disputes",
+                "Neighborhood Quarrels",
+                "Animal-Related Complaints",
+                "Youth-Related Issues",
+                "Barangay Clearance and Permit Concerns",
+                "Garbage and Sanitation Complaints",
+                "Alcohol-Related Disturbances",
+                "Traffic and Parking Issues",
+                "Physical Assault and Threats",
+                "Water Supply Disputes",
+                "Business-Related Conflicts",
+                "Curfew Violations",
+                "Smoking and Littering Violations",
+                "Illegal Structures and Encroachments",
+                "Physical Abuse",
+                "Sexual Abuse",
+                "Psychological Abuse/Emotional Abuse",
+                "Economic Abuse",
+                "Neglect",
+                "Other"
+            ], 
             datasets: [{ 
                 data: [], 
-                backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#0d6efd', '#6c757d'] 
+                backgroundColor: [
+                    '#4e79a7', 
+                    '#E0B72E',
+                    '#3CB371', 
+                    '#e15759', 
+                    '#76b7b2', 
+                    '#edc948', 
+                    '#b07aa1', 
+                    '#ff9da7',
+                    '#9c755f',
+                    '#bab0ac',
+                    '#8cd17d',
+                    '#d37295',
+                    '#a5a5a5',
+                    '#f1ce63',
+                    '#6c5b7b',
+                    '#ff6f69',
+                    '#88d8b0', 
+                    '#ffb347', 
+                    '#b0e0e6', 
+                    '#c2a2d0',
+                    '#d3d3d3'  
+                ]
             }] 
         }, 
         options: { 
             responsive: true, 
-            maintainAspectRatio: false 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right' }
+            }
         } 
     });
 
@@ -283,7 +352,7 @@ function processDocumentsData(rows) {
         docTypes[type] = (docTypes[type] || 0) + 1;
         const dt = new Date(r.requestDate);
         if (!isNaN(dt)) {
-            const mon = dt.toLocaleString('default', { month: 'short' });
+            const mon = `${dt.getFullYear()}-${dt.toLocaleString('default', { month: 'short' })}`;
             monthly[mon] = (monthly[mon] || 0) + 1;
         }
     });
@@ -318,7 +387,7 @@ function processComplaintsData(rows) {
 
         const dt = new Date(r.requestDate);
         if (!isNaN(dt)) {
-            const mon = dt.toLocaleString('default', { month: 'short' });
+            const mon = `${dt.getFullYear()}-${dt.toLocaleString('default', { month: 'short' })}`;
             monthlyIncidents[mon] = (monthlyIncidents[mon] || 0) + 1;
             if (['withdrawn', 'repudiated', 'dismissed', 'certified', 'resolved'].includes(st)) {
                 monthlyResolved[mon] = (monthlyResolved[mon] || 0) + 1;
@@ -327,7 +396,6 @@ function processComplaintsData(rows) {
     });
 
     const total = rows.length;
-    const primaryCriminal = rows.filter(r => ['criminal', 'civil'].includes((r.status || '').toLowerCase())).length;
     const resolved = rows.filter(r => ['withdrawn', 'repudiated', 'dismissed', 'certified', 'resolved'].includes((r.status || '').toLowerCase())).length;
     const escalated = rows.filter(r => ['mediation', 'conciliation', 'arbitration', 'pending'].includes((r.status || '').toLowerCase())).length;
     const vawc = rows.filter(r => ((r.status || '').toLowerCase().indexOf('vawc') !== -1)).length;
@@ -340,18 +408,59 @@ function processComplaintsData(rows) {
             incidents: formatMonthLabelsOrdered(monthlyIncidents).data, 
             resolved: formatMonthLabelsOrdered(monthlyResolved).data 
         },
-        summary: { total, primaryCriminal, resolved, escalated, vawc }
+        summary: { total, resolved, escalated, vawc }
     };
 }
 
 function updateIncidentCharts(rows) {
     const p = processComplaintsData(rows);
+
     incidentPieChart.data.labels = Object.keys(p.types);
     incidentPieChart.data.datasets[0].data = Object.values(p.types);
     incidentPieChart.update();
 
-    complaintDoughnutChart.data.labels = Object.keys(p.statusMap);
-    complaintDoughnutChart.data.datasets[0].data = Object.values(p.statusMap);
+    const settledStatuses = ["mediation", "conciliation", "arbitration"];
+    const unsettledStatuses = ["repudiated", "withdrawn", "pending", "dismissed", "certified"];
+
+    let settledCount = 0;
+    let unsettledCount = 0;
+
+    const statusCounts = {};
+    rows.forEach(r => {
+        const status = (r.status || '').toLowerCase();
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+
+        if (settledStatuses.includes(status)) settledCount++;
+        else unsettledCount++;
+    });
+
+    const groupMap = {
+        'Settled': settledStatuses,
+        'Unsettled': unsettledStatuses
+    };
+
+    complaintDoughnutChart.data.labels = ["Settled", "Unsettled"];
+    complaintDoughnutChart.data.datasets[0].data = [settledCount, unsettledCount];
+    complaintDoughnutChart.data.datasets[0].backgroundColor = ['#3CB371', '#E0B72E'];
+
+    complaintDoughnutChart.options.plugins.tooltip = {
+        callbacks: {
+            label: function(context) {
+                const group = context.label;
+                const statusesInGroup = groupMap[group] || [];
+                let tooltipText = `${group}: ${context.parsed}\n`;
+
+                statusesInGroup.forEach(st => {
+                    if (statusCounts[st] > 0) {
+                        tooltipText += `${st}: ${statusCounts[st]}\n`;
+                    }
+                });
+
+                return tooltipText.trim();
+            }
+        }
+    };
+
     complaintDoughnutChart.update();
 
     incidentTrendChart.data.labels = p.monthly.labels;
@@ -359,11 +468,10 @@ function updateIncidentCharts(rows) {
     incidentTrendChart.data.datasets[1].data = p.monthly.resolved.length ? p.monthly.resolved : new Array(p.monthly.incidents.length).fill(0);
     incidentTrendChart.update();
 
-    document.getElementById('totalIncidents').textContent = p.summary.total || 0;
-    document.getElementById('primaryCriminal').textContent = p.summary.primaryCriminal || 0;
-    document.getElementById('resolvedCases').textContent = p.summary.resolved || 0;
-    document.getElementById('escalatedCases').textContent = p.summary.escalated || 0;
-    document.getElementById('vawcRecords').textContent = p.summary.vawc || 0;
+    setText('totalIncidents', p.summary.total);
+    setText('resolvedCases', p.summary.resolved);
+    setText('escalatedCases', p.summary.escalated);
+    setText('vawcRecords', p.summary.vawc);
 }
 
 async function fetchJSON(url) {

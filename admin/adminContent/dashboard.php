@@ -349,7 +349,9 @@ $purokDataForJS = array_values($purokStats);
     Object.keys(purokPolygons).forEach(p => {
       const d = statsFor(p);
       const poly = L.polygon(purokPolygons[p], {
-        color: colorFor(d.total_residents, d.total_voters),
+        color: '#000000',
+        weight: 1,
+        opacity: 0.5,
         fillColor: colorFor(d.total_residents, d.total_voters),
         fillOpacity: .6
       }).addTo(map);
