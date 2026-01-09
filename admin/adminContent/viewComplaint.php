@@ -221,7 +221,7 @@ if (in_array(strtolower($complaint['complaintStatus']), ['criminal', 'civil'])) 
                     <strong class="text-muted d-block mb-2">Complainant:</strong>
                     <span class="view-mode"><?= htmlspecialchars($complaint['complainantName']) ?></span>
                     <input type="text" class="form-control d-none edit-mode" name="complainantName"
-                      value="<?= htmlspecialchars($complaint['complainantName']) ?>">
+                      value="<?= htmlspecialchars($complaint['complainantName']) ?>" disabled>
                   </div>
                 </div>
 
