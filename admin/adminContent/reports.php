@@ -12,6 +12,13 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        #servicesCsvBtn:hover, #servicesPrintBtn:hover, #incidentsCsvBtn:hover, #incidentsPrintBtn:hover {
+            background-color: #31afab !important;
+            border: 2px solid #31afab !important;
+            color: white !important;
+        }
+    </style>
 </head>
 
 <body style="font-family:'Poppins',sans-serif;background-color:#f0f2f5;">
@@ -22,7 +29,7 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
             <div class="d-flex flex-wrap justify-content-between align-items-center p-3"
                 style="background:#31afab;color:white;border-radius:0.5rem 0.5rem 0 0;">
                 <h5 class="mb-0 fw-semibold">Demographic Reports</h5>
-                <button id="exportDemographicsBtn" class="btn btn-success text-white fw-bold px-3 py-2"
+                <button id="exportDemographicsBtn" style="background-color: white; border: 2px solid #31afab; color: #31afab;" class="btn btn-success fw-bold px-3 py-2"
                     style="font-size:0.875rem;">Export</button>
             </div>
             <div class="card-body p-3 p-lg-4">
@@ -54,7 +61,6 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
             <div class="d-flex flex-wrap justify-content-between align-items-center p-3 gap-2"
                 style="background:#31afab;color:white;border-radius:0.5rem 0.5rem 0 0;">
                 <h5 class="mb-0 fw-semibold">Barangay Services Reports</h5>
-                <span class="badge bg-light text-info px-3 py-2" style="border-radius:20px;">Document Requests</span>
             </div>
             <div class="card-body p-3 p-lg-4">
                 <div class="bg-light rounded p-3 mb-4">
@@ -68,16 +74,16 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
                             <input id="servicesToDate" type="date" class="form-control">
                         </div>
                         <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-end">
-                            <button id="filterServicesBtn" class="btn btn-success w-50 fw-semibold">Filter Data</button>
+                            <button id="filterServicesBtn" style="background-color: #31afab; border: #31afab;" class="btn btn-success w-50 fw-semibold">Filter Data</button>
                         </div>
                         <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-end">
                             <div class="d-flex gap-2 w-100">
                                 <a id="servicesCsvBtn"
-                                    class="btn btn-outline-info flex-fill text-center text-decoration-none fw-semibold"
-                                    href="#" style="font-size:0.875rem;">📊 CSV</a>
+                                    class="btn btn-outline-info flex-fill text-center text-decoration-none fw-semibold" style="background-color: transparent; border: 2px solid #31afab; color: #31afab;"
+                                    href="#" style="font-size:0.875rem;">CSV</a>
                                 <a id="servicesPrintBtn"
-                                    class="btn btn-outline-secondary flex-fill text-center text-decoration-none fw-semibold"
-                                    href="#" style="font-size:0.875rem;">📄 Print</a>
+                                    class="btn btn-outline-secondary flex-fill text-center text-decoration-none fw-semibold" style="background-color: transparent; border: 2px solid #31afab; color: #31afab;"
+                                    href="#" style="font-size:0.875rem;">Print</a>
                             </div>
                         </div>
                     </div>
@@ -138,7 +144,6 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
             <div class="d-flex flex-wrap justify-content-between align-items-center p-3 gap-2"
                 style="background:#31afab;color:white;border-radius:0.5rem 0.5rem 0 0;">
                 <h5 class="mb-0 fw-semibold">Incident & Complaint Reports</h5>
-                <span class="badge bg-light text-danger px-3 py-2" style="border-radius:20px;">Blotter Records</span>
             </div>
             <div class="card-body p-3 p-lg-4">
                 <div class="bg-light rounded p-3 mb-4">
@@ -152,16 +157,16 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
                             <input id="incidentToDate" type="date" class="form-control">
                         </div>
                         <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-end">
-                            <button id="filterIncidentBtn" class="btn btn-success w-50 fw-semibold">Filter Data</button>
+                            <button id="filterIncidentBtn" style="background-color: #31afab; border: #31afab;" class="btn btn-success w-50 fw-semibold">Filter Data</button>
                         </div>
                         <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-end">
                             <div class="d-flex gap-2 w-100">
                                 <a id="incidentsCsvBtn"
-                                    class="btn btn-outline-info flex-fill text-center text-decoration-none fw-semibold"
-                                    href="#" style="font-size:0.875rem;">📊 CSV</a>
+                                    class="btn btn-outline-info flex-fill text-center text-decoration-none fw-semibold" style="background-color: transparent; border: 2px solid #31afab; color: #31afab;"
+                                    href="#" style="font-size:0.875rem;">CSV</a>
                                 <a id="incidentsPrintBtn"
-                                    class="btn btn-outline-secondary flex-fill text-center text-decoration-none fw-semibold"
-                                    href="#" style="font-size:0.875rem;">📄 Print</a>
+                                    class="btn btn-outline-secondary flex-fill text-center text-decoration-none fw-semibold" style="background-color: transparent; border: 2px solid #31afab; color: #31afab;"
+                                    href="#" style="font-size:0.875rem;">Print</a>
                             </div>
                         </div>
                     </div>
@@ -170,7 +175,7 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
                 <div class="row g-3 g-lg-4 mb-4">
                     <div class="col-12 col-lg-6">
                         <div class="border-0 shadow-sm" style="background:white;border-radius:0.5rem;overflow:hidden;">
-                            <div class="text-white fw-semibold p-2 px-3" style="background:#dc3545;font-size:0.95rem;">
+                            <div class="text-white fw-semibold p-2 px-3" style="background:#31afab;font-size:0.95rem;">
                                 Incidents by Type</div>
                             <div class="p-3 d-flex align-items-center justify-content-center" style="height:320px;">
                                 <canvas id="incidentPieChart" style="max-width:100%;max-height:100%;"></canvas>
@@ -204,13 +209,7 @@ include_once __DIR__ . "/../../sharedAssets/connect.php";
                     <div class="col-6 col-md-4 col-lg">
                         <div class="rounded text-center text-white p-3" style="background:#31afab;">
                             <h6 id="totalIncidents" class="mb-2 fw-bold" style="font-size:1.5rem;">4</h6>
-                            <p class="mb-0" style="font-size:0.75rem;">Total Incidents</p>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4 col-lg">
-                        <div class="rounded text-center text-white p-3" style="background:#dc3545;">
-                            <h6 id="primaryCriminal" class="mb-2 fw-bold" style="font-size:1.5rem;">0</h6>
-                            <p class="mb-0" style="font-size:0.75rem;">Primary Criminal</p>
+                            <p class="mb-0" style="font-size:0.75rem;">Total Complaints</p>
                         </div>
                     </div>
                     <div class="col-6 col-md-4 col-lg">

@@ -958,7 +958,7 @@ $result = mysqli_query($conn, $sql);
                                                                 Purok <span class="text-danger">*</span>
                                                             </label>
                                                             <select class="form-select" name="purokPermanent"
-                                                                id="addPermanentPurok" required>
+                                                                id="addPermanentPurok">
                                                                 <option value="">Select Purok</option>
                                                                 <?php for ($i = 1; $i <= 7; $i++): ?>
                                                                     <option value="Purok <?= $i; ?>">Purok
@@ -1122,58 +1122,6 @@ $result = mysqli_query($conn, $sql);
             }, 5000); // removes alerts after 5 seconds
         });
     </script>
-    <!-- <script>
-        const birthDateInput = document.getElementById('birthDate');
-        const ageInput = document.getElementById('age');
-
-        function calculateAge(dateString) {
-            if (!dateString) return '';
-            const today = new Date();
-            const birthDate = new Date(dateString);
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
-            return age;
-        }
-
-        birthDateInput.addEventListener('change', function () {
-            ageInput.value = calculateAge(this.value);
-        });
-
-        // Optional: Update age as user types manually in birthdate
-        birthDateInput.addEventListener('input', function () {
-            ageInput.value = calculateAge(this.value);
-        });
-    </script> -->
-    <!-- <script>
-        document.getElementById('sameAsCurrent').addEventListener('change', function () {
-            const isChecked = this.checked;
-
-            const fields = ['blockLotNo', 'streetName', 'phase', 'subdivisionName', 'barangayName', 'cityName', 'provinceName', 'purok'];
-
-            fields.forEach(field => {
-                const current = document.getElementById(field);
-                const permanent = document.getElementById(field + 'Permanent');
-
-                if (isChecked) {
-                    permanent.value = current.value;
-                    permanent.readOnly = true; // optional, prevent editing
-                } else {
-                    permanent.readOnly = false;
-                    permanent.value = '';
-                }
-
-                // Optional: if you want it to live-update as you type
-                if (isChecked) {
-                    current.addEventListener('input', () => {
-                        permanent.value = current.value;
-                    });
-                }
-            });
-        });
-    </script> -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const restrictButtons = document.querySelectorAll('.toggle-restrict-btn');

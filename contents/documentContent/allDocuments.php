@@ -62,6 +62,17 @@ if(mysqli_num_rows($documentsResult) > 0)   {
             <img src="assets/images/documents/<?php echo $documentsRow['documentImage'] ?>" class="card-img-top" style="width: 100%; height: 500px; object-fit: cover; pointer-events:none;" alt="Document">
             <div class="mt-auto">
 
+                <?php
+                    $dateOfBirth = new DateTime($birthDate);
+                    $today = new DateTime();
+                    $age = $today->diff($dateOfBirth)->y;
+
+                    if ($age <= 16) {
+                        $buttonDisabled = true;
+                        $expiryCountdown = '<br><small>You must be 17 years old to request</small>';
+                    }
+                ?>
+
                 <?php if (!$isProfileComplete) { ?>
 
                     <form method="POST">

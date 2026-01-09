@@ -3,81 +3,85 @@ include_once __DIR__ . '/../../sharedAssets/connect.php';
 
 // ===================== INSERT HANDLER =====================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $complaintTitle = $_POST['complaintTitle'] ?? '';
+    $complaintTitle = $_POST['complaintTitle'] ?? '';
 
-  // If "Other", replace with custom input
-  if ($complaintTitle === "Other" && !empty($_POST['otherComplaint'])) {
-    $complaintTitle = $_POST['otherComplaint'];
-  }
-
-  $complaintStatus = 'Criminal'; // ✅ Always set as Criminal
-  $complaintDescription = $_POST['complaintDescription'] ?? '';
-  $phoneNumber = $_POST['phoneNumber'] ?? '';
-  $complainantName = $_POST['complainantName'] ?? '';
-  $complaintVictim = $_POST['complaintVictim'] ?? '';
-  $victimAge = $_POST['victimAge'] ?? null;
-  $complaintAccused = $_POST['complaintAccused'] ?? '';
-  $victimRelationship = $_POST['victimRelationship'] ?? '';
-  $actionTaken = $_POST['actionTaken'] ?? '';
-  $complaintAddress = $_POST['complaintAddress'] ?? '';
-  $requestDate = date('Y-m-d H:i:s');
-
-  // Default values for unused columns
-  $evidenceFile = "";
-
-  // Handle file upload
-  if (!empty($_FILES['evidence']['name'])) {
-    $uploadDir = __DIR__ . "/../../uploads/";
-    if (!is_dir($uploadDir)) {
-      mkdir($uploadDir, 0777, true);
+    if ($complaintTitle === "Other" && !empty($_POST['otherComplaint'])) {
+        $complaintTitle = $_POST['otherComplaint'];
     }
 
-    $fileName = time() . "_" . basename($_FILES['evidence']['name']);
-    $targetPath = $uploadDir . $fileName;
+    $criminalComplaints = [
+        "Alcohol-Related Disturbances",
+        "Physical Assault and Threats",
+        "Physical Abuse",
+        "Sexual Abuse",
+        "Curfew Violations"
+    ];
 
-    if (move_uploaded_file($_FILES['evidence']['tmp_name'], $targetPath)) {
-      $evidenceFile = $fileName; // store only filename in DB
+    $complaintType = in_array($complaintTitle, $criminalComplaints) ? "Criminal" : "Civil";
+
+    $complaintStatus = 'Pending';
+    $complaintDescription = $_POST['complaintDescription'] ?? '';
+    $phoneNumber = $_POST['phoneNumber'] ?? '';
+    $complainantName = $_POST['complainantName'] ?? '';
+    $complaintVictim = $_POST['complaintVictim'] ?? '';
+    $victimAge = $_POST['victimAge'] ?? null;
+    $complaintAccused = $_POST['complaintAccused'] ?? '';
+    $victimRelationship = $_POST['victimRelationship'] ?? '';
+    $actionTaken = $_POST['actionTaken'] ?? '';
+    $complaintAddress = $_POST['complaintAddress'] ?? '';
+    $requestDate = date('Y-m-d H:i:s');
+
+    $evidenceFile = "";
+    if (!empty($_FILES['evidence']['name'])) {
+        $uploadDir = __DIR__ . "/../../uploads/";
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
+        $fileName = time() . "_" . basename($_FILES['evidence']['name']);
+        $targetPath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($_FILES['evidence']['tmp_name'], $targetPath)) {
+            $evidenceFile = $fileName;
+        }
     }
-  }
 
-  // ✅ Insert new complaint
-  $stmt = "INSERT INTO complaints (
-    userID, complaintTitle, complaintDescription, 
-    requestDate, complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, 
-    complaintVictim, complainantName, victimAge, victimRelationship, actionTaken, evidence, isDeleted
-) VALUES (
-    '1',
-    '$complaintTitle',
-    '$complaintDescription',
-    '$requestDate',
-    '$complaintStatus',
-    '$phoneNumber',
-    '$complaintAccused',
-    '$complaintAddress',
-    '$complaintVictim',
-    '$complainantName',
-    '$victimAge',
-    '$victimRelationship',
-    '$actionTaken',
-    '$evidenceFile',
-    'no'
-)";
+    $stmt = "INSERT INTO complaints (
+        userID, complaintTitle, complaintDescription, requestDate, 
+        complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, 
+        complaintVictim, complainantName, victimAge, victimRelationship, actionTaken, evidence, 
+        complaintType
+    ) VALUES (
+        '1',
+        '$complaintTitle',
+        '$complaintDescription',
+        '$requestDate',
+        '$complaintStatus',
+        '$phoneNumber',
+        '$complaintAccused',
+        '$complaintAddress',
+        '$complaintVictim',
+        '$complainantName',
+        '$victimAge',
+        '$victimRelationship',
+        '$actionTaken',
+        '$evidenceFile',
+        '$complaintType'
+    )";
 
-  mysqli_query($conn, $stmt);
+    mysqli_query($conn, $stmt);
 
-  echo "<script>window.location.href = 'http://localhost/E-Barangay/E-Barangay/admin/index.php?page=complaints';</script>";
-  exit;
+    echo "<script>window.location.href = 'index.php?page=complaints';</script>";
+    exit;
 }
 
 if (isset($_GET['delete'])) {
   $complaintID = (int) $_GET['delete'];
 
-  $stmt = $conn->prepare("UPDATE complaints SET isDeleted = 'yes' WHERE complaintID = ?");
+  $stmt = $conn->prepare("DELETE FROM complaints WHERE complaintID = ?");
   $stmt->bind_param("i", $complaintID);
   $stmt->execute();
   $stmt->close();
 
-  echo "<script>window.location.href = 'http://localhost/E-Barangay/E-Barangay/admin/index.php?page=complaints';</script>";
+  echo "<script>window.location.href = 'index.php?page=complaints';</script>";
   exit;
 }
 
@@ -103,14 +107,12 @@ $sql = "SELECT
     r.complaintStatus AS status
 FROM complaints r
 LEFT JOIN users u ON r.userID = u.userID
-LEFT JOIN userinfo ui ON u.userID = ui.userID
-WHERE r.isDeleted = 'no'";
+LEFT JOIN userinfo ui ON u.userID = ui.userID";
 
 $countSql = "SELECT COUNT(*) AS total
 FROM complaints r
 LEFT JOIN users u ON r.userID = u.userID
-LEFT JOIN userinfo ui ON u.userID = ui.userID
-WHERE r.isDeleted = 'no'";
+LEFT JOIN userinfo ui ON u.userID = ui.userID";
 
 $params = [];
 $types = '';
