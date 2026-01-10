@@ -30,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $actionTaken = $_POST['actionTaken'] ?? '';
     $complaintAddress = $_POST['complaintAddress'] ?? '';
     $requestDate = date('Y-m-d H:i:s');
+    
+    // Get latitude and longitude
+    $latitude = !empty($_POST['latitude']) ? $_POST['latitude'] : null;
+    $longitude = !empty($_POST['longitude']) ? $_POST['longitude'] : null;
 
     $evidenceFile = "";
     if (!empty($_FILES['evidence']['name'])) {
@@ -44,45 +48,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = "INSERT INTO complaints (
-        userID, complaintTitle, complaintDescription, requestDate, 
+    // Use prepared statement to prevent SQL injection
+    $stmt = $conn->prepare("INSERT INTO complaints (
+        userID, complaintType, complaintTitle, complaintDescription, requestDate, 
         complaintStatus, complaintPhoneNumber, complaintAccused, complaintAddress, 
-        complaintVictim, complainantName, victimAge, victimRelationship, actionTaken, evidence, 
-        complaintType
-    ) VALUES (
-        '1',
-        '$complaintTitle',
-        '$complaintDescription',
-        '$requestDate',
-        '$complaintStatus',
-        '$phoneNumber',
-        '$complaintAccused',
-        '$complaintAddress',
-        '$complaintVictim',
-        '$complainantName',
-        '$victimAge',
-        '$victimRelationship',
-        '$actionTaken',
-        '$evidenceFile',
-        '$complaintType'
-    )";
-
-    mysqli_query($conn, $stmt);
+        complaintVictim, victimAge, victimRelationship, complainantName, actionTaken, evidence, 
+        complaintLatitude, complaintLongitude
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    $userID = 1;
+    $stmt->bind_param(
+        "isssssssssissssdd",
+        $userID,              // 1. i - userID
+        $complaintType,       // 2. s - complaintType
+        $complaintTitle,      // 3. s - complaintTitle
+        $complaintDescription,// 4. s - complaintDescription
+        $requestDate,         // 5. s - requestDate
+        $complaintStatus,     // 6. s - complaintStatus
+        $phoneNumber,         // 7. s - complaintPhoneNumber
+        $complaintAccused,    // 8. s - complaintAccused
+        $complaintAddress,    // 9. s - complaintAddress
+        $complaintVictim,     // 10. s - complaintVictim
+        $victimAge,           // 11. i - victimAge
+        $victimRelationship,  // 12. s - victimRelationship
+        $complainantName,     // 13. s - complainantName
+        $actionTaken,         // 14. s - actionTaken
+        $evidenceFile,        // 15. s - evidence
+        $latitude,            // 16. d - complaintLatitude
+        $longitude            // 17. d - complaintLongitude
+    );
+    
+    $stmt->execute();
+    $stmt->close();
 
     echo "<script>window.location.href = 'index.php?page=complaints';</script>";
     exit;
 }
 
 if (isset($_GET['delete'])) {
-  $complaintID = (int) $_GET['delete'];
+    $complaintID = (int) $_GET['delete'];
 
-  $stmt = $conn->prepare("DELETE FROM complaints WHERE complaintID = ?");
-  $stmt->bind_param("i", $complaintID);
-  $stmt->execute();
-  $stmt->close();
+    $stmt = $conn->prepare("DELETE FROM complaints WHERE complaintID = ?");
+    $stmt->bind_param("i", $complaintID);
+    $stmt->execute();
+    $stmt->close();
 
-  echo "<script>window.location.href = 'index.php?page=complaints';</script>";
-  exit;
+    echo "<script>window.location.href = 'index.php?page=complaints';</script>";
+    exit;
 }
 
 $search = trim($_GET['search'] ?? '');
@@ -93,11 +105,11 @@ $date = $_GET['date'] ?? '';
 $perPage = 20;
 $currentPage = isset($_GET['p']) ? (int) $_GET['p'] : 1;
 if ($currentPage < 1)
-  $currentPage = 1;
+    $currentPage = 1;
 
 $offset = ($currentPage - 1) * $perPage;
 
-// ✅ Base query
+// ✅ Base query with WHERE clause
 $sql = "SELECT 
     r.*, 
     COALESCE(CONCAT_WS(' ', ui.firstName, ui.middleName, ui.lastName, ui.suffix), r.complainantName) AS reporterName,
@@ -107,56 +119,58 @@ $sql = "SELECT
     r.complaintStatus AS status
 FROM complaints r
 LEFT JOIN users u ON r.userID = u.userID
-LEFT JOIN userinfo ui ON u.userID = ui.userID";
+LEFT JOIN userinfo ui ON u.userID = ui.userID
+WHERE 1=1";
 
 $countSql = "SELECT COUNT(*) AS total
 FROM complaints r
 LEFT JOIN users u ON r.userID = u.userID
-LEFT JOIN userinfo ui ON u.userID = ui.userID";
+LEFT JOIN userinfo ui ON u.userID = ui.userID
+WHERE 1=1";
 
 $params = [];
 $types = '';
 
 if ($search !== '') {
-  $sql .= " AND (
+    $sql .= " AND (
         COALESCE(CONCAT(ui.firstName, ' ', ui.lastName), r.complainantName) LIKE ?
         OR CAST(r.complaintID AS CHAR) LIKE ?
         OR r.complaintTitle LIKE ?
     )";
-  $countSql .= " AND (
+    $countSql .= " AND (
         COALESCE(CONCAT(ui.firstName, ' ', ui.lastName), r.complainantName) LIKE ?
         OR CAST(r.complaintID AS CHAR) LIKE ?
         OR r.complaintTitle LIKE ?
     )";
-  $term = "%$search%";
-  $params = array_merge($params, [$term, $term, $term]);
-  $types .= 'sss';
+    $term = "%$search%";
+    $params = array_merge($params, [$term, $term, $term]);
+    $types .= 'sss';
 }
 
 if ($status !== '' && $status !== 'All') {
-  $sql .= " AND r.complaintStatus = ?";
-  $countSql .= " AND r.complaintStatus = ?";
-  $params[] = $status;
-  $types .= 's';
+    $sql .= " AND r.complaintStatus = ?";
+    $countSql .= " AND r.complaintStatus = ?";
+    $params[] = $status;
+    $types .= 's';
 }
 
 if ($type !== '' && $type !== 'All') {
-  $sql .= " AND r.complaintTitle = ?";
-  $countSql .= " AND r.complaintTitle = ?";
-  $params[] = $type;
-  $types .= 's';
+    $sql .= " AND r.complaintTitle = ?";
+    $countSql .= " AND r.complaintTitle = ?";
+    $params[] = $type;
+    $types .= 's';
 }
 
 if ($date !== '') {
-  $sql .= " AND DATE(r.requestDate) = ?";
-  $countSql .= " AND DATE(r.requestDate) = ?";
-  $params[] = $date;
-  $types .= 's';
+    $sql .= " AND DATE(r.requestDate) = ?";
+    $countSql .= " AND DATE(r.requestDate) = ?";
+    $params[] = $date;
+    $types .= 's';
 }
 
 $countStmt = $conn->prepare($countSql);
 if (!empty($params)) {
-  $countStmt->bind_param($types, ...$params);
+    $countStmt->bind_param($types, ...$params);
 }
 $countStmt->execute();
 $totalRecords = $countStmt->get_result()->fetch_assoc()['total'] ?? 0;
@@ -170,29 +184,29 @@ $types .= 'ii';
 
 $stmt = $conn->prepare($sql);
 if (!empty($params)) {
-  $stmt->bind_param($types, ...$params);
+    $stmt->bind_param($types, ...$params);
 }
 $stmt->execute();
 $result = $stmt->get_result();
 
 function getStatusBadgeClass($status)
 {
-  return match (strtolower($status)) {
-    'criminal', 'civil' => 'bg-danger text-white',
-    'mediation', 'conciliation', 'arbitration' => 'bg-info text-white',
-    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white',
-    default => 'bg-secondary text-white',
-  };
+    return match (strtolower($status)) {
+        'criminal', 'civil' => 'bg-danger text-white',
+        'mediation', 'conciliation', 'arbitration' => 'bg-info text-white',
+        'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'bg-success text-white',
+        default => 'bg-secondary text-white',
+    };
 }
 
 function getBorderClass($status)
 {
-  return match (strtolower($status)) {
-    'criminal', 'civil' => 'border-danger',
-    'mediation', 'conciliation', 'arbitration' => 'border-info',
-    'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success',
-    default => 'border-secondary',
-  };
+    return match (strtolower($status)) {
+        'criminal', 'civil' => 'border-danger',
+        'mediation', 'conciliation', 'arbitration' => 'border-info',
+        'repudiated', 'withdrawn', 'pending', 'dismissed', 'certified' => 'border-success',
+        default => 'border-secondary',
+    };
 }
 ?>
 
@@ -360,12 +374,24 @@ function getBorderClass($status)
 
                   <div class="col-md-2">
                     <select name="complaintType" class="form-select">
-                      <option value="All" <?= ($status === '' || $status === 'All') ? 'selected' : '' ?>>All Type</option>
-                      <?php foreach (['Noise Complaints', 'Boundary and Land Disputes', 'Neighborhood Quarrels', 'Animal-Related Complaints', 'Youth-Related Issues', 'Barangay Clearance and Permit Concerns', 'Garbage and Sanitation Complaints', 'Alcohol-Related Disturbances', 'Traffic and Parking Issues', 'Physical Assault and Threats', 'Water Supply Disputes', 'Business-Related Conflicts', 'Curfew Violations', 'Smoking and Littering Violations', 'Illegal Structures and Encroachments', 'Physical Abuse', 'Sexual Abuse', 'Psychological Abuse/Emotional Abuse', 'Economic Abuse', 'Neglect', 'Other'] as $st): ?>
-                        <option value="<?= $st ?>" <?= $status === $st ? 'selected' : '' ?>><?= $st ?></option>
+                      <option value="All" <?= ($type === '' || $type === 'All') ? 'selected' : '' ?>>All Type</option>
+
+                      <?php foreach ([
+                        'Noise Complaints', 'Boundary and Land Disputes', 'Neighborhood Quarrels',
+                        'Animal-Related Complaints', 'Youth-Related Issues', 'Barangay Clearance and Permit Concerns',
+                        'Garbage and Sanitation Complaints', 'Alcohol-Related Disturbances', 'Traffic and Parking Issues',
+                        'Physical Assault and Threats', 'Water Supply Disputes', 'Business-Related Conflicts',
+                        'Curfew Violations', 'Smoking and Littering Violations', 'Illegal Structures and Encroachments',
+                        'Physical Abuse', 'Sexual Abuse', 'Psychological Abuse/Emotional Abuse',
+                        'Economic Abuse', 'Neglect', 'Other'
+                      ] as $st): ?>
+                        <option value="<?= $st ?>" <?= ($type === $st) ? 'selected' : '' ?>>
+                          <?= $st ?>
+                        </option>
                       <?php endforeach; ?>
                     </select>
                   </div>
+
 
                   <div class="col-md-3">
                     <input type="date" name="date" value="<?= htmlspecialchars($date) ?>" class="form-control">
@@ -636,7 +662,7 @@ function getBorderClass($status)
 
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success">Submit Complaint</button>
+                        <button type="submit" class="btn btn-success" style="background-color:#31afab; border: #31afab;">Submit Complaint</button>
                       </div>
                     </form>
                   </div>
@@ -663,11 +689,53 @@ function getBorderClass($status)
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Initialize map
-    const map = L.map('map').setView([14.5995, 120.9842], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    // Initialize map when modal is shown
+    let map;
+    let marker;
+
+    document.getElementById('addComplaintModal').addEventListener('shown.bs.modal', function () {
+      if (!map) {
+        // Initialize map only once
+        map = L.map('map').setView([14.111903674282024, 121.14573570538116], 17);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add click event to place marker
+        map.on('click', function (e) {
+          const lat = e.latlng.lat;
+          const lng = e.latlng.lng;
+
+          // Remove existing marker if any
+          if (marker) {
+            map.removeLayer(marker);
+          }
+
+          // Add new marker
+          marker = L.marker([lat, lng]).addTo(map);
+
+          // Update hidden inputs
+          document.getElementById('lat').value = lat;
+          document.getElementById('lng').value = lng;
+        });
+      }
+
+      // Fix map display issues after modal is shown
+      setTimeout(function () {
+        map.invalidateSize();
+      }, 100);
+    });
+
+    // Complaint type handler
+    document.getElementById("complaintTitle").addEventListener("change", function () {
+      const otherDiv = document.getElementById("otherComplaintDiv");
+      if (this.value === "Other") {
+        otherDiv.classList.remove("d-none");
+      } else {
+        otherDiv.classList.add("d-none");
+      }
+    });
   </script>
 
   <!-- Bootstrap bundle already included below -->
