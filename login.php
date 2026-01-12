@@ -591,8 +591,8 @@ if (isset($_POST['login'])) {
                 
                 <div class="row">
                     <div class="col d-flex justify-content-center">
-                        <img src="assets/images/logoSanAntonio.webp" class="logoSanAntonio me-2" alt="Logo San Antonio">
-                        <img src="assets/images/logoSantoTomas.webp" class="logoSantoTomas" alt="Logo Santo Tomas">
+                        <a href="index.php"><img src="assets/images/logoSanAntonio.webp" class="logoSanAntonio me-2" alt="Logo San Antonio"></a>
+                        <a href="index.php"></a><img src="assets/images/logoSantoTomas.webp" class="logoSantoTomas" alt="Logo Santo Tomas"></a>
                     </div>
                 </div>
                 <div class="row mt-1">
